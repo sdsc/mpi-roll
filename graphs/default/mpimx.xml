@@ -1,0 +1,41 @@
+<?xml version="1.0" standalone="no"?>
+
+<graph>
+
+  <description>
+  MPI libraries for MX
+  </description>
+
+  <copyright>
+  Copyright (c) 2000 - 2008 The Regents of the University of California.
+  All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
+  </copyright>
+
+  <changelog>
+  </changelog>
+
+  <edge from="base">
+    <to>mpimx_gnu-common</to>
+  </edge>
+
+  <edge from="intel-compilers-common">
+    <to>mpimx_intel-common</to>
+  </edge>
+
+  <edge from="pgi-common">
+    <to>mpimx_pgi-common</to>
+  </edge>
+
+  <edge from="mpimx_gnu-common">
+    <to>mpimx-modules-common</to>
+  </edge>
+
+  <edge from="mpimx_intel-common">
+    <to>mpimx-modules-common</to>
+  </edge>
+
+  <edge from="mpimx_pgi-common">
+    <to>mpimx-modules-common</to>
+  </edge>
+
+</graph>
