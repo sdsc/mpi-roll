@@ -16,11 +16,9 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 
 <post>
 
-if test -d /opt/modulefiles; then
+# MPICH
 
-  # MPICH
-
-  /bin/mkdir -m 0755 -p /opt/modulefiles/mpi/mpich_mx
+/bin/mkdir -m 0755 -p /opt/modulefiles/mpi/mpich_mx
 
 <file name="/opt/modulefiles/mpi/mpich_mx/1.2.7" perms="0644">
 #%Module1.0
@@ -39,12 +37,12 @@ prepend-path LD_LIBRARY_PATH $mpich_mxHome/lib$libsubdir
 set ModulesVersion "1.2.7"
 </file>
 
-  /bin/ln -s /opt/modulefiles/mpi/openmpi_mx/.version.1.2.7 \
-             /opt/modulefiles/mpi/openmpi_mx/.version
+/bin/ln -s /opt/modulefiles/mpi/mpich_mx/.version.1.2.7 \
+           /opt/modulefiles/mpi/mpich_mx/.version
 
-  # OPENMPI
+# OPENMPI
 
-  /bin/mkdir -m 0755 -p /opt/modulefiles/mpi/openmpi_mx
+/bin/mkdir -m 0755 -p /opt/modulefiles/mpi/openmpi_mx
 
 <file name="/opt/modulefiles/mpi/openmpi_mx/1.3.3" perms="0644">
 #%Module1.0
@@ -63,8 +61,8 @@ prepend-path LD_LIBRARY_PATH $openmpi_mxHome/lib$libsubdir
 set ModulesVersion "1.3.3"
 </file>
 
-  /bin/ln -s /opt/modulefiles/mpi/openmpi_mx/.version.1.3.3 \
-             /opt/modulefiles/mpi/openmpi_mx/.version
+/bin/ln -s /opt/modulefiles/mpi/openmpi_mx/.version.1.3.3 \
+           /opt/modulefiles/mpi/openmpi_mx/.version
 
 </post>
 

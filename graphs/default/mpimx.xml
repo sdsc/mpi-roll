@@ -26,15 +26,7 @@
     <to>mpimx_pgi-common</to>
   </edge>
 
-  <edge from="mpimx_gnu-common">
-    <to>mpimx-modules-common</to>
-  </edge>
-
-  <edge from="mpimx_intel-common">
-    <to>mpimx-modules-common</to>
-  </edge>
-
-  <edge from="mpimx_pgi-common">
+  <edge from="envmodules-common">
     <to>mpimx-modules-common</to>
   </edge>
 
