@@ -15,6 +15,7 @@
   </changelog>
 
   <package>mpich_mx_pgi</package>
+  <package>mpich2_mx_pgi</package>
   <package>openmpi_mx_pgi</package>
 
   <post>
