@@ -40,6 +40,30 @@ set ModulesVersion "1.2.7"
 /bin/ln -s /opt/modulefiles/mpi/mpich_mx/.version.1.2.7 \
            /opt/modulefiles/mpi/mpich_mx/.version
 
+# MPICH2
+
+/bin/mkdir -m 0755 -p /opt/modulefiles/mpi/mpich2_mx
+
+<file name="/opt/modulefiles/mpi/mpich2_mx/1.0.7" perms="0644">
+#%Module1.0
+set mpich2_mxHome /opt/mpich2_mx
+set compiler [expr ! [catch {exec which icc} ignored] ? {"intel"} : \
+                   ! [catch {exec which pgcc} ignored] ? {"pgi"} : {"gnu"}]
+set libsubdir [expr {$compiler} == {"gnu"} ? {""} : {"/$compiler"}]
+module-whatis "mpich2_mx mpi stack"
+module-whatis "Version: 1.0.7"
+prepend-path PATH $mpich2_mxHome/bin
+prepend-path LD_LIBRARY_PATH $mpich2_mxHome/lib$libsubdir
+</file>
+
+<file name="/opt/modulefiles/mpi/mpich2_mx/.version.1.0.7">
+#%Module1.0
+set ModulesVersion "1.0.7"
+</file>
+
+/bin/ln -s /opt/modulefiles/mpi/mpich2_mx/.version.1.0.7 \
+           /opt/modulefiles/mpi/mpich2_mx/.version
+
 # OPENMPI
 
 /bin/mkdir -m 0755 -p /opt/modulefiles/mpi/openmpi_mx
