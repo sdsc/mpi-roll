@@ -25,11 +25,11 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 set mpich_mxHome /opt/mpich_mx
 set compiler [expr ! [catch {exec which icc} ignored] ? {"intel"} : \
                    ! [catch {exec which pgcc} ignored] ? {"pgi"} : {"gnu"}]
-set libsubdir [expr {$compiler} == {"gnu"} ? {""} : {"/$compiler"}]
+set suffix [expr {$compiler} == {"gnu"} ? {""} : {"$compiler"}]
 module-whatis "mpich_mx mpi stack"
 module-whatis "Version: 1.2.7"
-prepend-path PATH $mpich_mxHome/bin
-prepend-path LD_LIBRARY_PATH $mpich_mxHome/lib$libsubdir
+prepend-path PATH $mpich_mxHome/bin$suffix
+prepend-path LD_LIBRARY_PATH $mpich_mxHome/lib$suffix
 </file>
 
 <file name="/opt/modulefiles/mpi/mpich_mx/.version.1.2.7">
@@ -49,11 +49,11 @@ set ModulesVersion "1.2.7"
 set mpich2_mxHome /opt/mpich2_mx
 set compiler [expr ! [catch {exec which icc} ignored] ? {"intel"} : \
                    ! [catch {exec which pgcc} ignored] ? {"pgi"} : {"gnu"}]
-set libsubdir [expr {$compiler} == {"gnu"} ? {""} : {"/$compiler"}]
+set suffix [expr {$compiler} == {"gnu"} ? {""} : {"$compiler"}]
 module-whatis "mpich2_mx mpi stack"
 module-whatis "Version: 1.0.7"
-prepend-path PATH $mpich2_mxHome/bin
-prepend-path LD_LIBRARY_PATH $mpich2_mxHome/lib$libsubdir
+prepend-path PATH $mpich2_mxHome/bin$suffix
+prepend-path LD_LIBRARY_PATH $mpich2_mxHome/lib$suffix
 </file>
 
 <file name="/opt/modulefiles/mpi/mpich2_mx/.version.1.0.7">
@@ -73,11 +73,11 @@ set ModulesVersion "1.0.7"
 set openmpi_mxHome /opt/openmpi_mx
 set compiler [expr ! [catch {exec which icc} ignored] ? {"intel"} : \
                    ! [catch {exec which pgcc} ignored] ? {"pgi"} : {"gnu"}]
-set libsubdir [expr {$compiler} == {"gnu"} ? {""} : {"/$compiler"}]
+set suffix [expr {$compiler} == {"gnu"} ? {""} : {"/$compiler"}]
 module-whatis "openmpi_mx mpi stack"
 module-whatis "Version: 1.3.3"
-prepend-path PATH $openmpi_mxHome/bin
-prepend-path LD_LIBRARY_PATH $openmpi_mxHome/lib$libsubdir
+prepend-path PATH $openmpi_mxHome/bin$suffix
+prepend-path LD_LIBRARY_PATH $openmpi_mxHome/lib$suffix
 </file>
 
 <file name="/opt/modulefiles/mpi/openmpi_mx/.version.1.3.3">

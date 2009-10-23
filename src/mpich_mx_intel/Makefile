@@ -55,6 +55,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.2  2009/10/23 17:04:34  jhayes
+# Preserve compiler-specific bin directories.
+#
 # Revision 1.1  2009/10/20 14:32:29  jhayes
 # Merge mpich_mx, openmpi_intel, openmpi_pgi rolls.  Add gnu versions.
 # Restructure for release.
@@ -112,9 +115,8 @@ install::
 	  make install \
 	)
 	umount $(PKGROOT)
-	mv $(ROOT)/$(PKGROOT)/lib $(ROOT)/$(PKGROOT)/intellib
-	mkdir $(ROOT)/$(PKGROOT)/lib
-	mv $(ROOT)/$(PKGROOT)/intellib $(ROOT)/$(PKGROOT)/lib/intel
+	mv $(ROOT)/$(PKGROOT)/lib $(ROOT)/$(PKGROOT)/libintel
+	mv $(ROOT)/$(PKGROOT)/bin $(ROOT)/$(PKGROOT)/binintel
 	rm -fr $(SOURCE)
 
 clean::

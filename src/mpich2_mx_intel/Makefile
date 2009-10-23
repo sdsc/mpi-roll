@@ -55,6 +55,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.2  2009/10/23 17:04:34  jhayes
+# Preserve compiler-specific bin directories.
+#
 # Revision 1.1  2009/10/22 05:33:23  jhayes
 # Add mpich2 gnu/intel/pgi.
 #
@@ -110,9 +113,8 @@ install::
 	  make install \
 	)
 	umount $(PKGROOT)
-	mv $(ROOT)/$(PKGROOT)/lib $(ROOT)/$(PKGROOT)/intellib
-	mkdir $(ROOT)/$(PKGROOT)/lib
-	mv $(ROOT)/$(PKGROOT)/intellib $(ROOT)/$(PKGROOT)/lib/intel
+	mv $(ROOT)/$(PKGROOT)/lib $(ROOT)/$(PKGROOT)/libintel
+	mv $(ROOT)/$(PKGROOT)/bin $(ROOT)/$(PKGROOT)/binintel
 	rm -fr $(SOURCE)
 
 clean::
