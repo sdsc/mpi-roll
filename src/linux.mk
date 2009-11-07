@@ -53,15 +53,6 @@
 # 
 # @Copyright@
 #
-# $Log$
-# Revision 1.1  2009/10/20 14:32:27  jhayes
-# Merge mpich_mx, openmpi_intel, openmpi_pgi rolls.  Add gnu versions.
-# Restructure for release.
-#
-# Revision 1.1  2009/02/05 18:36:05  bruno
-# added
-#
-#
 
 SRCDIRS = `find . -type d -maxdepth 1 \
 	-not -name CVS \

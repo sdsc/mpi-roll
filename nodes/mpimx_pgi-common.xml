@@ -2,23 +2,26 @@
 
 <kickstart>
 
-  <description>
-  MPI libraries for MX and PGI compilers
-  </description>
+<description>
+MPI libraries for MX and PGI compilers
+http://www.mcs.anl.gov/research/projects/mpi/mpich1
+http://www.mcs.anl.gov/research/projects/mpich2
+http://www.open-mpi.org
+</description>
 
-  <copyright>
-  Copyright (c) 2000 - 2008 The Regents of the University of California.
-  All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
-  </copyright>
+<copyright>
+Copyright (c) 2000 - 2009 The Regents of the University of California.
+All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
+</copyright>
 
-  <changelog>
-  </changelog>
+<changelog>
+</changelog>
 
-  <package>mpich_mx_pgi</package>
-  <package>mpich2_mx_pgi</package>
-  <package>openmpi_mx_pgi</package>
+<package>mpich_mx_pgi</package>
+<package>mpich2_mx_pgi</package>
+<package>openmpi_mx_pgi</package>
 
-  <post>
-  </post>
+<post>
+</post>
 
 </kickstart>

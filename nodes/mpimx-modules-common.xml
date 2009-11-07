@@ -3,11 +3,14 @@
 <kickstart>
 
 <description>
-MPI libraries for MX
+MPI libraries for MX modules files
+http://www.mcs.anl.gov/research/projects/mpi/mpich1
+http://www.mcs.anl.gov/research/projects/mpich2
+http://www.open-mpi.org
 </description>
 
 <copyright>
-Copyright (c) 2000 - 2008 The Regents of the University of California.
+Copyright (c) 2000 - 2009 The Regents of the University of California.
 All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 </copyright>
 
@@ -16,13 +19,13 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 
 <post>
 
-if test `grep -c mpi /etc/profile.d/modules.sh` = 0; then
-  echo 'export MODULEPATH=/opt/modulefiles/mpi:$MODULEPATH' >> \
-       /etc/profile.d/modules.sh
-fi
 if test `grep -c mpi /etc/profile.d/modules.csh` = 0; then
   echo 'setenv MODULEPATH /opt/modulefiles/mpi:$MODULEPATH' >> \
        /etc/profile.d/modules.csh
+fi
+if test `grep -c mpi /etc/profile.d/modules.sh` = 0; then
+  echo 'export MODULEPATH=/opt/modulefiles/mpi:$MODULEPATH' >> \
+       /etc/profile.d/modules.sh
 fi
 
 # MPICH

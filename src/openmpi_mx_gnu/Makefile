@@ -54,12 +54,6 @@
 #
 # @Copyright@
 #
-# $Log$
-# Revision 1.1  2009/10/20 14:32:29  jhayes
-# Merge mpich_mx, openmpi_intel, openmpi_pgi rolls.  Add gnu versions.
-# Restructure for release.
-#
-#
 
 PKGROOT = /opt/openmpi_mx
 SOURCE = openmpi-$(VERSION)

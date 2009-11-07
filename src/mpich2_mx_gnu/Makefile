@@ -54,11 +54,6 @@
 #
 # @Copyright@
 #
-# $Log$
-# Revision 1.1  2009/10/22 05:33:23  jhayes
-# Add mpich2 gnu/intel/pgi.
-#
-#
 
 PKGROOT = /opt/mpich2_mx
 SOURCE = mpich2-$(VERSION)
