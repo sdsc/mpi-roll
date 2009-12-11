@@ -1,0 +1,19 @@
+<preface id="preface" xreflabel="preface">
+<title>Preface</title>
+
+
+<para>
+
+The mpimx Roll provides MX-enabled MPICH, MPICH2, and OpenMPI for a Rocks
+cluster.  It installs the software in /opt/mpich_mx, /opt/mpich2_mx, and
+/opt/openmpi_mx on both client and server hosts.  Both static and shared MPI
+libraries are included with the MPICH and MPICH2 installations; for OpenMPI,
+only static libraries are provided.  Binaries and libraries produced with the
+GNU compilers are always included.  If the PGI and/or Intel compilers are
+available, compatible versions of the MPI binaries and libraries are also
+installed in subdirectories of each implementation's bin/ and lib/ directories.
+(Because of PGI v8.0 compiler bugs, no PGI version of MPICH2 is included.)
+
+</para>
+
+</preface>
