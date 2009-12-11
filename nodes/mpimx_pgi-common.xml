@@ -18,7 +18,10 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 </changelog>
 
 <package>mpich_mx_pgi</package>
+<!--
+Note: MPICH2 doesn't compile w/PGI 8.0 due to compiler bugs.
 <package>mpich2_mx_pgi</package>
+-->
 <package>openmpi_mx_pgi</package>
 
 <post>
