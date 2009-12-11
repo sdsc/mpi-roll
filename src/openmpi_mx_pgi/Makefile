@@ -56,14 +56,15 @@
 #
 
 PKGROOT = /opt/openmpi_mx
+INSTDIR = $(ROOT)/$(PKGROOT)
 SOURCE = openmpi-$(VERSION)
 REDHAT.ROOT = $(PWD)/../../
 RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 
 -include $(ROCKSROOT)/etc/Rules.mk
 
-COMPILE_FLAGS = -O4 -Mipa -Munroll=c:1 -Mnoframe -Mlre -Mautoinline
 MXHOME = /opt/mx
+COMPILE_FLAGS = -O4 -Mipa -Munroll=c:1 -Mnoframe -Mlre -Mautoinline
 
 build:
 	tar zxvf $(REDHAT.ROOT)/src/$(SOURCE).tgz
@@ -72,10 +73,9 @@ build:
 	  export CFLAGS="$(COMPILE_FLAGS)"; \
 	  export CXX=pgCC; \
 	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
-	  export F77=pgf77; \
-	  export F90=pgf90; \
 	  export FC=pgf90; \
 	  export FCFLAGS="$(COMPILE_FLAGS)"; \
+	  export F77=pgf77; \
 	  export FFLAGS="$(COMPILE_FLAGS)"; \
 	  cd $(SOURCE); \
 	  ./configure \
@@ -88,13 +88,17 @@ build:
 
 # Clean immediately after install to free disk space
 install::
-	mkdir -p $(ROOT)/$(PKGROOT)
+	mkdir -p $(INSTDIR)
 	( \
 	  cd $(SOURCE); \
-	  make prefix=$(ROOT)/$(PKGROOT) install \
+	  make prefix=$(INSTDIR) install \
 	)
-	mv $(ROOT)/$(PKGROOT)/lib $(ROOT)/$(PKGROOT)/libpgi
-	mv $(ROOT)/$(PKGROOT)/bin $(ROOT)/$(PKGROOT)/binpgi
+	mv $(INSTDIR)/bin $(INSTDIR)/binpgi
+	mkdir $(INSTDIR)/bin
+	mv $(INSTDIR)/binpgi $(INSTDIR)/bin/pgi
+	mv $(INSTDIR)/lib $(INSTDIR)/libpgi
+	mkdir $(INSTDIR)/lib
+	mv $(INSTDIR)/libpgi $(INSTDIR)/lib/pgi
 	rm -fr $(SOURCE)
 
 clean::

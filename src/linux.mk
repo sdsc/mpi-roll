@@ -56,4 +56,5 @@
 
 SRCDIRS = `find . -type d -maxdepth 1 \
 	-not -name CVS \
+	-not -name mpich2_mx_pgi \
 	-not -name .`

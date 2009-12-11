@@ -56,19 +56,20 @@
 #
 
 PKGROOT = /opt/openmpi_mx
+INSTDIR = $(ROOT)/$(PKGROOT)
 SOURCE = openmpi-$(VERSION)
 REDHAT.ROOT = $(PWD)/../../
 RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 
 -include $(ROCKSROOT)/etc/Rules.mk
 
-COMPILE_FLAGS = -O3
-MXHOME = /opt/mx
-
 INTEL_BASE = /opt/intel/Compiler/11.1/046
 C_INTEL_ENV = $(INTEL_BASE)/bin/intel64/iccvars_intel64.sh
 F_INTEL_ENV = $(INTEL_BASE)/bin/intel64/ifortvars_intel64.sh
 INTEL_LICENSE_FILE = /opt/flexlm/license/license-intel.txt
+
+MXHOME = /opt/mx
+COMPILE_FLAGS = -I$(MXHOME)/include -O3
 
 build:
 	tar zxvf $(REDHAT.ROOT)/src/$(SOURCE).tgz
@@ -80,33 +81,35 @@ build:
 	  export CFLAGS="$(COMPILE_FLAGS)"; \
 	  export CXX=icpc; \
 	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
-	  export F77=ifort; \
-	  export F90=ifort; \
-	  export F90FLAGS="$(COMPILE_FLAGS)"; \
 	  export FC=ifort; \
 	  export FCFLAGS="$(COMPILE_FLAGS)"; \
+	  export F77=ifort; \
 	  export FFLAGS="$(COMPILE_FLAGS)"; \
 	  cd $(SOURCE); \
 	  ./configure \
 	    --prefix=$(PKGROOT) --disable-dlopen --enable-mca-static \
-	    --enable-mpi-threads --enable-static --with-mx=$(MXHOME) \
-	    --with-mpi-f90-size=large --with-platform=optimized \
+	    --enable-mpi-threads --enable-static --with-mpi-f90-size=large \
+	    --with-mx=$(MXHOME) --with-platform=optimized \
 	    --with-tm=/opt/torque; \
 	  make \
 	)
 
 # Clean immediately after install to free disk space
 install::
-	mkdir -p $(ROOT)/$(PKGROOT)
+	mkdir -p $(INSTDIR)
 	( \
 	  . $(C_INTEL_ENV); \
 	  . $(F_INTEL_ENV); \
 	  export INTEL_LICENSE_FILE=$(INTEL_LICENSE_FILE); \
 	  cd $(SOURCE); \
-	  make prefix=$(ROOT)/$(PKGROOT) install \
+	  make prefix=$(INSTDIR) install \
 	)
-	mv $(ROOT)/$(PKGROOT)/lib $(ROOT)/$(PKGROOT)/libintel
-	mv $(ROOT)/$(PKGROOT)/bin $(ROOT)/$(PKGROOT)/binintel
+	mv $(INSTDIR)/bin $(INSTDIR)/binintel
+	mkdir $(INSTDIR)/bin
+	mv $(INSTDIR)/binintel $(INSTDIR)/bin/intel
+	mv $(INSTDIR)/lib $(INSTDIR)/libintel
+	mkdir $(INSTDIR)/lib
+	mv $(INSTDIR)/libintel $(INSTDIR)/lib/intel
 	rm -rf $(SOURCE)
 
 clean::

@@ -56,14 +56,15 @@
 #
 
 PKGROOT = /opt/openmpi_mx
+INSTDIR = $(ROOT)/$(PKGROOT)
 SOURCE = openmpi-$(VERSION)
 REDHAT.ROOT = $(PWD)/../../
 RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 
 -include $(ROCKSROOT)/etc/Rules.mk
 
-COMPILE_FLAGS = -I$(MXHOME)/include -O2
 MXHOME = /opt/mx
+COMPILE_FLAGS = -I$(MXHOME)/include -O2
 
 build:
 	tar zxvf $(REDHAT.ROOT)/src/$(SOURCE).tgz
@@ -71,9 +72,10 @@ build:
 	  export CC=gcc; \
 	  export CFLAGS="$(COMPILE_FLAGS)"; \
 	  export CXX=g++; \
-	  export F90=gfortan; \
-	  export F90FLAGS="$(COMPILE_FLAGS)"; \
-	  export FC=g77; \
+	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
+	  export FC=gfortran; \
+	  export FCFLAGS="$(COMPILE_FLAGS)"; \
+	  export F77=g77; \
 	  export FFLAGS="$(COMPILE_FLAGS)"; \
 	  cd $(SOURCE); \
 	  ./configure \
@@ -86,10 +88,10 @@ build:
 
 # Clean immediately after install to free disk space
 install::
-	mkdir -p $(ROOT)/$(PKGROOT)
+	mkdir -p $(INSTDIR)
 	( \
 	  cd $(SOURCE); \
-	  make prefix=$(ROOT)/$(PKGROOT) install \
+	  make prefix=$(INSTDIR) install \
 	)
 	rm -fr $(SOURCE)
 

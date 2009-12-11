@@ -56,14 +56,15 @@
 #
 
 PKGROOT = /opt/mpich_mx
+INSTDIR = $(ROOT)/$(PKGROOT)
 SOURCE = mpich-$(VERSION)
 REDHAT.ROOT = $(PWD)/../../
 RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 
 -include $(ROCKSROOT)/etc/Rules.mk
 
-COMPILE_FLAGS = -I$(MXHOME)/include -O2
 MXHOME = /opt/mx
+COMPILE_FLAGS = -I$(MXHOME)/include -O2
 
 build:
 	tar zxvf $(REDHAT.ROOT)/src/$(SOURCE).tgz
@@ -87,9 +88,9 @@ build:
 
 # Clean immediately after install to free disk space
 install::
-	mkdir -p $(ROOT)/$(PKGROOT)
+	mkdir -p $(INSTDIR)
 	if [ ! -d $(PKGROOT) ]; then mkdir -p $(PKGROOT); fi
-	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
+	mount --bind $(INSTDIR) $(PKGROOT)
 	( \
 	  cd $(SOURCE); \
 	  make install \

@@ -58,12 +58,13 @@
 PKGROOT = /opt/mpich2_mx
 SOURCE = mpich2-$(VERSION)
 REDHAT.ROOT = $(PWD)/../../
+INSTDIR = $(ROOT)/$(PKGROOT)
 RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 
 -include $(ROCKSROOT)/etc/Rules.mk
 
-COMPILE_FLAGS = -I$(MXHOME)/include -O2
 MXHOME = /opt/mx
+COMPILE_FLAGS = -I$(MXHOME)/include -O2
 
 build:
 	tar zxvf $(REDHAT.ROOT)/src/$(SOURCE).tgz
@@ -71,23 +72,24 @@ build:
 	  export CC=gcc; \
 	  export CFLAGS="$(COMPILE_FLAGS)"; \
 	  export CXX=g++; \
+	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
 	  export F90=gfortran; \
 	  export F90FLAGS="$(COMPILE_FLAGS)"; \
 	  export FC=g77; \
 	  export FFLAGS="$(COMPILE_FLAGS)"; \
-	  export MX_HOME=$(MXHOME); \
 	  export PREFIX=$(PKGROOT); \
-	  export RSHCOMMAND=ssh; \
 	  cd $(SOURCE); \
-	  ./configure --prefix=$(PKGROOT); \
+	  ./configure --prefix=$(PKGROOT) \
+	    --with-device=ch3:nemesis:mx \
+	    --with-mx-include=$(MXHOME)/include --with-mx-lib=$(MXHOME)/lib; \
 	  make \
 	)
 
 # Clean immediately after install to free disk space
 install::
-	mkdir -p $(ROOT)/$(PKGROOT)
+	mkdir -p $(INSTDIR)
 	if [ ! -d $(PKGROOT) ]; then mkdir -p $(PKGROOT); fi
-	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
+	mount --bind $(INSTDIR) $(PKGROOT)
 	( \
 	  cd $(SOURCE); \
 	  make install \

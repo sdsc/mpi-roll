@@ -56,19 +56,20 @@
 #
 
 PKGROOT = /opt/mpich_mx
+INSTDIR = $(ROOT)/$(PKGROOT)
 SOURCE = mpich-$(VERSION)
 REDHAT.ROOT = $(PWD)/../../
 RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 
 -include $(ROCKSROOT)/etc/Rules.mk
 
-COMPILE_FLAGS = -O
-MXHOME = /opt/mx
-
 INTEL_BASE = /opt/intel/Compiler/11.1/046
 C_INTEL_ENV = $(INTEL_BASE)/bin/intel64/iccvars_intel64.sh
 F_INTEL_ENV = $(INTEL_BASE)/bin/intel64/ifortvars_intel64.sh
 INTEL_LICENSE_FILE = /opt/flexlm/license/license-intel.txt
+
+MXHOME = /opt/mx
+COMPILE_FLAGS = -I$(MXHOME)/include -O
 
 build:
 	tar zxvf $(REDHAT.ROOT)/src/$(SOURCE).tgz
@@ -77,7 +78,7 @@ build:
 	  . $(F_INTEL_ENV); \
 	  export INTEL_LICENSE_FILE=$(INTEL_LICENSE_FILE); \
 	  export CC=icc; \
-	  export CFLAGS="-I$(MXHOME)/include"; \
+	  export CFLAGS="$(COMPILE_FLAGS)"; \
 	  export CXX=icpc; \
 	  export F90=ifort; \
 	  export F90FLAGS="$(COMPILE_FLAGS)"; \
@@ -95,9 +96,9 @@ build:
 
 # Clean immediately after install to free disk space
 install::
-	mkdir -p $(ROOT)/$(PKGROOT)
+	mkdir -p $(INSTDIR)
 	if [ ! -d $(PKGROOT) ]; then mkdir -p $(PKGROOT); fi
-	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
+	mount --bind $(INSTDIR) $(PKGROOT)
 	( \
 	  . $(C_INTEL_ENV); \
 	  . $(F_INTEL_ENV); \
@@ -106,8 +107,12 @@ install::
 	  make install \
 	)
 	umount $(PKGROOT)
-	mv $(ROOT)/$(PKGROOT)/lib $(ROOT)/$(PKGROOT)/libintel
-	mv $(ROOT)/$(PKGROOT)/bin $(ROOT)/$(PKGROOT)/binintel
+	mv $(INSTDIR)/bin $(INSTDIR)/binintel
+	mkdir $(INSTDIR)/bin
+	mv $(INSTDIR)/binintel $(INSTDIR)/bin/intel
+	mv $(INSTDIR)/lib $(INSTDIR)/libintel
+	mkdir $(INSTDIR)/lib
+	mv $(INSTDIR)/libintel $(INSTDIR)/lib/intel
 	rm -fr $(SOURCE)
 
 clean::
