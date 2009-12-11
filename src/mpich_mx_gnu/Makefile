@@ -82,7 +82,7 @@ build:
 	  export RSHCOMMAND=ssh; \
 	  cd $(SOURCE); \
 	  ./configure --prefix=$(PKGROOT) -lib="$$LINKOPT" -opt="-O" \
-	              --with-device=ch_mx; \
+	              --with-device=ch_mx --enable-sharedlib; \
 	  make \
 	)
 
