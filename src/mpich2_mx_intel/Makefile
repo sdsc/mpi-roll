@@ -88,7 +88,7 @@ build:
 	  export PREFIX=$(PKGROOT); \
 	  cd $(SOURCE); \
 	  ./configure --prefix=$(PKGROOT) \
-	    --with-device=ch3:nemesis:mx \
+	    --with-device=ch3:nemesis:mx --enable-sharedlibs=gcc \
 	    --with-mx-include=$(MXHOME)/include --with-mx-lib=$(MXHOME)/lib; \
 	  make \
 	)
