@@ -19,13 +19,14 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 
 <post>
 
-if test `grep -c mpi /etc/profile.d/modules.csh` = 0; then
-  echo 'setenv MODULEPATH /opt/modulefiles/mpi:$MODULEPATH' >> \
-       /etc/profile.d/modules.csh
+# Make sure modules package reads modulefiles from /opt/modulefiles/mpi
+line='setenv MODULEPATH /opt/modulefiles/mpi:$MODULEPATH'
+if test `grep -Fc "$line" /etc/profile.d/modules.csh` = 0; then
+  echo "$line" >> /etc/profile.d/modules.csh
 fi
-if test `grep -c mpi /etc/profile.d/modules.sh` = 0; then
-  echo 'export MODULEPATH=/opt/modulefiles/mpi:$MODULEPATH' >> \
-       /etc/profile.d/modules.sh
+line='export MODULEPATH=/opt/modulefiles/mpi:$MODULEPATH'
+if test `grep -Fc "$line" /etc/profile.d/modules.sh` = 0; then
+  echo "$line" >> /etc/profile.d/modules.sh
 fi
 
 # MPICH
