@@ -1,0 +1,999 @@
+#!perl
+
+# use strict 'refs';
+# use warnings;
+use Socket;
+use Sys::Hostname;
+use Cwd;
+use POSIX ":sys_wait_h";
+use File::Basename;
+
+use constant MAX_RECV_LEN => 65536;
+
+srand;
+
+
+###############
+#             #
+#  Variables  #
+#             #
+###############
+
+$verbose = 0;
+$sigcatch = 1;
+$pwd = &Cwd::cwd();
+$delay_rexec = 0;
+$lock_mbytes = 0;
+$bounce_buffers = 0;
+$np = 1;
+$use_shmem = 1;
+$use_numactl = 0;
+$use_tree_spawn = 0;
+@spawn_servers = ();
+$rexec = $ENV{'RSHCOMMAND'};
+$rexec ||= "@RSHCOMMAND@";
+$rexec_reaper = 1;
+$arch = "@ARCH@";
+$varenv = '';
+$dry_run = 0;
+$kill_time = 30;
+$recv_mode = 'polling';
+$totalview = 0;
+$totalview_cmd = $ENV{'TOTALVIEW'} || 'totalview';
+$ddt = 0;
+$ddt_cmd = $ENV{'DDT'} || 'ddt';
+$numactl_cmd = 'numactl';
+$display = $ENV{'DISPLAY'};
+$timeout = 0;
+$eager = 0;
+$close_stdin = 0;
+$cleanup_shmem = 0;
+$pid_socket = -1;
+$pid_rexec = -1;
+$default_machinefile = "@DEFAULT_MACHINES_DIR@/machines.ch_@myri@.$arch";
+$magic = int (rand (9999999));
+$local_host = $ENV{'MXMPI_MASTER'} || hostname;
+$local_port = '';
+$fixed_alloc = 0;
+%pids_hash = ();
+$mpilabel = '';
+@env_exclude_list = qw(PWD PS1 HOME SSH_CLIENT SSH_CONNECTION HOST TERM SSH_AUTH_SOCK SSH_TTY SHLVL DISPLAY LD_LIBRARY_PATH);
+$copy_env = 0;
+@M_GM@ $shmem_prefix = '/tmp/gmpi_shmem-';
+
+@rexec_flags = split(/ /, $rexec);
+
+
+###################
+#                 #
+#  Sub functions  #
+#                 #
+###################
+
+# tree_spawn arguments: ([ ["host", "cmds"],... ], [launch-hosts], wait-for-completion, \%pids_hash)
+# if launch-hosts array is empty, use a subset of the target hosts
+# pids_hash is filled childpid=> [ range of ids started under this process ]
+
+sub tree_spawn {
+    my ($cmds,$gw_list,$wait, $phash, $silent) = @_;
+    my $nb = @$cmds;
+    my $i;
+    my $step;
+    my @gw = @$gw_list;
+    $phash ||= {};
+
+    if (@gw) {
+	$step = int(($nb + $#gw) / @gw);
+    } else {
+	my @host_tab = ();
+	for ($i=0;$i < $nb ; $i ++) {
+	    push @host_tab, $cmds->[$i]->[0];
+	}
+	$step = $use_tree_spawn && $nb >= 4 ? int(sqrt($nb)) : 1;
+	my $nb_launcher = int(($nb + $step - 1) / $step);
+	@gw = @host_tab;
+	$#gw = $nb_launcher - 1;
+#	print STDERR "launchers($nb/$step)-[ 0.. ".$nb_launcher."[:.".join(" ",@gw)."\n";
+    }
+    for ($i=0;$i < @gw && $i < $nb; $i += 1) {
+	my $launch_host = $gw[$i];
+	my $cmdline = "";
+	my @n_flag = ();
+	$n_flag[0] = "-n" if $i > 0 || $silent || $close_stdin;
+	for ($j = $i * $step; $j < ($i + 1) * $step && $j < $nb; $j++) {
+	    my ($h,$dir,$cmd) = @{$cmds->[$j]};
+#	    print STDERR " doing command $j ($h=>$cmd)\n";
+	    $cmdline = " & \n $cmdline" if $cmdline;
+	    if ($h eq $launch_host) {
+		$cmdline = $step == 1 ? "cd $dir && exec $cmd" : "(cd $dir && exec $cmd) $cmdline";
+	    } else {
+		$cmdline = "$rexec ".(($j > 0 || $silent || $close_stdin) ? "-n" : "")." $h 'cd $dir && exec $cmd' $cmdline";
+	    }
+	}
+	my $login = $logins{$launch_host} ? "-l $logins{$launch_host}" : "";
+	if (($dry_run || $verbose)) {
+	    print STDERR "@rexec_flags $login $launch_host @n_flag \"$cmdline\"\n";
+	}
+	if ($dry_run == 0) {
+	    $pid_rexec = fork;
+	    if ($pid_rexec == 0) {
+		if ($silent) {
+		    open(STDOUT,">/dev/null");
+		    open(STDERR,">/dev/null");
+		}
+		if (!exec(@rexec_flags, $launch_host, @n_flag, $cmdline)) {
+			print STDERR "sleeping to re-try exec\n";
+			sleep 2;
+			exec(@rexec_flags, $launch_host, @n_flag, $cmdline) or die "Really could not exec";
+		}
+	    } else {
+		$phash->{$pid_rexec} = [$i*$step,$j - $i*$step];
+	    }
+	}
+	sleep ($delay_rexec) if ($delay_rexec && $i != $#gw);
+    }
+    if ($wait) {
+	foreach (keys %$phash) {
+	    waitpid($_,0);
+	}
+    }
+}
+
+#cleaning = 0;
+
+sub clean_up {
+  return if $cleaning;
+  $cleaning = 1;
+
+  # reap remote processes, usefull because ssh is broken and does not
+  # clean up remote processes when killed.
+  if (($pid_socket == 0) && ($rexec_reaper)) {
+    # we are the "tcp/ip coordinator" process
+    print ("Reap remote processes:\n") if $verbose;
+    my @cmds = ();
+    for ($z=0; $z<$np; $z++) {
+	if (defined ($remote_pids[$z])) {
+	    push @cmds,[$hosts[$z],".","kill -9 $remote_pids[$z]"];
+	}
+    }
+    tree_spawn(\@cmds,\@spawn_servers,1, {}, 1);
+  }
+  if (($pid_rexec != 0) && ($pid_socket != 0)) {
+    # we are the main process
+    my $child_alive;
+    foreach $p (keys %pids_hash) {
+	if (waitpid($p,WNOHANG) != $p && kill 0 => $p) {
+#	    print STDERR "Terminate $p\n";
+	    kill 'TERM', $p;
+            $child_alive = 1;
+	}
+    }
+    sleep(1) if $child_alive;
+    if ($pid_socket > 1) {
+      if (kill 0 => $pid_socket) {
+	kill 'TERM', $pid_socket;
+      }
+    }
+
+    if (($cleanup_shmem) && ($use_shmem > 0) && defined ($shmem_file)) {
+      print "Cleaning up shared memory files on remote nodes.\n" if $verbose;
+      for ($i=0; $i<$np; $i++) {
+	if (defined ($hosts[$i])) {
+	  $unique_hosts{$hosts[$i]}++;
+	}
+      }
+      my @cmds=();
+      foreach $host_cleanup (keys (%unique_hosts)) {
+	  push @cmds, [$host_cleanup,".", "rm -f $shmem_file"];
+      }
+      tree_spawn(\@cmds,\@spawn_servers,1)
+    }
+    foreach $p (keys %pids_hash) {
+	if (waitpid($p,WNOHANG) != $p && kill 0 => $p) {
+	    print STDERR "Kill $p\n" if $verbose;
+	    kill 'KILL', $p;
+	    $child_alive = 1;
+	}
+    }
+  }
+
+  while (wait != -1) {
+    ;
+  }
+}
+
+
+sub cleanup_SIGINT {
+  if (($pid_rexec != 0) && ($pid_socket != 0)) {
+    print ("Received SIGINT. Cleaning up...\n") if $verbose;
+  }
+  clean_up;
+  exit (1);
+}
+
+sub cleanup_SIGTERM {
+  if (($pid_rexec != 0) && ($pid_socket != 0)) {
+    print ("Received SIGTERM. Cleaning up...\n") if $verbose;
+  }
+  clean_up;
+  exit (1);
+}
+
+sub cleanup_SIGKILL {
+  if (($pid_rexec != 0) && ($pid_socket != 0)) {
+    print ("Received SIGKILL. Cleaning up...\n") if $verbose;
+  }
+  clean_up;
+  exit (1);
+}
+
+sub cleanup_SIGQUIT {
+  if (($pid_rexec != 0) && ($pid_socket != 0)) {
+    print ("Received SIGQUIT. Cleaning up...\n") if $verbose;
+  }
+  clean_up;
+  exit (1);
+}
+
+sub cleanup_ALARM {
+  print ("Received SIGALRM. Cleaning up...\n") if $verbose;
+  clean_up;
+  exit (1);
+}
+
+sub cleanup_TIMEOUT {
+  print ("Timeout: still waiting for data from remote MPI processes !\n");
+  print ("Timeout: cleaning up...\n");
+  clean_up
+  exit (1);
+}
+
+
+#cannonize program
+sub find_program {
+  my ($prog) = @_;
+
+  if ($prog =~ m|^/|) {
+  } elsif ($prog =~ m|/|) {
+    $prog = $pwd."/".$prog;
+  } else {
+    if (-x $prog) {
+      $prog = $pwd."/".$prog;
+    } else {
+      foreach (split (/:/, $ENV{PATH})) {
+	if (-x "$_/$prog") {
+	  $prog = "$_/$prog";
+	  last;
+	}
+      }
+    }
+  }
+
+  my $dir = dirname($0);
+  my $p = "$dir/$prog";
+  -e $prog or $prog = $p;
+
+  -e $prog or die "$prog not found !\n";
+  -x $prog or die "$prog is not executable !\n";
+
+  print "Program binary is: $prog\n" if $verbose;
+  return $prog;
+}
+
+sub usage {
+  if ($_[0] ne '') {
+    print (STDERR "Error in mpirun.ch_@myri@: @_\n\n");
+  }
+
+  print (STDERR "Usage:\n \t mpirun.ch_@myri@ [options] [-np <n>] prog [flags]\n");
+  print (STDERR "   -v   Verbose - provide additional details of the script's execution.\n");
+  print (STDERR "   -t   Testing - do not actually run, just print what would be executed.\n");
+  print (STDERR "   -s   Close stdin - can run in background without tty input problems.\n");
+  print (STDERR "   -r   Cleanup remote shared memory files - should be removed automatically,\n");
+  print (STDERR "        but always good to have an option to force it.\n");
+  print (STDERR "   -machinefile <file>   Specifies a machine file, default is\n");
+  print (STDERR "                         $default_machinefile.\n");
+  print (STDERR "   --@myri@-no-shmem   Disable the shared memory support (enabled by default).\n");
+@M_GM@  print (STDERR "   --gm-shmem-prefix File prefix of the shared-mem communications storage (defaut: /tmp/gmpi_shmem-)\n");
+@M_GM@  print (STDERR "   --@myri@-numa-shmem Enable shared memory only for processes sharing the same Myrinet interface.\n");
+  print (STDERR "   --@myri@-numactl    CPU affinity support.\n");
+  print (STDERR "   --@myri@-wait <n>   Wait <n> seconds between each spawning step.\n");
+  print (STDERR "   --@myri@-kill <n>   Kill all processes <n> seconds after the first exits.\n");
+@M_GM@  print (STDERR "   --@myri@-eager <n>  Specifies the Eager/Rendez-vous protocol threshold size.\n");
+  print (STDERR "   --@myri@-recv <m>   Specifies the receive mode <polling>, <blocking>");
+@M_GM@ print (STDERR "  or  <hybrid>");
+  print (STDERR "                    , <polling> is the default.\n");
+@M_GM@  print (STDERR "   --@myri@-lock-mbytes <n>  Maximum number of megabytes of memory locked by gm (for communications) per process\n");
+  print (STDERR "   --@myri@-label      Prefix each process output with its rank\n");
+  print (STDERR "   --@myri@-no-sigcatch Do not catch and print source of received signals\n");
+  print (STDERR "   --@myri@-copy-env   Have each process inherit most variables of the current environment\n");
+@M_GM@  print (STDERR "   --@myri@-bounce-buffers <n>  Maximum number of bounce buffers (only valid for --disable-registration mode)\n");
+  print (STDERR "   --@myri@-tree-spawn Use a two-level spawn tree to launch processes\n");
+  print (STDERR "   -totalview      Specifies Totalview debugging session.\n");
+  print (STDERR "   -ddt            Specifies DDT debugging session.\n");
+  print (STDERR "   -pg <file>      Specifies the procgroup file.\n");
+  print (STDERR "   -wd <path>      Specifies the working directory.\n");
+  print (STDERR "   -np <n>         Specifies the number of processes.\n");
+  print (STDERR "   prog [flags]    Specifies which command line to run.\n");
+  exit (1);
+}
+
+
+#set the current dir
+if (defined ($ENV {'PWD'})) {
+  my @P = stat($ENV {'PWD'}."/.");
+  my @p = stat(".");
+  if ($p[0] == $P[0] && $p[1] == $P[1]) {
+    $pwd = $ENV{'PWD'};
+  }
+}
+
+#####################
+#                   #
+#   Args parsing    #
+#                   #
+#####################
+
+my $label_found = 0;
+my $nolabel = 0;
+if (defined ($ENV{MXSMPI_LABEL})) {
+  $label_found = 1;
+} else {
+  $ENV{MXSMPI_LABEL} = "";
+}
+
+while (@ARGV > 0) {
+  $_ = $ARGV[0];
+
+  if ($_ eq '-v') {
+    $verbose = 1;
+  } elsif ($_ eq '-t') {
+    $dry_run = 1;
+  } elsif ($_ eq '-s') {
+    $close_stdin = 1;
+  } elsif ($_ eq '-r') {
+    $cleanup_shmem = 1;
+  } elsif ($_ eq '-machinefile') {
+    shift;
+    usage ("No machine file specified (-machinefile) !") unless @ARGV >= 1;
+    $machine_file = $ARGV[0];
+  } elsif ($_ eq '--@myri@-no-shmem') {
+    $use_shmem = 0;
+  } elsif ($_ eq '--@myri@-fixed-alloc') {
+    $fixed_alloc = 1;
+  } elsif ($_ eq '--@myri@-tree-spawn') {
+    $use_tree_spawn = 1;
+  } elsif ($_ eq '--@myri@-spawn-servers') {
+    shift; 
+    @spawn_servers = split(",",$ARGV[0]);
+  } elsif ($_ eq '--@myri@-no-sigcatch') {
+    $sigcatch = 0;
+  } elsif ($_ eq '--@myri@-label') {
+    if ($label_found == 0) {
+      # suppress the default blank string and allow MXMPI_ID
+      delete $ENV{MXSMPI_LABEL};
+    }
+  } elsif ($_ eq '--@myri@-nolabel') {
+    $nolabel = 1;
+    delete $ENV{MXSMPI_LABEL};
+  } elsif ($_ eq '--@myri@-copy-env') {
+    $copy_env = 1;
+  } elsif ($_ eq '--@myri@-shmem-prefix') {
+    shift;
+    usage ("No prefix specified (--@myri@-shmem-prefix) !") unless @ARGV >= 1;
+@M_GM@    $shmem_prefix = $ARGV[0];
+  } elsif ($_ eq '--@myri@-numa-shmem') {
+    $use_shmem = 2;
+  } elsif ($_ eq '--@myri@-numactl') {
+    $use_numactl = 1;
+  } elsif ($_ eq '--@myri@-wait') {
+    shift;
+    usage ("No waiting time specified (--@myri@-wait) !") unless @ARGV >= 1;
+    $delay_rexec = $ARGV[0];
+  } elsif ($_ eq '--@myri@-lock-mbytes') {
+    shift;
+    usage ("No megabytes amount specified (--@myri@-lock-mbytes) !") unless @ARGV >= 1;
+    $lock_mbytes = $ARGV[0];
+  } elsif ($_ eq '--@myri@-bounce-buffers') {
+    shift;
+    usage ("No bounce buffers number specified (--@myri@-bounce-buffers) !") unless @ARGV >= 1;
+    $bounce_buffers = $ARGV[0];
+  } elsif ($_ eq '--@myri@-kill') {
+    shift;
+    if ((@ARGV == 0) && ($ARGV[0] !~ /^\d+$/)) {
+      usage ("No termination delay specified (--@myri@-kill) !");
+    }
+    $kill_time = $ARGV[0];
+  } elsif ($_ eq '--@myri@-eager') {
+    shift;
+    if ((@ARGV == 0) && ($ARGV[0] !~ /^\d+$/)) {
+      usage ("No Eager/Rendez-vous protocol threshold message size (--@myri@-eager) !");
+    }
+    $eager = $ARGV[0];
+  } elsif ($_ eq '--@myri@-recv') {
+    shift;
+    usage ("No receive mode specified (--@myri@-recv) !") unless @ARGV >= 1;
+    if ($ARGV[0] !~ /^(polling|blocking|hybrid)$/) {
+      usage ("Bad receive mode specified (--@myri@-recv) !");
+    }
+    $recv_mode = $ARGV[0];
+  } elsif (($_ eq '-totalview') || ($_ eq '-tv')) {
+    $totalview = 1;
+  } elsif ($_ eq '-ddt') {
+    $ddt = 1;
+  } elsif ($_ eq '-pg') {
+    shift;
+    usage ("No procgroup file specified (-pg) !") unless @ARGV >= 1;
+    if ($np > 1) {
+      usage ("-np and -pg are exclusive !");
+    }
+    $procgroup_file = $ARGV[0];
+  } elsif ($_ eq '-wd') {
+    shift;
+    usage ("No working directory specified (-wd) !") unless @ARGV >= 1;
+    $wdir = $ARGV[0];
+  } elsif ($_ eq '-np') {
+    shift;
+    if ((@ARGV == 0) || !($ARGV[0] =~ /^(\s*)(\d+)$/)) {
+      usage ("Bad number of processes (-np) !");
+    }
+    if (defined ($procgroup_file) && ($np > 1)) {
+      usage ("-np and -pg are exclusive !");
+    }
+    $np = $ARGV[0];
+  } elsif (($_ eq '-help') || ($_ eq '--help') || ($_ eq '-h')) {
+    usage ('');
+  } elsif ($_ eq '-mvback' ) {
+  } elsif ($_ eq '-mvhome' ) {
+  } elsif (/=/) {
+    $varenv .= " $ARGV[0]";
+  } elsif (/^-/) {
+    usage ("Unknown option ($_) !");
+  } else {
+    $app_cmd = find_program ($ARGV[0]);
+    @app_flags = (@ARGV[1..$#ARGV]);
+    last;
+  }
+  shift;
+}
+
+if ($nolabel == 0) {
+  $mpilabel = find_program("mpi@myri@label");
+}
+
+$app_cmd or usage (" Missing program name !");
+
+#
+# For AIX, fixup LIBPATH and MALLOCTYPE
+#
+if ($arch eq 'rs6000') {
+
+    @app_path = split ('/', $app_cmd);
+    $app_dir = "/" . join ('/', @app_path[1..($#app_path-1)]);
+
+    if (defined ($ENV{LIBPATH})) {
+	$ENV{LIBPATH} .= ":" . $app_dir;
+    } else {
+	$ENV{LIBPATH} = $app_dir;
+    }
+
+    $varenv .= " LIBPATH=" . $ENV{LIBPATH};
+    $varenv .= " MALLOCTYPE=user:" . $app_path[$#app_path];
+}
+
+# Change the default machine file to $ENV{"MACHINE FILE"} if exists
+if (defined ($ENV{"MACHINE_FILE"})) {
+  $default_machinefile = $ENV{"MACHINE_FILE"};
+}
+
+# If the machine file is not defined, use the system-wide one.
+$machine_file = $default_machinefile unless defined ($machine_file);
+
+# If the machine file is not an absolute path, add the current directory.
+$machine_file = $pwd."/".$machine_file if !($machine_file =~ m|^/|);
+
+
+# Print the settings if verbose.
+if ($verbose) {
+  print ("Dry-run mode enabled (Testing).\n") if $dry_run;
+  print ("Machines file is $machine_file\n");
+@M_GM@  print ("Shared memory for intra-nodes coms is enabled.\n") if ($use_shmem == 1);
+@M_GM@  print ("Shared memory for NUMA intra-nodes coms is enabled.\n") if ($use_shmem == 2);
+@M_GM@  print ("Shared memory for intra-nodes coms is disabled.\n") if !$use_shmem;
+  print ("CPU affinity via numactl is enabled.\n") if $use_numactl;
+  print ("Delay of $delay_rexec between spanwing steps.\n") if $delay_rexec;
+  print ("Processes will be killed $kill_time after first exits.\n") if $kill_time;
+  print ("@myri@ receive mode used: $recv_mode.\n");
+  print ("Eager/Rendez-vous threshold: $eager Bytes.\n") if $eager;
+  print ("Use Totalview for debugging session.\n") if $totalview;
+  print ("Use DDT for debugging session.\n") if $ddt;
+  print ("Set working directory to $wdir.\n") if (defined ($wdir));
+  print ("$np processes will be spawned: \n") if (!defined ($procgroup_file));
+}
+
+
+if (!defined ($wdir)) {
+  $wdir = $pwd;
+}
+
+if (defined ($procgroup_file)) {
+  # Open the procgroup file, read it and close it.
+  open (PROCGROUP_FILE, "$procgroup_file")
+    or die "Cannot open the procgroup file $procgroup_file: $!\n";
+  @procgroup_file_data = <PROCGROUP_FILE>;
+  close(PROCGROUP_FILE);
+
+  # Extract the informations from the procgroup file.
+  $np = 0;
+  $line_number = 0;
+  while (scalar (@procgroup_file_data)) {
+    $line = shift (@procgroup_file_data);
+    $line_number++;
+    next if ($line =~ /^\s*$/);
+    next if ($line =~ /^\#/);
+    chomp ($line);
+
+    if ($line =~ /^\S+\s+\d+\s*\S*\s*\S*/) {
+      @fields = split (/\s+/, $line);
+    } else {
+      die "Bad line in $procgroup_file (line $line_number): \"$line\"";
+    }
+
+    if (scalar (@fields) < 2) {
+      die "Bad line at $machine_file:$line_number): \"$line\"";
+    }
+
+    # Extract the hostname, the index and the executable (and maybe the login)
+    $i = $fields[1];
+    if ($np == 0) {
+      $i++;
+      if ($fields[0] eq "local") {
+        $fields[0] = $local_host;
+      }
+      if (!defined ($fields[2])) {
+        $fields[2] = $app_cmd;
+      }
+    }
+
+    # sanity checks
+    if (!defined ($fields[2])) {
+      die "Missing progname in $procgroup_file (line $line_number): \"$line\"";
+    }
+
+    for ($j=0; $j<$i; $j++) {
+      $hosts[$np] = $fields[0];
+      $boards[$np] = -1;
+      $apps_cmd[$np] = $fields[2];
+      if (defined ($fields[3])) {
+        $logins{$fields[0]} = $fields[3];
+      }
+      $apps_flags[$np] = ' ';
+      if (defined ($fields[4])) {
+	for ($k=4; $k<scalar (@fields); $k++) {
+	  $apps_flags[$np] .= $fields[$k].' ';
+	}
+      }
+      $np++;
+    }
+  }
+} else {
+  # Open the machines file, read it and close it.
+  open (MACHINE_FILE, "$machine_file")
+    or die "Cannot open the machines file $machine_file: $!\n";
+  @machine_file_data = <MACHINE_FILE>;
+  close(MACHINE_FILE);
+
+  # Extract the informations from the machines file.
+  $i = 0;
+  $line_number = 0;
+  while ($i<$np) {
+    $line = shift (@machine_file_data);
+    push (@machine_file_data, $line);
+    $line_number++;
+    next if ($line =~ /^\s*$/);
+    next if ($line =~ /^\#/);
+    chomp ($line);
+
+    if ($line =~ /^\S+(\s+\d+)?(\s+\d+)?\s*$/) {
+      @fields = split (/\s+/, $line);
+    } else {
+      die "Bad line in $machine_file (line $line_number): \"$line\"";
+    }
+
+    # Extract the board number if present.
+    if (scalar (@fields) > 1) {
+      if ($fields[1] =~ /^\d$/) {
+	$board_id = $fields[1];
+      } else {
+	die "Bad board number at $machine_file:$line_number): \"$line\"";
+      }
+    } else {
+      $board_id = -1;
+    }
+
+    # Extract the host name and eventually the number of processors.
+    if ($fields[0] =~ /^(\S+):(\d+)$/) {
+      if ($2 < 1) {
+	die "Bad counts in $machine_file (line $line_number): \"$line\"";
+      }
+
+      for ($j=0; $j<$2; $j++) {
+	$hosts[$i] = $1;
+	$boards[$i] = $board_id;
+	
+	$apps_cmd[$i] = $app_cmd;
+	$apps_flags[$i] = '';
+	for ($k=0; $k<scalar (@app_flags); $k++) {
+	  $apps_flags[$i] .= $app_flags[$k].' ';
+	}
+	$i++;
+      }
+    } else {
+      $hosts[$i] = $fields[0];
+      $boards[$i] = $board_id;
+
+      $apps_cmd[$i] = $app_cmd;
+      $apps_flags[$i] = '';
+      for ($k=0; $k<scalar (@app_flags); $k++) {
+	$apps_flags[$i] .= $app_flags[$k].' ';
+      }
+      $i++;
+    }
+  }
+}
+
+# Print the configuration.
+if ($verbose) {
+  for ($i=0; $i<$np; $i++) {
+    if ($boards[$i] >= 0) {
+      print ("\tProcess $i ($apps_cmd[$i] $apps_flags[$i]) on $hosts[$i] and board $boards[$i]\n");
+    } else {
+      print ("\tProcess $i ($apps_cmd[$i] $apps_flags[$i]) on $hosts[$i]\n");
+    }
+  }
+}
+
+
+# Open the first socket with the first available port.
+if (!$dry_run && !$fixed_alloc) {
+  print ("Open a socket on $local_host...\n") if $verbose;
+  socket (FIRST_SOCKET, AF_INET, SOCK_STREAM, getprotobyname ('tcp'))
+    or die ("First socket creation failed: $!\n");
+#  setsockopt (FIRST_SOCKET, SOL_SOCKET, SO_REUSEADDR, 1)
+#    or warn ("Error setting first socket option: $!\n");
+
+  bind (FIRST_SOCKET, sockaddr_in (0, INADDR_ANY))
+      or die ("Error when listening on first socket: $!\n");
+  ($local_port,) = sockaddr_in (getsockname (FIRST_SOCKET));
+  print ("Got a first socket opened on port $local_port.\n") if $verbose;
+  $varenv .= " @MYRI@PI_MASTER=$local_host @MYRI@PI_PORT=$local_port";
+  listen (FIRST_SOCKET, SOMAXCONN)
+      or die ("Error when listening on first socket: $!\n");
+}
+
+
+# Initialize the shared memory flag.
+if ($use_shmem > 0) {
+  if (!$shmem_file) {
+@M_GM@    $shmem_file = $shmem_prefix."$magic:[0-9]*.tmp";
+  }
+
+@M_GM@  print "Shared memory file: $shmem_file\n\n" if $verbose;
+}
+@M_GM@ $varenv .= " GMPI_SHMEM=$use_shmem";
+@M_GM@ $varenv .= " GMPI_SHMEM_PREFIX=$shmem_prefix";
+@M_MX@ $varenv .= " MX_DISABLE_SHMEM=".($use_shmem?0:1);
+
+
+# Initialize the receive mode flag.
+if ($recv_mode ne 'polling') {
+  $varenv .= " @MYRI@PI_RECV=$recv_mode";
+}
+
+
+# Initialize the Eager size flag.
+if ($eager) {
+  $varenv .= " @MYRI@PI_EAGER=$eager";
+}
+
+if ($lock_mbytes) {
+  $varenv .= " @MYRI@PI_MAX_LOCKED_MBYTES=$lock_mbytes ";
+}
+
+if ($fixed_alloc) {
+  $varenv .= " @MYRI@PI_FILE=$machine_file ";
+}
+
+if ($bounce_buffers) {
+  $varenv .= " @MYRI@PI_BOUNCE_BUFFERS=$bounce_buffers ";
+}
+
+# Force Malloc override by using a flat namespace on MacOSX
+if ($arch eq 'macosx') {
+@M_GM@  $varenv .= " DYLD_FORCE_FLAT_NAMESPACE=1";
+}
+
+if ($verbose) {
+    $varenv .= " @MYRI@PI_VERBOSE=1";
+}
+
+if ($sigcatch) {
+    $varenv .= " @MYRI@PI_SIGCATCH=1";
+}
+    
+$SIG{'INT'} = 'cleanup_SIGINT';
+$SIG{'TERM'} = 'cleanup_SIGTERM';
+$SIG{'KILL'} = 'cleanup_SIGKILL';
+$SIG{'QUIT'} = 'cleanup_SIGQUIT';
+
+if (!$dry_run && !$fixed_alloc) {
+  $pid_socket = fork;
+  if ($pid_socket == 0) {
+    # Gather the information from all remote processes via sockets.
+    $SIG{'ALRM'} = 'cleanup_TIMEOUT';
+    alarm ($timeout);
+
+    $index = $np;
+    while ($index > 0) {
+      accept (INCOMING_SOCKET, FIRST_SOCKET);
+      recv (INCOMING_SOCKET, $incoming_data, MAX_RECV_LEN, 0);
+
+      if ($incoming_data !~ /^<<<(\d+):(\d+):(\d+):(\d+):(\d+):(\d+):(\d+)::(\d+)>>>$/) {
+        warn ("Received invalid data format !\n");
+        close (INCOMING_SOCKET);
+        next;
+      }
+
+      # Check the magic number.
+      if ($1 != $magic) {
+	warn ("Received bad magic number !\n");
+	close (INCOMING_SOCKET);
+	next;
+      }
+
+      if ($2 > $np) {
+	clean_up;
+	die "MPI Id received is out of range ($2 over $np)\n";
+      }
+
+@M_GM@ $badport = 0;
+@M_MX@ $badport = -1;
+      if ($3 == $badport) {
+	clean_up;
+	die "MPI Id $2 was unable to open a @myri@ port.)\n";
+      }
+	
+      if (defined ($port_board_ids[$2])) {
+	warn ("Ignoring message from the MPI Id $2 ($_) !\n");
+	close (INCOMING_SOCKET);
+	next;
+      }
+
+      $port_board_ids[$2] = $3;
+      $unique_high_ids[$2] = $4;
+      $unique_low_ids[$2] = $5;
+      $numanodes[$2] = $6;
+      $remote_pids[$2] = $7;
+      $remote_ports[$2] = $8;
+      $index--;
+      close (INCOMING_SOCKET);
+
+      if ($verbose) {
+	printf "MPI Id %d is using @myri@ port %d, board %d (MAC %04x%06x).\n",
+	  $2, ($3 & 0xFFFF), ($3 >> 16), $4, $5;
+      }
+    }
+
+    print ("Received data from all $np MPI processes.\n") if $verbose;
+
+	
+    # Build the Port ID/Board ID mapping.
+    $global_mapping = '[[[';
+    for ($i=0; $i<$np; $i++) {
+      $global_mapping .= '<'.$port_board_ids[$i].':'.$unique_high_ids[$i].':'.$unique_low_ids[$i].':'.$remote_pids[$i].'>';
+    }
+    $global_mapping .= '|||';
+
+
+    # Send the Port ID/Board ID mapping to all remote processes.
+    $index = 0;
+    while ($index < $np) {
+      unless ($remote_addr = inet_aton($hosts[$index])) {
+	clean_up;
+	die "Cannot get address of host: $hosts[$index]";
+      }
+      $net_addr = sockaddr_in($remote_ports[$index], $remote_addr);
+
+      unless (socket (SECOND_SOCKET, AF_INET, SOCK_STREAM, 
+		      getprotobyname ('tcp'))) {
+	clean_up;
+	die ("Second socket creation failed: $!\n");
+      }
+      setsockopt (SECOND_SOCKET, SOL_SOCKET, SO_REUSEADDR, 1)
+	or warn ("Error setting second socket option: $!\n");
+      unless (connect(SECOND_SOCKET, $net_addr)) {
+	clean_up;
+	die "Cannot connect to $hosts[$index] on port $remote_ports[$index]: $!";
+      }
+
+      print ("Sending mapping to MPI Id $index.\n") if $verbose;
+
+      $local_mapping = '';
+      for ($i=0; $i<$np; $i++) {
+	if (($hosts[$index] eq $hosts[$i]) 
+	    && ($numanodes[$index] eq $numanodes[$i])) {
+	  $local_mapping .= '<'.$i.'>';
+	}
+      }
+      $local_mapping .= ']]]';
+      send (SECOND_SOCKET, "$global_mapping$local_mapping", 0);
+      close (SECOND_SOCKET);
+
+      $port_board_ids[$index] = 0;
+      $index++;
+    }
+    alarm (0);
+    print ("Data sent to all processes.\n") if $verbose;
+
+    # Keep the first socket opened for abort messages.
+    while (1) {
+      accept (ABORT_SOCKET, FIRST_SOCKET);
+      recv (ABORT_SOCKET, $incoming_data, MAX_RECV_LEN, 0);
+
+      if ($incoming_data !~ /^<<<ABORT_(\d+)_ABORT>>>$/) {
+        print ("Received spurious abort message, keep listening...\n");
+        close (ABORT_SOCKET);
+        next;
+      }
+
+      if ($1 != $magic) {
+	print ("Received bad magic number in abort message!\n");
+	close (ABORT_SOCKET);
+	next;
+      }
+
+      close (ABORT_SOCKET);
+      close (FIRST_SOCKET);
+      print ("Received valid abort message !\n") if $verbose;
+      clean_up;
+      exit (0);
+    }
+  }
+}
+
+
+if (defined($ENV{LD_LIBRARY_PATH})) {
+    $varenv .= " LD_LIBRARY_PATH=$ENV{LD_LIBRARY_PATH}";
+}
+
+if ($copy_env) {
+    my %exclude;
+    foreach (@env_exclude_list) { $exclude{$_} = 1; }
+    
+    foreach (keys %ENV) {
+	unless ($exclude{$_} || $ENV{$_} =~ m/[ \n\t;*]/) {
+	    $varenv .= " $_=$ENV{$_} ";
+	}
+    }
+}
+
+if ($display && !($display =~ m/^localhost/) && !($display =~ m/^:/)) {
+    $varenv .= " DISPLAY=$display ";
+}
+
+$varenv = "@MYRI@PI_MAGIC=$magic $varenv";
+
+# Build command lines.
+for ($i=0; $i<$np; $i+= 1) {
+    my $varenvp = $varenv;
+    my $cmdline = "";
+    $varenvp .= " @MYRI@PI_ID=$i";
+    $varenvp .= " @MYRI@PI_NP=$np";
+    $varenvp .= " @MYRI@PI_BOARD=$boards[$i]";
+    if (defined $ENV{MXSMPI_LABEL}) {
+      $varenvp .= " MXSMPI_LABEL=$ENV{MXSMPI_LABEL}";
+    }
+
+    $slave_ip = inet_ntoa(inet_aton("$hosts[$i]"));
+    $varenvp .= " @MYRI@PI_SLAVE=$slave_ip";
+
+    # add any -mpichtv arg if necessary
+    my $mpichtv = ($totalview | $ddt) ? "-mpichtv" : "";
+    # totalview is special case: require -a before prog args
+    my $tvarg = ($totalview && $i == 0) ? "-a" : "";
+
+    $numactl_line = "";
+    if ($use_numactl) {
+      $numactl_id = 0;
+      for ($j=0; $j<$i; $j++) {
+	if ($hosts[$i] eq $hosts[$j]) {
+	  $numactl_id++;
+	}
+      }
+      $numactl_line = "$numactl_cmd --cpubind=$numactl_id --membind=$numactl_id";
+    }
+
+    # add the program arguments
+    $cmdline = " $numactl_line $apps_cmd[$i] $tvarg $apps_flags[$i] $mpichtv";
+
+    # invoke totalview or ddt if asked
+    if ($ddt && $i == 0) {
+	$cmdline = "$ddt_cmd $cmdline";
+    } elsif ($totalview && $i == 0) {
+	$cmdline = "$totalview_cmd $cmdline";
+    }
+
+    # add environment and labelling
+    $cmdline = "env $varenvp $mpilabel $cmdline ";
+
+    $cmds[$i] = [ $hosts[$i], $wdir, $cmdline ];
+}
+
+# Spawn remote processes.
+tree_spawn(\@cmds,\@spawn_servers,0,\%pids_hash);
+#foreach (keys %pids_hash) {
+#    my ($group_first,$group_size) = @{$pids_hash{$_}};
+#    printf STDERR "process $_:$group_first,$group_size\n";
+#}
+printf STDERR "All processes have been spawned\n" if $verbose;
+
+# If dry_run, there is nothing more to do.
+if ($dry_run) {
+  while (wait != -1) {
+    ;
+  }
+  exit (0);
+}
+$nb_alive = $np;
+
+# Wait and eventually kill remaining processes;
+if ($kill_time) {
+  $first_pid = wait;
+  if ($first_pid == -1) {
+    clean_up;
+    exit 0;
+  }
+
+  if ($first_pid == $pid_socket) {
+    clean_up;
+    exit 0;
+  }
+  my ($group_first,$group_size) = @{$pids_hash{$first_pid}};
+  $nb_alive -= $group_size;
+
+  if ($verbose) {
+      my $group_desc = "$group_first";
+      $group_desc = "..".($group_first+$group_size -1) if $group_size > 1;
+      printf "MPI Process $group_desc has exited, wait $kill_time seconds and kill all remaining processes...\n";
+  }
+
+  $SIG{'ALRM'} = 'cleanup_ALARM';
+  alarm ($kill_time + 1);
+}
+
+while (1) {
+  $next_pid = wait;
+  if ($next_pid == -1) {
+    print ("All processes have exited.\n") if $verbose;
+    clean_up;
+    exit 0;
+  }
+
+  if ($next_pid != $pid_socket) {
+    my ($group_first,$group_size) = @{$pids_hash{$next_pid}};
+    $nb_alive -= $group_size;
+    if ($nb_alive == 0) {
+	print ("All remote MPI processes have exited.\n") if $verbose;
+	clean_up;
+	exit 0;
+    } else {
+#	print " MPI process $next_pid:($group_first,$group_size) have exited.\n" if $verbose;
+    }
+  } else {
+    # the process waiting for an Abort has exited, so let's aborting
+    print ("Abort in progress...\n") if $verbose;
+    clean_up;
+    exit 0;
+  }
+}
+exit 0;

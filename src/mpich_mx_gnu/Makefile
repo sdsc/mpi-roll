@@ -68,6 +68,7 @@ COMPILE_FLAGS = -I$(MXHOME)/include -O2
 
 build:
 	tar zxvf $(REDHAT.ROOT)/src/$(SOURCE).tgz
+	cd patch-files && find . -type f | grep -v CVS | cpio -pduv ../
 	( \
 	  export CC=gcc; \
 	  export CFLAGS="$(COMPILE_FLAGS)"; \

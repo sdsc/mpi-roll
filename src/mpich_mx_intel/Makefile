@@ -73,6 +73,7 @@ COMPILE_FLAGS = -I$(MXHOME)/include -O
 
 build:
 	tar zxvf $(REDHAT.ROOT)/src/$(SOURCE).tgz
+	cd patch-files && find . -type f | grep -v CVS | cpio -pduv ../
 	( \
 	  . $(C_INTEL_ENV); \
 	  . $(F_INTEL_ENV); \
