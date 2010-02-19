@@ -55,7 +55,7 @@
 # @Copyright@
 #
 
-PKGROOT = /opt/openmpi_mx
+PKGROOT = /opt/openmpi_mx/intel
 INSTDIR = $(ROOT)/$(PKGROOT)
 SOURCE = openmpi-$(VERSION)
 REDHAT.ROOT = $(PWD)/../../
@@ -104,12 +104,6 @@ install::
 	  cd $(SOURCE); \
 	  make prefix=$(INSTDIR) install \
 	)
-	mv $(INSTDIR)/bin $(INSTDIR)/binintel
-	mkdir $(INSTDIR)/bin
-	mv $(INSTDIR)/binintel $(INSTDIR)/bin/intel
-	mv $(INSTDIR)/lib $(INSTDIR)/libintel
-	mkdir $(INSTDIR)/lib
-	mv $(INSTDIR)/libintel $(INSTDIR)/lib/intel
 	rm -rf $(SOURCE)
 
 clean::

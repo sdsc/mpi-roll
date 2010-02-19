@@ -55,7 +55,7 @@
 # @Copyright@
 #
 
-PKGROOT = /opt/mpich2_mx
+PKGROOT = /opt/mpich2_mx/intel
 INSTDIR = $(ROOT)/$(PKGROOT)
 SOURCE = mpich2-$(VERSION)
 REDHAT.ROOT = $(PWD)/../../
@@ -86,6 +86,7 @@ build:
 	  export FC=ifort; \
 	  export FFLAGS="$(COMPILE_FLAGS)"; \
 	  export PREFIX=$(PKGROOT); \
+	  export LD_LIBRARY_PATH=$(MXHOME)/lib:$$LD_LIBRARY_PATH; \
 	  cd $(SOURCE); \
 	  ./configure --prefix=$(PKGROOT) \
 	    --with-device=ch3:nemesis:mx --enable-sharedlibs=gcc \
@@ -106,12 +107,6 @@ install::
 	  make install \
 	)
 	umount $(PKGROOT)
-	mv $(INSTDIR)/bin $(INSTDIR)/binintel
-	mkdir $(INSTDIR)/bin
-	mv $(INSTDIR)/binintel $(INSTDIR)/bin/intel
-	mv $(INSTDIR)/lib $(INSTDIR)/libintel
-	mkdir $(INSTDIR)/lib
-	mv $(INSTDIR)/libintel $(INSTDIR)/lib/intel
 	rm -fr $(SOURCE)
 
 clean::

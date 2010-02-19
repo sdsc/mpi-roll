@@ -55,7 +55,7 @@
 # @Copyright@
 #
 
-PKGROOT = /opt/openmpi_mx
+PKGROOT = /opt/openmpi_mx/pgi
 INSTDIR = $(ROOT)/$(PKGROOT)
 SOURCE = openmpi-$(VERSION)
 REDHAT.ROOT = $(PWD)/../../
@@ -93,15 +93,11 @@ build:
 install::
 	mkdir -p $(INSTDIR)
 	( \
+	  export PATH=$(PGIDIR)/bin:$${PATH}; \
+	  export LD_LIBRARY_PATH=$(PGIDIR)/libso:$${PATH}; \
 	  cd $(SOURCE); \
 	  make prefix=$(INSTDIR) install \
 	)
-	mv $(INSTDIR)/bin $(INSTDIR)/binpgi
-	mkdir $(INSTDIR)/bin
-	mv $(INSTDIR)/binpgi $(INSTDIR)/bin/pgi
-	mv $(INSTDIR)/lib $(INSTDIR)/libpgi
-	mkdir $(INSTDIR)/lib
-	mv $(INSTDIR)/libpgi $(INSTDIR)/lib/pgi
 	rm -fr $(SOURCE)
 
 clean::

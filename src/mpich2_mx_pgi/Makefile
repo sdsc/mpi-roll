@@ -55,7 +55,7 @@
 # @Copyright@
 #
 
-PKGROOT = /opt/mpich2_mx
+PKGROOT = /opt/mpich2_mx/pgi
 INSTDIR = $(ROOT)/$(PKGROOT)
 SOURCE = mpich2-$(VERSION)
 REDHAT.ROOT = $(PWD)/../../
@@ -81,6 +81,7 @@ build:
 	  export FC=pgf77; \
 	  export FFLAGS="$(COMPILE_FLAGS)"; \
 	  export PREFIX=$(PKGROOT); \
+	  export LD_LIBRARY_PATH=$(MXHOME)/lib:$$LD_LIBRARY_PATH; \
 	  cd $(SOURCE); \
 	  ./configure --prefix=$(PKGROOT) \
 	    --with-device=ch3:nemesis:mx --enable-sharedlibs=gcc \
@@ -98,12 +99,6 @@ install::
 	  make install \
 	)
 	umount $(PKGROOT)
-	mv $(INSTDIR)/bin $(INSTDIR)/binpgi
-	mkdir $(INSTDIR)/bin
-	mv $(INSTDIR)/binpgi $(INSTDIR)/bin/pgi
-	mv $(INSTDIR)/lib $(INSTDIR)/libpgi
-	mkdir $(INSTDIR)/lib
-	mv $(INSTDIR)/libpgi $(INSTDIR)/lib/pgi
 	rm -fr $(SOURCE)
 
 clean::

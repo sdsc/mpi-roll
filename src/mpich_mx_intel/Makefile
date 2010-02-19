@@ -55,7 +55,7 @@
 # @Copyright@
 #
 
-PKGROOT = /opt/mpich_mx
+PKGROOT = /opt/mpich_mx/intel
 INSTDIR = $(ROOT)/$(PKGROOT)
 SOURCE = mpich-$(VERSION)
 REDHAT.ROOT = $(PWD)/../../
@@ -108,12 +108,6 @@ install::
 	  make install \
 	)
 	umount $(PKGROOT)
-	mv $(INSTDIR)/bin $(INSTDIR)/binintel
-	mkdir $(INSTDIR)/bin
-	mv $(INSTDIR)/binintel $(INSTDIR)/bin/intel
-	mv $(INSTDIR)/lib $(INSTDIR)/libintel
-	mkdir $(INSTDIR)/lib
-	mv $(INSTDIR)/libintel $(INSTDIR)/lib/intel
 	rm -fr $(SOURCE)
 
 clean::

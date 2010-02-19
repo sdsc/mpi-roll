@@ -55,7 +55,7 @@
 # @Copyright@
 #
 
-PKGROOT = /opt/mpich_mx
+PKGROOT = /opt/mpich_mx/pgi
 INSTDIR = $(ROOT)/$(PKGROOT)
 SOURCE = mpich-$(VERSION)
 REDHAT.ROOT = $(PWD)/../../
@@ -100,12 +100,6 @@ install::
 	  make install \
 	)
 	umount $(PKGROOT)
-	mv $(INSTDIR)/bin $(INSTDIR)/binpgi
-	mkdir $(INSTDIR)/bin
-	mv $(INSTDIR)/binpgi $(INSTDIR)/bin/pgi
-	mv $(INSTDIR)/lib $(INSTDIR)/libpgi
-	mkdir $(INSTDIR)/lib
-	mv $(INSTDIR)/libpgi $(INSTDIR)/lib/pgi
 	rm -fr $(SOURCE)
 
 clean::
