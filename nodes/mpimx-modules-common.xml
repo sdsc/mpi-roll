@@ -19,122 +19,159 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 
 <post>
 
-# Make sure modules package reads modulefiles from /opt/modulefiles/mpi
-line='setenv MODULEPATH /opt/modulefiles/mpi:$MODULEPATH'
-if test `grep -Fc "$line" /etc/profile.d/modules.csh` = 0; then
-  echo "$line" >> /etc/profile.d/modules.csh
-fi
-line='export MODULEPATH=/opt/modulefiles/mpi:$MODULEPATH'
-if test `grep -Fc "$line" /etc/profile.d/modules.sh` = 0; then
-  echo "$line" >> /etc/profile.d/modules.sh
-fi
-
-<!-- env vars in <file> tags don't work, so use fixed-path temps -->
-/bin/mkdir -m 0755 -p /opt/modulefiles/.tmp
-
 # MPICH
 
-export version=1.2.7
-/bin/mkdir -m 0755 -p /opt/modulefiles/mpi/mpich_mx
+/bin/mkdir -m 0755 -p /opt/modulefiles/mpi/.gnu/mpich_mx
+/bin/mkdir -m 0755 -p /opt/modulefiles/mpi/.intel/mpich_mx
+/bin/mkdir -m 0755 -p /opt/modulefiles/mpi/.pgi/mpich_mx
 
-<file name="/opt/modulefiles/.tmp/mpich_mx" perms="0644">
+<file name="/opt/modulefiles/mpi/.gnu/mpich_mx/1.2.7" perms="0644">
 #%Module1.0
-set mpich_mxHome /opt/mpich_mx
-set compiler [expr ! [catch {exec which icc} ignored] ? {"intel"} : \
-                   ! [catch {exec which pgcc} ignored] ? {"pgi"} : {"gnu"}]
-if { ! [file exists $mpich_mxHome/$compiler/bin] } {
-  puts stderr "No $compiler mpich_mx implementation is available"
-  break
-}
 module-whatis "mpich_mx mpi stack"
-module-whatis "Version: VERSION"
-prepend-path PATH $mpich_mxHome/$compiler/bin
-prepend-path LD_LIBRARY_PATH $mpich_mxHome/$compiler/lib
+module-whatis "Version: 1.2.7"
+set mpich_mxHome /opt/mpich_mx
+prepend-path PATH $mpich_mxHome/gnu/bin
+prepend-path LD_LIBRARY_PATH $mpich_mxHome/gnu/lib
 </file>
-/usr/bin/perl -pi -e "s/VERSION/$version/" /opt/modulefiles/.tmp/mpich_mx
-/bin/cp /opt/modulefiles/.tmp/mpich_mx /opt/modulefiles/mpi/mpich_mx/$version
-
-<file name="/opt/modulefiles/.tmp/mpich_mx.version" perms="0644">
+<file name="/opt/modulefiles/mpi/.intel/mpich_mx/1.2.7" perms="0644">
 #%Module1.0
-set ModulesVersion "VERSION"
+module-whatis "mpich_mx mpi stack"
+module-whatis "Version: 1.2.7"
+set mpich_mxHome /opt/mpich_mx
+prepend-path PATH $mpich_mxHome/intel/bin
+prepend-path LD_LIBRARY_PATH $mpich_mxHome/intel/lib
 </file>
-/usr/bin/perl -pi -e "s/VERSION/$version/" \
-              /opt/modulefiles/.tmp/mpich_mx.version
-/bin/cp /opt/modulefiles/.tmp/mpich_mx.version \
-        /opt/modulefiles/mpi/mpich_mx/.version.$version
+<file name="/opt/modulefiles/mpi/.pgi/mpich_mx/1.2.7" perms="0644">
+#%Module1.0
+module-whatis "mpich_mx mpi stack"
+module-whatis "Version: 1.2.7"
+set mpich_mxHome /opt/mpich_mx
+prepend-path PATH $mpich_mxHome/pgi/bin
+prepend-path LD_LIBRARY_PATH $mpich_mxHome/pgi/lib
+</file>
 
-/bin/ln -s /opt/modulefiles/mpi/mpich_mx/.version.$version \
-           /opt/modulefiles/mpi/mpich_mx/.version
+<file name="/opt/modulefiles/mpi/.gnu/mpich_mx/.version.1.2.7" perms="0644">
+#%Module1.0
+set ModulesVersion "1.2.7"
+</file>
+<file name="/opt/modulefiles/mpi/.intel/mpich_mx/.version.1.2.7" perms="0644">
+#%Module1.0
+set ModulesVersion "1.2.7"
+</file>
+<file name="/opt/modulefiles/mpi/.pgi/mpich_mx/.version.1.2.7" perms="0644">
+#%Module1.0
+set ModulesVersion "1.2.7"
+</file>
+
+/bin/ln -s /opt/modulefiles/mpi/.gnu/mpich_mx/.version.1.2.7 \
+           /opt/modulefiles/mpi/.gnu/mpich_mx/.version
+/bin/ln -s /opt/modulefiles/mpi/.intel/mpich_mx/.version.1.2.7 \
+           /opt/modulefiles/mpi/.intel/mpich_mx/.version
+/bin/ln -s /opt/modulefiles/mpi/.pgi/mpich_mx/.version.1.2.7 \
+           /opt/modulefiles/mpi/.pgi/mpich_mx/.version
 
 # MPICH2
 
-export version=1.0.7
-/bin/mkdir -m 0755 -p /opt/modulefiles/mpi/mpich2_mx
+/bin/mkdir -m 0755 -p /opt/modulefiles/mpi/.gnu/mpich2_mx
+/bin/mkdir -m 0755 -p /opt/modulefiles/mpi/.intel/mpich2_mx
+/bin/mkdir -m 0755 -p /opt/modulefiles/mpi/.pgi/mpich2_mx
 
-<file name="/opt/modulefiles/.tmp/mpich2_mx" perms="0644">
+<file name="/opt/modulefiles/mpi/.gnu/mpich2_mx/1.0.7" perms="0644">
 #%Module1.0
-set mpich2_mxHome /opt/mpich2_mx
-set compiler [expr ! [catch {exec which icc} ignored] ? {"intel"} : \
-                   ! [catch {exec which pgcc} ignored] ? {"pgi"} : {"gnu"}]
-if { ! [file exists $mpich2_mxHome/$compiler/bin] } {
-  puts stderr "No $compiler mpich2_mx implementation is available"
-  break
-}
 module-whatis "mpich2_mx mpi stack"
-module-whatis "Version: VERSION"
-prepend-path PATH $mpich2_mxHome/$compiler/bin
-prepend-path LD_LIBRARY_PATH $mpich2_mxHome/$compiler/lib
+module-whatis "Version: 1.0.7"
+set mpich2_mxHome /opt/mpich2_mx
+prepend-path PATH $mpich2_mxHome/gnu/bin
+prepend-path LD_LIBRARY_PATH $mpich2_mxHome/gnu/lib
 </file>
-/usr/bin/perl -pi -e "s/VERSION/$version/" /opt/modulefiles/.tmp/mpich2_mx
-/bin/cp /opt/modulefiles/.tmp/mpich2_mx \
-        /opt/modulefiles/mpi/mpich2_mx/$version
-
-<file name="/opt/modulefiles/.tmp/mpich2_mx.version" perms="0644">
+<file name="/opt/modulefiles/mpi/.intel/mpich2_mx/1.0.7" perms="0644">
 #%Module1.0
-set ModulesVersion "VERSION"
+module-whatis "mpich2_mx mpi stack"
+module-whatis "Version: 1.0.7"
+set mpich2_mxHome /opt/mpich2_mx
+prepend-path PATH $mpich2_mxHome/intel/bin
+prepend-path LD_LIBRARY_PATH $mpich2_mxHome/intel/lib
 </file>
-/usr/bin/perl -pi -e "s/VERSION/$version/" \
-              /opt/modulefiles/mpi/mpich2_mx.version
-/bin/cp /opt/modulefiles/.tmp/mpich2_mx.version \
-        /opt/modulefiles/mpi/mpich2_mx/.version.$version
+<file name="/opt/modulefiles/mpi/.pgi/mpich2_mx/1.0.7" perms="0644">
+#%Module1.0
+module-whatis "mpich2_mx mpi stack"
+module-whatis "Version: 1.0.7"
+set mpich2_mxHome /opt/mpich2_mx
+prepend-path PATH $mpich2_mxHome/pgi/bin
+prepend-path LD_LIBRARY_PATH $mpich2_mxHome/pgi/lib
+</file>
 
-/bin/ln -s /opt/modulefiles/mpi/mpich2_mx/.version.$version \
-           /opt/modulefiles/mpi/mpich2_mx/.version
+<file name="/opt/modulefiles/mpi/.gnu/mpich2_mx/.version" perms="0644">
+#%Module1.0
+set ModulesVersion "1.0.7"
+</file>
+<file name="/opt/modulefiles/mpi/.intel/mpich2_mx/.version" perms="0644">
+#%Module1.0
+set ModulesVersion "1.0.7"
+</file>
+<file name="/opt/modulefiles/mpi/.pgi/mpich2_mx/.version" perms="0644">
+#%Module1.0
+set ModulesVersion "1.0.7"
+</file>
+
+/bin/ln -s /opt/modulefiles/mpi/.gnu/mpich2_mx/.version.1.0.7 \
+           /opt/modulefiles/mpi/.gnu/mpich2_mx/.version
+/bin/ln -s /opt/modulefiles/mpi/.intel/mpich2_mx/.version.1.0.7 \
+           /opt/modulefiles/mpi/.intel/mpich2_mx/.version
+/bin/ln -s /opt/modulefiles/mpi/.pgi/mpich2_mx/.version.1.0.7 \
+           /opt/modulefiles/mpi/.pgi/mpich2_mx/.version
 
 # OPENMPI
 
 export version=1.3.3
-/bin/mkdir -m 0755 -p /opt/modulefiles/mpi/openmpi_mx
+/bin/mkdir -m 0755 -p /opt/modulefiles/mpi/.gnu/openmpi_mx
+/bin/mkdir -m 0755 -p /opt/modulefiles/mpi/.intel/openmpi_mx
+/bin/mkdir -m 0755 -p /opt/modulefiles/mpi/.pgi/openmpi_mx
 
-<file name="/opt/modulefiles/.tmp/openmpi_mx" perms="0644">
+<file name="/opt/modulefiles/mpi/.gnu/openmpi_mx/1.3.3" perms="0644">
 #%Module1.0
-set openmpi_mxHome /opt/openmpi_mx
-set compiler [expr ! [catch {exec which icc} ignored] ? {"intel"} : \
-                   ! [catch {exec which pgcc} ignored] ? {"pgi"} : {"gnu"}]
-if { ! [file exists $openmpi_mxHome/$compiler/bin] } {
-  puts stderr "No $compiler openmpi_mx implementation is available"
-  break
-}
 module-whatis "openmpi_mx mpi stack"
-module-whatis "Version: VERSION"
-prepend-path PATH $openmpi_mxHome/$compiler/bin
-prepend-path LD_LIBRARY_PATH $openmpi_mxHome/$compiler/lib
+module-whatis "Version: 1.3.3"
+set openmpi_mxHome /opt/openmpi_mx
+prepend-path PATH $openmpi_mxHome/gnu/bin
+prepend-path LD_LIBRARY_PATH $openmpi_mxHome/gnu/lib
 </file>
-/usr/bin/perl -pi -e "s/VERSION/$version/" /opt/modulefiles/.tmp/openmpi_mx
-/bin/cp /opt/modulefiles/.tmp/openmpi_mx \
-        /opt/modulefiles/mpi/openmpi_mx/$version
-
-<file name="/opt/modulefiles/.tmp/openmpi_mx.version" perms="0644">
+<file name="/opt/modulefiles/mpi/.intel/openmpi_mx/1.3.3" perms="0644">
 #%Module1.0
-set ModulesVersion "VERSION"
+module-whatis "openmpi_mx mpi stack"
+module-whatis "Version: 1.3.3"
+set openmpi_mxHome /opt/openmpi_mx
+prepend-path PATH $openmpi_mxHome/intel/bin
+prepend-path LD_LIBRARY_PATH $openmpi_mxHome/intel/lib
 </file>
-/usr/bin/perl -pi -e "s/VERSION/$version/" \
-              /opt/modulefiles/.tmp/openmpi_mx.version
-/bin/cp /opt/modulefiles/.tmp/openmpi_mx.version \
-        /opt/modulefiles/mpi/openmpi_mx/.version.$version
+<file name="/opt/modulefiles/mpi/.pgi/openmpi_mx/1.3.3" perms="0644">
+#%Module1.0
+module-whatis "openmpi_mx mpi stack"
+module-whatis "Version: 1.3.3"
+set openmpi_mxHome /opt/openmpi_mx
+prepend-path PATH $openmpi_mxHome/pgi/bin
+prepend-path LD_LIBRARY_PATH $openmpi_mxHome/pgi/lib
+</file>
 
-/bin/ln -s /opt/modulefiles/mpi/openmpi_mx/.version.$version \
-           /opt/modulefiles/mpi/openmpi_mx/.version
+<file name="/opt/modulefiles/mpi/.gnu/openmpi_mx/.version.1.3.3" perms="0644">
+#%Module1.0
+set ModulesVersion "1.3.3"
+</file>
+<file name="/opt/modulefiles/mpi/.intel/openmpi_mx/.version.1.3.3" perms="0644">
+#%Module1.0
+set ModulesVersion "1.3.3"
+</file>
+<file name="/opt/modulefiles/mpi/.pgi/openmpi_mx/.version.1.3.3" perms="0644">
+#%Module1.0
+set ModulesVersion "1.3.3"
+</file>
+
+/bin/ln -s /opt/modulefiles/mpi/.gnu/openmpi_mx/.version.1.3.3 \
+           /opt/modulefiles/mpi/.gnu/openmpi_mx/.version
+/bin/ln -s /opt/modulefiles/mpi/.intel/openmpi_mx/.version.1.3.3 \
+           /opt/modulefiles/mpi/.intel/openmpi_mx/.version
+/bin/ln -s /opt/modulefiles/mpi/.pgi/openmpi_mx/.version.1.3.3 \
+           /opt/modulefiles/mpi/.pgi/openmpi_mx/.version
 
 </post>
 
