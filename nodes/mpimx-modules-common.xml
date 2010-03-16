@@ -29,25 +29,25 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 #%Module1.0
 module-whatis "mpich_mx mpi stack"
 module-whatis "Version: 1.2.7"
-set mpich_mxHome /opt/mpich_mx
-prepend-path PATH $mpich_mxHome/gnu/bin
-prepend-path LD_LIBRARY_PATH $mpich_mxHome/gnu/lib
+set mpich_mxHome /opt/mpich/gnu/mx
+prepend-path PATH $mpich_mxHome/bin
+prepend-path LD_LIBRARY_PATH $mpich_mxHome/lib
 </file>
 <file name="/opt/modulefiles/mpi/.intel/mpich_mx/1.2.7" perms="0644">
 #%Module1.0
 module-whatis "mpich_mx mpi stack"
 module-whatis "Version: 1.2.7"
-set mpich_mxHome /opt/mpich_mx
-prepend-path PATH $mpich_mxHome/intel/bin
-prepend-path LD_LIBRARY_PATH $mpich_mxHome/intel/lib
+set mpich_mxHome /opt/mpich/intel/mx
+prepend-path PATH $mpich_mxHome/bin
+prepend-path LD_LIBRARY_PATH $mpich_mxHome/lib
 </file>
 <file name="/opt/modulefiles/mpi/.pgi/mpich_mx/1.2.7" perms="0644">
 #%Module1.0
 module-whatis "mpich_mx mpi stack"
 module-whatis "Version: 1.2.7"
-set mpich_mxHome /opt/mpich_mx
-prepend-path PATH $mpich_mxHome/pgi/bin
-prepend-path LD_LIBRARY_PATH $mpich_mxHome/pgi/lib
+set mpich_mxHome /opt/mpich/pgi/mx
+prepend-path PATH $mpich_mxHome/bin
+prepend-path LD_LIBRARY_PATH $mpich_mxHome/lib
 </file>
 
 <file name="/opt/modulefiles/mpi/.gnu/mpich_mx/.version.1.2.7" perms="0644">
@@ -80,25 +80,25 @@ set ModulesVersion "1.2.7"
 #%Module1.0
 module-whatis "mpich2_mx mpi stack"
 module-whatis "Version: 1.0.7"
-set mpich2_mxHome /opt/mpich2_mx
-prepend-path PATH $mpich2_mxHome/gnu/bin
-prepend-path LD_LIBRARY_PATH $mpich2_mxHome/gnu/lib
+set mpich2_mxHome /opt/mpich2/gnu/mx
+prepend-path PATH $mpich2_mxHome/bin
+prepend-path LD_LIBRARY_PATH $mpich2_mxHome/lib
 </file>
 <file name="/opt/modulefiles/mpi/.intel/mpich2_mx/1.0.7" perms="0644">
 #%Module1.0
 module-whatis "mpich2_mx mpi stack"
 module-whatis "Version: 1.0.7"
-set mpich2_mxHome /opt/mpich2_mx
-prepend-path PATH $mpich2_mxHome/intel/bin
-prepend-path LD_LIBRARY_PATH $mpich2_mxHome/intel/lib
+set mpich2_mxHome /opt/mpich2/intel/mx
+prepend-path PATH $mpich2_mxHome/bin
+prepend-path LD_LIBRARY_PATH $mpich2_mxHome/lib
 </file>
 <file name="/opt/modulefiles/mpi/.pgi/mpich2_mx/1.0.7" perms="0644">
 #%Module1.0
 module-whatis "mpich2_mx mpi stack"
 module-whatis "Version: 1.0.7"
-set mpich2_mxHome /opt/mpich2_mx
-prepend-path PATH $mpich2_mxHome/pgi/bin
-prepend-path LD_LIBRARY_PATH $mpich2_mxHome/pgi/lib
+set mpich2_mxHome /opt/mpich2/pgi/mx
+prepend-path PATH $mpich2_mxHome/bin
+prepend-path LD_LIBRARY_PATH $mpich2_mxHome/lib
 </file>
 
 <file name="/opt/modulefiles/mpi/.gnu/mpich2_mx/.version" perms="0644">
@@ -132,25 +132,25 @@ export version=1.3.3
 #%Module1.0
 module-whatis "openmpi_mx mpi stack"
 module-whatis "Version: 1.3.3"
-set openmpi_mxHome /opt/openmpi_mx
-prepend-path PATH $openmpi_mxHome/gnu/bin
-prepend-path LD_LIBRARY_PATH $openmpi_mxHome/gnu/lib
+set openmpi_mxHome /opt/openmpi/gnu/mx
+prepend-path PATH $openmpi_mxHome/bin
+prepend-path LD_LIBRARY_PATH $openmpi_mxHome/lib
 </file>
 <file name="/opt/modulefiles/mpi/.intel/openmpi_mx/1.3.3" perms="0644">
 #%Module1.0
 module-whatis "openmpi_mx mpi stack"
 module-whatis "Version: 1.3.3"
-set openmpi_mxHome /opt/openmpi_mx
-prepend-path PATH $openmpi_mxHome/intel/bin
-prepend-path LD_LIBRARY_PATH $openmpi_mxHome/intel/lib
+set openmpi_mxHome /opt/openmpi/intel/mx
+prepend-path PATH $openmpi_mxHome/bin
+prepend-path LD_LIBRARY_PATH $openmpi_mxHome/lib
 </file>
 <file name="/opt/modulefiles/mpi/.pgi/openmpi_mx/1.3.3" perms="0644">
 #%Module1.0
 module-whatis "openmpi_mx mpi stack"
 module-whatis "Version: 1.3.3"
-set openmpi_mxHome /opt/openmpi_mx
-prepend-path PATH $openmpi_mxHome/pgi/bin
-prepend-path LD_LIBRARY_PATH $openmpi_mxHome/pgi/lib
+set openmpi_mxHome /opt/openmpi/pgi/mx
+prepend-path PATH $openmpi_mxHome/bin
+prepend-path LD_LIBRARY_PATH $openmpi_mxHome/lib
 </file>
 
 <file name="/opt/modulefiles/mpi/.gnu/openmpi_mx/.version.1.3.3" perms="0644">
