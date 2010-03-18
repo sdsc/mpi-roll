@@ -65,7 +65,7 @@ RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 
 MXHOME = /opt/mx
 PGIDIR = /opt/pgi/linux86-64/8.0
-COMPILE_FLAGS = -O4 -Mipa -Munroll=c:1 -Mnoframe -Mlre -Mautoinline
+COMPILE_FLAGS = -O2
 
 build:
 	tar zxvf $(REDHAT.ROOT)/src/$(SOURCE).tgz
@@ -95,6 +95,14 @@ install::
 	( \
 	  export PATH=$(PGIDIR)/bin:$${PATH}; \
 	  export LD_LIBRARY_PATH=$(PGIDIR)/libso:$${PATH}; \
+	  export CC=pgcc; \
+	  export CFLAGS="$(COMPILE_FLAGS)"; \
+	  export CXX=pgCC; \
+	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
+	  export FC=pgf90; \
+	  export FCFLAGS="$(COMPILE_FLAGS)"; \
+	  export F77=pgf77; \
+	  export FFLAGS="$(COMPILE_FLAGS)"; \
 	  cd $(SOURCE); \
 	  make prefix=$(INSTDIR) install \
 	)
