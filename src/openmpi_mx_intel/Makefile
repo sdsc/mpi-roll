@@ -55,7 +55,7 @@
 # @Copyright@
 #
 
-PKGROOT = /opt/openmpi/intel/mx
+PKGROOT = /opt/openmpi_mx/intel/mx
 INSTDIR = $(ROOT)/$(PKGROOT)
 SOURCE = openmpi-$(VERSION)
 REDHAT.ROOT = $(PWD)/../../
