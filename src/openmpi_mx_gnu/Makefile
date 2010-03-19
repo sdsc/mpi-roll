@@ -55,7 +55,7 @@
 # @Copyright@
 #
 
-PKGROOT = /opt/openmpi/gnu/mx
+PKGROOT = /opt/openmpi_mx/gnu
 INSTDIR = $(ROOT)/$(PKGROOT)
 SOURCE = openmpi-$(VERSION)
 REDHAT.ROOT = $(PWD)/../../
@@ -75,7 +75,7 @@ build:
 	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
 	  export FC=gfortran; \
 	  export FCFLAGS="$(COMPILE_FLAGS)"; \
-	  export F77=g77; \
+	  export F77=gfortran; \
 	  export FFLAGS="$(COMPILE_FLAGS)"; \
 	  cd $(SOURCE); \
 	  ./configure \
