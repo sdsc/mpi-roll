@@ -55,7 +55,7 @@
 # @Copyright@
 #
 
-PKGROOT = /opt/mpich2/gnu/mx
+PKGROOT = /opt/mpich2_mx/gnu
 SOURCE = mpich2-$(VERSION)
 REDHAT.ROOT = $(PWD)/../../
 INSTDIR = $(ROOT)/$(PKGROOT)

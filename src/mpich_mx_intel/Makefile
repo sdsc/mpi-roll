@@ -55,7 +55,7 @@
 # @Copyright@
 #
 
-PKGROOT = /opt/mpich/intel/mx
+PKGROOT = /opt/mpich_mx/intel
 INSTDIR = $(ROOT)/$(PKGROOT)
 SOURCE = mpich-$(VERSION)
 REDHAT.ROOT = $(PWD)/../../
