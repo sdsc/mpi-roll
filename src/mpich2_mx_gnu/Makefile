@@ -75,7 +75,7 @@ build:
 	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
 	  export F90=gfortran; \
 	  export F90FLAGS="$(COMPILE_FLAGS)"; \
-	  export FC=g77; \
+	  export FC=gfortran; \
 	  export FFLAGS="$(COMPILE_FLAGS)"; \
 	  export PREFIX=$(PKGROOT); \
 	  export LD_LIBRARY_PATH=$(MXHOME)/lib:$$LD_LIBRARY_PATH; \
