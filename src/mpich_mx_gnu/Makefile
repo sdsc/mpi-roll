@@ -74,8 +74,8 @@ build:
 	  export CFLAGS="$(COMPILE_FLAGS)"; \
 	  export CXX=g++; \
 	  export F90=gfortran; \
+          export FC=gfortran
 	  export F90FLAGS="$(COMPILE_FLAGS)"; \
-	  export FC=gfortran; \
 	  export FFLAGS="$(COMPILE_FLAGS)"; \
 	  export LINKOPT="-Wl,-rpath,$(MXHOME)/lib64,-rpath,$(MXHOME)/lib -L$(MXHOME)/lib64 -L$(MXHOME)/lib -lmyriexpress"; \
 	  export MX_HOME=$(MXHOME); \
