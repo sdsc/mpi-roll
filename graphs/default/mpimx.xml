@@ -33,4 +33,8 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
   <to>mpimx-modules-common</to>
 </edge>
 
+<order head="envmodules-common">
+  <tail>mpimx-modules-common</tail>
+</order>
+
 </graph>
