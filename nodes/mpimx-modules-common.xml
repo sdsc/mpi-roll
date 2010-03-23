@@ -101,15 +101,15 @@ prepend-path PATH $mpich2_mxHome/bin
 prepend-path LD_LIBRARY_PATH $mpich2_mxHome/lib
 </file>
 
-<file name="/opt/modulefiles/mpi/.gnu/mpich2_mx/.version" perms="0644">
+<file name="/opt/modulefiles/mpi/.gnu/mpich2_mx/.version.1.0.7" perms="0644">
 #%Module1.0
 set ModulesVersion "1.0.7"
 </file>
-<file name="/opt/modulefiles/mpi/.intel/mpich2_mx/.version" perms="0644">
+<file name="/opt/modulefiles/mpi/.intel/mpich2_mx/.version.1.0.7" perms="0644">
 #%Module1.0
 set ModulesVersion "1.0.7"
 </file>
-<file name="/opt/modulefiles/mpi/.pgi/mpich2_mx/.version" perms="0644">
+<file name="/opt/modulefiles/mpi/.pgi/mpich2_mx/.version.1.0.7" perms="0644">
 #%Module1.0
 set ModulesVersion "1.0.7"
 </file>
