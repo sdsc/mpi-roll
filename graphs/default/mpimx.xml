@@ -20,20 +20,40 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 <edge from="base">
   <to>mpimx_gnu-common</to>
 </edge>
+<order head="base">
+  <tail>mpimx_gnu-common</tail>
+</order>
 
 <edge from="intel-compilers-common">
   <to>mpimx_intel-common</to>
 </edge>
+<order head="intel-compilers-common">
+  <tail>mpimx_intel-common</tail>
+</order>
 
 <edge from="pgi-common">
   <to>mpimx_pgi-common</to>
 </edge>
+<order head="pgi-common">
+  <tail>mpimx_pgi-common</tail>
+</order>
 
 <edge from="envmodules-common">
   <to>mpimx-modules-common</to>
 </edge>
-
 <order head="envmodules-common">
+  <tail>mpimx-modules-common</tail>
+</order>
+
+<order head="mpimx_gnu-common">
+  <tail>mpimx-modules-common</tail>
+</order>
+
+<order head="mpimx_intel-common">
+  <tail>mpimx-modules-common</tail>
+</order>
+
+<order head="mpimx_pgi-common">
   <tail>mpimx-modules-common</tail>
 </order>
 
