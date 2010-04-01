@@ -25,6 +25,11 @@ Note: MPICH2 doesn't compile w/PGI 8.0 due to compiler bugs.
 <package>openmpi_mx_pgi</package>
 
 <post>
+# The openmpi build seems to have a bug in its libtool processing; it
+# references $(INTSTALL)/lib in its lib/*.la files instead of $(INSTALL)/lib64.
+# This is a cheap/quick fix.
+/usr/bin/perl -pi -e 's#/opt/torque/lib\b#/opt/torque/lib64#g' \
+                     /opt/openmpi/pgi/mx/lib/*.la
 </post>
 
 </kickstart>

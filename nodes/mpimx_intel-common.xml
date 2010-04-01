@@ -22,6 +22,11 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 <package>openmpi_mx_intel</package>
 
 <post>
+# The openmpi build seems to have a bug in its libtool processing; it
+# references $(INTSTALL)/lib in its lib/*.la files instead of $(INSTALL)/lib64.
+# This is a cheap/quick fix.
+/usr/bin/perl -pi -e 's#/opt/torque/lib\b#/opt/torque/lib64#g' \
+                     /opt/openmpi/intel/mx/lib/*.la
 </post>
 
 </kickstart>
