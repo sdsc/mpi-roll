@@ -23,6 +23,7 @@ Note: MPICH2 doesn't compile w/PGI 8.0 due to compiler bugs.
 <package>mpich2_mx_pgi</package>
 -->
 <package>openmpi_mx_pgi</package>
+<package>roll-mpimx-usersguide</package>
 
 <post>
 # The openmpi build seems to have a bug in its libtool processing; it
