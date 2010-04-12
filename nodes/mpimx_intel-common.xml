@@ -20,7 +20,6 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 <package>mpich_mx_intel</package>
 <package>mpich2_mx_intel</package>
 <package>openmpi_mx_intel</package>
-<package>roll-mpimx-usersguide</package>
 
 <post>
 # The openmpi build seems to have a bug in its libtool processing; it

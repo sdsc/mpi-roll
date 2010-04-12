@@ -11,7 +11,7 @@ libraries are included with the MPICH and MPICH2 installations; for OpenMPI,
 only static libraries are provided.  Binaries and libraries produced with the
 GNU compilers are always included.  If the PGI and/or Intel compilers are
 available, compatible versions of the MPI binaries and libraries are also
-installed in subdirectories of each implementation's bin/ and lib/ directories.
+installed in subdirectories of each implementation installation directories.
 (Because of PGI v8.0 compiler bugs, no PGI version of MPICH2 is included.)
 
 </para>

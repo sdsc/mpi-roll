@@ -45,6 +45,13 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
   <tail>mpimx-modules-common</tail>
 </order>
 
+<edge from="server">
+  <to>mpimx-doc</to>
+</edge>
+<order head="server">
+  <tail>mpimx-doc</tail>
+</order>
+
 <order head="mpimx_gnu-common">
   <tail>mpimx-modules-common</tail>
 </order>
