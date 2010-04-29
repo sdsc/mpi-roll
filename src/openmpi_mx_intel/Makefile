@@ -89,7 +89,7 @@ build:
 	  ./configure \
 	    --prefix=$(PKGROOT) --disable-dlopen --enable-mca-static \
 	    --enable-mpi-threads --enable-static --with-mpi-f90-size=large \
-	    --with-mx=$(MXHOME) --with-platform=optimized \
+	    --with-mx=$(MXHOME) --without-openib --with-platform=optimized \
 	    --with-tm=/opt/torque; \
 	  make \
 	)
