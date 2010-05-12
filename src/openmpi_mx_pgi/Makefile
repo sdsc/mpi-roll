@@ -68,7 +68,7 @@ PGIDIR = /opt/pgi/linux86-64/8.0
 COMPILE_FLAGS = -O2
 
 build:
-	tar zxvf $(REDHAT.ROOT)/src/$(SOURCE).tgz
+	tar zxvf $(REDHAT.ROOT)/src/$(SOURCE).tar.gz
 	( \
 	  export PATH=$(PGIDIR)/bin:$${PATH}; \
 	  export LD_LIBRARY_PATH=$(PGIDIR)/libso:$${PATH}; \

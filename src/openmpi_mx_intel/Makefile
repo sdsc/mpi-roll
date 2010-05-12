@@ -72,7 +72,7 @@ MXHOME = /opt/mx
 COMPILE_FLAGS = -I$(MXHOME)/include -O3
 
 build:
-	tar zxvf $(REDHAT.ROOT)/src/$(SOURCE).tgz
+	tar zxvf $(REDHAT.ROOT)/src/$(SOURCE).tar.gz
 	( \
 	  . $(C_INTEL_ENV); \
 	  . $(F_INTEL_ENV); \

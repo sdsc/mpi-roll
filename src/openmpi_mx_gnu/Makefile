@@ -64,10 +64,10 @@ RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 -include $(ROCKSROOT)/etc/Rules.mk
 
 MXHOME = /opt/mx
-COMPILE_FLAGS = -I$(MXHOME)/include -O2
+COMPILE_FLAGS = -I$(MXHOME)/include -O2 -mtune=core2 -march=core2 -mfpmath=sse -msse3 -g -fPIC
 
 build:
-	tar zxvf $(REDHAT.ROOT)/src/$(SOURCE).tgz
+	tar zxvf $(REDHAT.ROOT)/src/$(SOURCE).tar.gz
 	( \
 	  export CC=gcc; \
 	  export CFLAGS="$(COMPILE_FLAGS)"; \
