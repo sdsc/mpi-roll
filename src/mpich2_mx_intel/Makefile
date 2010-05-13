@@ -63,7 +63,7 @@ RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 
 -include $(ROCKSROOT)/etc/Rules.mk
 
-INTEL_BASE = /opt/intel/Compiler/11.1/046
+INTEL_BASE = /opt/intel/Compiler/11.1/072
 C_INTEL_ENV = $(INTEL_BASE)/bin/intel64/iccvars_intel64.sh
 F_INTEL_ENV = $(INTEL_BASE)/bin/intel64/ifortvars_intel64.sh
 INTEL_LICENSE_FILE = /opt/flexlm/license/license-intel.txt
