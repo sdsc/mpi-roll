@@ -30,6 +30,7 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 module-whatis "mpich_mx mpi stack"
 module-whatis "Version: 1.2.7"
 set mpich_mxHome /opt/mpich/gnu/mx
+setenv MPIHOME $mpich_mxHome
 prepend-path PATH $mpich_mxHome/bin
 prepend-path LD_LIBRARY_PATH $mpich_mxHome/lib
 </file>
@@ -38,6 +39,7 @@ prepend-path LD_LIBRARY_PATH $mpich_mxHome/lib
 module-whatis "mpich_mx mpi stack"
 module-whatis "Version: 1.2.7"
 set mpich_mxHome /opt/mpich/intel/mx
+setenv MPIHOME $mpich_mxHome
 prepend-path PATH $mpich_mxHome/bin
 prepend-path LD_LIBRARY_PATH $mpich_mxHome/lib
 </file>
@@ -46,6 +48,7 @@ prepend-path LD_LIBRARY_PATH $mpich_mxHome/lib
 module-whatis "mpich_mx mpi stack"
 module-whatis "Version: 1.2.7"
 set mpich_mxHome /opt/mpich/pgi/mx
+setenv MPIHOME $mpich_mxHome
 prepend-path PATH $mpich_mxHome/bin
 prepend-path LD_LIBRARY_PATH $mpich_mxHome/lib
 </file>
@@ -81,6 +84,7 @@ set ModulesVersion "1.2.7"
 module-whatis "mpich2_mx mpi stack"
 module-whatis "Version: 1.0.7"
 set mpich2_mxHome /opt/mpich2/gnu/mx
+setenv MPIHOME $mpich2_mxHome
 prepend-path PATH $mpich2_mxHome/bin
 prepend-path LD_LIBRARY_PATH $mpich2_mxHome/lib
 </file>
@@ -89,6 +93,7 @@ prepend-path LD_LIBRARY_PATH $mpich2_mxHome/lib
 module-whatis "mpich2_mx mpi stack"
 module-whatis "Version: 1.0.7"
 set mpich2_mxHome /opt/mpich2/intel/mx
+setenv MPIHOME $mpich2_mxHome
 prepend-path PATH $mpich2_mxHome/bin
 prepend-path LD_LIBRARY_PATH $mpich2_mxHome/lib
 </file>
@@ -97,6 +102,7 @@ prepend-path LD_LIBRARY_PATH $mpich2_mxHome/lib
 module-whatis "mpich2_mx mpi stack"
 module-whatis "Version: 1.0.7"
 set mpich2_mxHome /opt/mpich2/pgi/mx
+setenv MPIHOME $mpich2_mxHome
 prepend-path PATH $mpich2_mxHome/bin
 prepend-path LD_LIBRARY_PATH $mpich2_mxHome/lib
 </file>
@@ -133,6 +139,7 @@ export version=1.4.1
 module-whatis "openmpi_mx mpi stack"
 module-whatis "Version: 1.4.1"
 set openmpi_mxHome /opt/openmpi/gnu/mx
+setenv MPIHOME $openmpi_mxHome
 prepend-path PATH $openmpi_mxHome/bin
 prepend-path LD_LIBRARY_PATH $openmpi_mxHome/lib
 </file>
@@ -141,6 +148,7 @@ prepend-path LD_LIBRARY_PATH $openmpi_mxHome/lib
 module-whatis "openmpi_mx mpi stack"
 module-whatis "Version: 1.4.1"
 set openmpi_mxHome /opt/openmpi/intel/mx
+setenv MPIHOME $openmpi_mxHome
 prepend-path PATH $openmpi_mxHome/bin
 prepend-path LD_LIBRARY_PATH $openmpi_mxHome/lib
 </file>
@@ -149,6 +157,7 @@ prepend-path LD_LIBRARY_PATH $openmpi_mxHome/lib
 module-whatis "openmpi_mx mpi stack"
 module-whatis "Version: 1.4.1"
 set openmpi_mxHome /opt/openmpi/pgi/mx
+setenv MPIHOME $openmpi_mxHome
 prepend-path PATH $openmpi_mxHome/bin
 prepend-path LD_LIBRARY_PATH $openmpi_mxHome/lib
 </file>
