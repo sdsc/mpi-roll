@@ -77,7 +77,6 @@ set ModulesVersion "1.2.7"
 
 /bin/mkdir -m 0755 -p /opt/modulefiles/mpi/.gnu/mpich2_mx
 /bin/mkdir -m 0755 -p /opt/modulefiles/mpi/.intel/mpich2_mx
-/bin/mkdir -m 0755 -p /opt/modulefiles/mpi/.pgi/mpich2_mx
 
 <file name="/opt/modulefiles/mpi/.gnu/mpich2_mx/1.0.7" perms="0644">
 #%Module1.0
@@ -97,6 +96,26 @@ setenv MPIHOME $mpich2_mxHome
 prepend-path PATH $mpich2_mxHome/bin
 prepend-path LD_LIBRARY_PATH $mpich2_mxHome/lib
 </file>
+
+<file name="/opt/modulefiles/mpi/.gnu/mpich2_mx/.version.1.0.7" perms="0644">
+#%Module1.0
+set ModulesVersion "1.0.7"
+</file>
+<file name="/opt/modulefiles/mpi/.intel/mpich2_mx/.version.1.0.7" perms="0644">
+#%Module1.0
+set ModulesVersion "1.0.7"
+</file>
+
+/bin/ln -s /opt/modulefiles/mpi/.gnu/mpich2_mx/.version.1.0.7 \
+           /opt/modulefiles/mpi/.gnu/mpich2_mx/.version
+/bin/ln -s /opt/modulefiles/mpi/.intel/mpich2_mx/.version.1.0.7 \
+           /opt/modulefiles/mpi/.intel/mpich2_mx/.version
+
+<!-- this will work when/if pgi can compile mpich2 -->
+if test -d /opt/mpich2/pgi/mx; then
+
+/bin/mkdir -m 0755 -p /opt/modulefiles/mpi/.pgi/mpich2_mx
+
 <file name="/opt/modulefiles/mpi/.pgi/mpich2_mx/1.0.7" perms="0644">
 #%Module1.0
 module-whatis "mpich2_mx mpi stack"
@@ -107,25 +126,15 @@ prepend-path PATH $mpich2_mxHome/bin
 prepend-path LD_LIBRARY_PATH $mpich2_mxHome/lib
 </file>
 
-<file name="/opt/modulefiles/mpi/.gnu/mpich2_mx/.version.1.0.7" perms="0644">
-#%Module1.0
-set ModulesVersion "1.0.7"
-</file>
-<file name="/opt/modulefiles/mpi/.intel/mpich2_mx/.version.1.0.7" perms="0644">
-#%Module1.0
-set ModulesVersion "1.0.7"
-</file>
 <file name="/opt/modulefiles/mpi/.pgi/mpich2_mx/.version.1.0.7" perms="0644">
 #%Module1.0
 set ModulesVersion "1.0.7"
 </file>
 
-/bin/ln -s /opt/modulefiles/mpi/.gnu/mpich2_mx/.version.1.0.7 \
-           /opt/modulefiles/mpi/.gnu/mpich2_mx/.version
-/bin/ln -s /opt/modulefiles/mpi/.intel/mpich2_mx/.version.1.0.7 \
-           /opt/modulefiles/mpi/.intel/mpich2_mx/.version
 /bin/ln -s /opt/modulefiles/mpi/.pgi/mpich2_mx/.version.1.0.7 \
            /opt/modulefiles/mpi/.pgi/mpich2_mx/.version
+
+fi
 
 # OPENMPI
 
