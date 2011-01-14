@@ -64,14 +64,17 @@ RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 -include $(ROCKSROOT)/etc/Rules.mk
 
 MXHOME = /opt/mx
-PGIDIR = /opt/pgi/linux86-64/10.5
 COMPILE_FLAGS = -O2
 
 build:
 	tar zxvf $(REDHAT.ROOT)/src/$(SOURCE).tar.gz
 	( \
-	  export PATH=$(PGIDIR)/bin:$${PATH}; \
-	  export LD_LIBRARY_PATH=$(PGIDIR)/libso:$${PATH}; \
+	  export PGCCPATH=`which pgcc 2>/dev/null || true`; \
+          if test -z "$${PGCCPATH}" -a \
+                  -e /etc/profile.d/modules.sh; then \
+            . /etc/profile.d/modules.sh; \
+            module load pgi; \
+          fi; \
 	  export CC=pgcc; \
 	  export CFLAGS="$(COMPILE_FLAGS)"; \
 	  export CXX=pgCC; \
@@ -93,16 +96,12 @@ build:
 install::
 	mkdir -p $(INSTDIR)
 	( \
-	  export PATH=$(PGIDIR)/bin:$${PATH}; \
-	  export LD_LIBRARY_PATH=$(PGIDIR)/libso:$${PATH}; \
-	  export CC=pgcc; \
-	  export CFLAGS="$(COMPILE_FLAGS)"; \
-	  export CXX=pgCC; \
-	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
-	  export FC=pgf90; \
-	  export FCFLAGS="$(COMPILE_FLAGS)"; \
-	  export F77=pgf77; \
-	  export FFLAGS="$(COMPILE_FLAGS)"; \
+	  export PGCCPATH=`which pgcc 2>/dev/null || true`; \
+          if test -z "$${PGCCPATH}" -a \
+                  -e /etc/profile.d/modules.sh; then \
+            . /etc/profile.d/modules.sh; \
+            module load pgi; \
+          fi; \
 	  cd $(SOURCE); \
 	  make prefix=$(INSTDIR) install \
 	)

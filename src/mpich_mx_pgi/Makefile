@@ -64,15 +64,18 @@ RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 -include $(ROCKSROOT)/etc/Rules.mk
 
 MXHOME = /opt/mx
-PGIDIR = /opt/pgi/linux86-64/10.5
 COMPILE_FLAGS = -I$(MXHOME)/include -O
 
 build:
 	tar zxvf $(REDHAT.ROOT)/src/$(SOURCE).tgz
 	cd patch-files && find . -type f | grep -v CVS | cpio -pduv ../
 	( \
-	  export PATH=$(PGIDIR)/bin:$${PATH}; \
-	  export LD_LIBRARY_PATH=$(PGIDIR)/libso:$${PATH}; \
+	  export PGCCPATH=`which pgcc 2>/dev/null || true`; \
+          if test -z "$${PGCCPATH}" -a \
+                  -e /etc/profile.d/modules.sh; then \
+            . /etc/profile.d/modules.sh; \
+            module load pgi; \
+          fi; \
 	  export CC=pgcc; \
 	  export CFLAGS="$(COMPILE_FLAGS)"; \
 	  export CXX=pgCC; \

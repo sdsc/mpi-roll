@@ -63,20 +63,18 @@ RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 
 -include $(ROCKSROOT)/etc/Rules.mk
 
-INTEL_BASE = /opt/intel/Compiler/11.1/072
-C_INTEL_ENV = $(INTEL_BASE)/bin/intel64/iccvars_intel64.sh
-F_INTEL_ENV = $(INTEL_BASE)/bin/intel64/ifortvars_intel64.sh
-INTEL_LICENSE_FILE = /opt/flexlm/license/license-intel.txt
-
 MXHOME = /opt/mx
 COMPILE_FLAGS = -I$(MXHOME)/include -O3
 
 build:
 	tar zxvf $(REDHAT.ROOT)/src/$(SOURCE).tar.gz
 	( \
-	  . $(C_INTEL_ENV); \
-	  . $(F_INTEL_ENV); \
-	  export INTEL_LICENSE_FILE=$(INTEL_LICENSE_FILE); \
+	  export ICCPATH=`which icc 2>/dev/null || true`; \
+          if test -z "$${ICCPATH}" -a \
+                  -e /etc/profile.d/modules.sh; then \
+            . /etc/profile.d/modules.sh; \
+            module load intel; \
+          fi; \
 	  export CC=icc; \
 	  export CFLAGS="$(COMPILE_FLAGS)"; \
 	  export CXX=icpc; \
@@ -98,9 +96,12 @@ build:
 install::
 	mkdir -p $(INSTDIR)
 	( \
-	  . $(C_INTEL_ENV); \
-	  . $(F_INTEL_ENV); \
-	  export INTEL_LICENSE_FILE=$(INTEL_LICENSE_FILE); \
+	  export ICCPATH=`which icc 2>/dev/null || true`; \
+          if test -z "$${ICCPATH}" -a \
+                  -e /etc/profile.d/modules.sh; then \
+            . /etc/profile.d/modules.sh; \
+            module load intel; \
+          fi; \
 	  cd $(SOURCE); \
 	  make prefix=$(INSTDIR) install \
 	)
