@@ -5,6 +5,14 @@ $Id$
 @Copyright@
 
 $Log$
+Revision 1.2  2011/02/14 23:34:12  mjk
+NOTICE: Rocks build environment has changed
+
+You must rebuild and install the rocks-devel package (base roll).  Only
+then can you build docs on your frontend.
+
+All usersguides have been updated to build with the new rules.
+
 Revision 1.1  2009/12/11 19:10:16  jhayes
 Add usersguide.
 
@@ -27,13 +35,13 @@ added
 <book>
 <bookinfo>
 
-	<title> mpimx Roll: Users Guide </title>
+	<title> mpimx Users Guide </title>
 
-        <edition>Version &document_version;</edition>
-        <pubdate>&document_pubdate;</pubdate>
+        <edition>&document-version;</edition>
+        <pubdate>&document-pubdate;</pubdate>
         <copyright id="copyright" xreflabel="copyright">
-                <year>&document_year;</year>
-                <holder>&document_copyright;</holder>   
+                <year>&document-year;</year>
+                <holder>&document-copyright;</holder>   
         </copyright>
 
         <releaseinfo>
@@ -42,16 +50,16 @@ added
 
         <legalnotice>
                 <para>
-                This document is subject to the Rocks License 
+                This document is subject to the &rocks; License 
                 (see <xref linkend="rocks-copyright">).
                 </para>
         </legalnotice>
 
 </bookinfo>
 
-&source_preface;
-&source_roll-overview;
-&source_installing;
-&source_appendix;
+&source-preface;
+&source-roll-overview;
+&source-installing;
+&source-appendix;
 
 </book>

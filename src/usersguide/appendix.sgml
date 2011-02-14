@@ -7,6 +7,14 @@ Appendix for Copyright and License notices
 @Copyright@
 
 $Log$
+Revision 1.2  2011/02/14 23:34:12  mjk
+NOTICE: Rocks build environment has changed
+
+You must rebuild and install the rocks-devel package (base roll).  Only
+then can you build docs on your frontend.
+
+All usersguides have been updated to build with the new rules.
+
 Revision 1.1  2009/12/11 19:10:16  jhayes
 Add usersguide.
 
@@ -20,7 +28,7 @@ added
 -->
 
 <appendix id="rocks-copyright" xreflabel="Appendix A: Rocks Copyright">
-<title>Rocks Copyright</title>
+<title>&rocks; Copyright</title>
 <para>
 <screen>
 &rockscopyright;
@@ -32,7 +40,7 @@ added
 <appendix>
 <title>Third Party Copyrights and Licenses</title>
 
-&source_roll-copyright-disclaimer;
+&source-roll-copyright-disclaimer;
 
 <section>
 	<title>MPICH License and Copyright</title>
