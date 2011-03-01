@@ -1,4 +1,4 @@
-ROLLNAME = mpimx
+ROLLNAME = mpi$(ROLLSUFFIX)
 RELEASE  = 0
 COLOR    = orange
 

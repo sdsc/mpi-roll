@@ -7,7 +7,7 @@
 # 		         www.rocksclusters.org
 # 		        version 4.3 (Mars Hill)
 #
-# Copyright (c) 2000 - 2007 The Regents of the University of California.
+# Copyright (c) 2000 - 2011 The Regents of the University of California.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -53,50 +53,82 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # @Copyright@
-#
 
-PKGROOT = /opt/mpich/gnu/mx
-INSTDIR = $(ROOT)/$(PKGROOT)
-SOURCE = mpich-$(VERSION)
+ifndef ROLLCOMPILER
+  ROLLCOMPILER = gnu
+endif
+ifndef ROLLNETWORK
+  ROLLNETWORK = eth
+endif
+
+PKGROOT = /opt/openmpi/$(ROLLCOMPILER)/$(ROLLNETWORK)
+SOURCE = openmpi-$(VERSION)
 REDHAT.ROOT = $(PWD)/../../
+
+INSTDIR = $(ROOT)/$(PKGROOT)
 RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 
 -include $(ROCKSROOT)/etc/Rules.mk
 
-MXHOME = /opt/mx
-COMPILE_FLAGS = -I$(MXHOME)/include -O2
+COMPILERSETUP = \
+  if test -e /etc/profile.d/modules.sh; then \
+    . /etc/profile.d/modules.sh; \
+    module load $(ROLLCOMPILER); \
+  fi
+
+CCOMP = gcc
+CPPCOMP = g++
+FCOMP = gfortran
+F90COMP = gfortran
+COMPILE_FLAGS = -O2 -mtune=core2 -march=core2 -mfpmath=sse -msse3 -g -fPIC
+ifeq ("$(ROLLCOMPILER)", "intel")
+  CCOMP = icc
+  CPPCOMP = icpc
+  FCOMP = ifort
+  F90COMP = ifort
+  COMPILE_FLAGS = -O
+else ifeq ("$(ROLLCOMPILER)", "pgi")
+  CCOMP = pgcc
+  CPPCOMP = pgCC
+  FCOMP = pgf77
+  F90COMP = pgf90
+  COMPILE_FLAGS = -O
+endif
+
+CONFIG_OPTS = --prefix=$(PKGROOT) --disable-dlopen --enable-mca-static \
+              --enable-mpi-threads --enable-static --with-mpi-f90-size=large \
+              --with-platform=optimized --with-tm=/opt/torque
+ifeq ("$(ROLLNETWORK)", "mx")
+  MXHOME = /opt/mx
+  COMPILE_FLAGS += -I$(MXHOME)/include
+  CONFIG_OPTS += --with-mx=$(MXHOME) --without-openib
+endif
 
 build:
-	tar zxvf $(REDHAT.ROOT)/src/$(SOURCE).tgz
-	cd patch-files && find . -type f | grep -v CVS | cpio -pduv ../
+	tar zxvf $(SOURCE).tar.gz
 	( \
-	  export CC=gcc; \
+	  $(COMPILERSETUP); \
+	  export CC=$(CCOMP); \
 	  export CFLAGS="$(COMPILE_FLAGS)"; \
-	  export CXX=g++; \
-	  export F90=gfortran; \
-          export FC=gfortran; \
-	  export F90FLAGS="$(COMPILE_FLAGS)"; \
+	  export CXX=$(CPPCOMP); \
+	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
+	  export F77=$(FCOMP); \
 	  export FFLAGS="$(COMPILE_FLAGS)"; \
-	  export LINKOPT="-Wl,-rpath,$(MXHOME)/lib64,-rpath,$(MXHOME)/lib -L$(MXHOME)/lib64 -L$(MXHOME)/lib -lmyriexpress"; \
-	  export MX_HOME=$(MXHOME); \
-	  export PREFIX=$(PKGROOT); \
-	  export RSHCOMMAND=ssh; \
+	  export FC=$(F90COMP); \
+	  export FCFLAGS="$(COMPILE_FLAGS)"; \
 	  cd $(SOURCE); \
-	  ./configure --prefix=$(PKGROOT) -lib="$$LINKOPT" -opt="-O" \
-	              --with-device=ch_mx --enable-sharedlib; \
+	  ./configure $(CONFIG_OPTS); \
 	  make \
 	)
 
 # Clean immediately after install to free disk space
 install::
 	mkdir -p $(INSTDIR)
-	if [ ! -d $(PKGROOT) ]; then mkdir -p $(PKGROOT); fi
-	mount --bind $(INSTDIR) $(PKGROOT)
 	( \
+	  $(COMPILERSETUP); \
 	  cd $(SOURCE); \
-	  make install \
+	  make prefix=$(INSTDIR) install \
 	)
-	umount $(PKGROOT)
 	rm -fr $(SOURCE)
 
 clean::

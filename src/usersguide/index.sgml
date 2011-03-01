@@ -5,6 +5,9 @@ $Id$
 @Copyright@
 
 $Log$
+Revision 1.3  2011/03/01 19:12:29  jhayes
+Support ROLLCOMPILER and ROLLNETWORK make variables.  Upgrade mpich2 version.
+
 Revision 1.2  2011/02/14 23:34:12  mjk
 NOTICE: Rocks build environment has changed
 
@@ -35,7 +38,7 @@ added
 <book>
 <bookinfo>
 
-	<title> mpimx Users Guide </title>
+	<title> mpi Users Guide </title>
 
         <edition>&document-version;</edition>
         <pubdate>&document-pubdate;</pubdate>
@@ -45,7 +48,7 @@ added
         </copyright>
 
         <releaseinfo>
-                <ulink url="roll-mpimx-usersguide.pdf">(PDF version)</ulink>
+                <ulink url="roll-mpi-usersguide.pdf">(PDF version)</ulink>
         </releaseinfo>
 
         <legalnotice>

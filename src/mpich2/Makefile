@@ -7,7 +7,7 @@
 # 		         www.rocksclusters.org
 # 		        version 4.3 (Mars Hill)
 #
-# Copyright (c) 2000 - 2007 The Regents of the University of California.
+# Copyright (c) 2000 - 2011 The Regents of the University of California.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -53,59 +53,92 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # @Copyright@
-#
 
-PKGROOT = /opt/openmpi/intel/mx
-INSTDIR = $(ROOT)/$(PKGROOT)
-SOURCE = openmpi-$(VERSION)
+ifndef ROLLCOMPILER
+  ROLLCOMPILER = gnu
+endif
+ifndef ROLLNETWORK
+  ROLLNETWORK = eth
+endif
+
+PKGROOT = /opt/mpich2/$(ROLLCOMPILER)/$(ROLLNETWORK)
+SOURCE = mpich2-$(VERSION)
 REDHAT.ROOT = $(PWD)/../../
+
+INSTDIR = $(ROOT)/$(PKGROOT)
 RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 
 -include $(ROCKSROOT)/etc/Rules.mk
 
-MXHOME = /opt/mx
-COMPILE_FLAGS = -I$(MXHOME)/include -O3
+COMPILERSETUP = \
+  if test -e /etc/profile.d/modules.sh; then \
+    . /etc/profile.d/modules.sh; \
+    module load $(ROLLCOMPILER); \
+  fi
+
+CCOMP = gcc
+CPPCOM = g++
+FCOMP = gfortran
+F90COMP = gfortran
+COMPILE_FLAGS = -O2
+ifeq ("$(ROLLCOMPILER)", "intel")
+  CCOMP = icc
+  CPPCOMP = icpc
+  FCOMP = ifort
+  F90COMP = ifort
+  COMPILE_FLAGS = -O
+else ifeq ("$(ROLLCOMPILER)", "pgi")
+  CCOMP = pgcc
+  CPPCOMP = pgCC
+  FCOMP = pgf90
+  F90COMP = pgf90
+  COMPILE_FLAGS = -O
+endif
+
+CONFIG_OPTS = --prefix=$(PKGROOT) --enable-shared --enable-sharedlibs=gcc
+NETWORKSETUP = cat /dev/null
+ifeq ("$(ROLLNETWORK)", "mx")
+  MXHOME = /opt/mx
+  COMPILE_FLAGS += -I$(MXHOME)/include
+  CONFIG_OPTS += --with-device=ch3:nemesis:mx \
+                 --with-mx-include=$(MXHOME)/include \
+                 --with-mx-lib=$(MXHOME)/lib
+  NETWORKSETUP = export LD_LIBRARY_PATH=$(MXHOME)/lib:$$LD_LIBRARY_PATH
+endif
+
+#	  export FFLAGS="$(COMPILE_FLAGS)"; \
+#	  export F90=$(F90COMP); \
+#	  export F90FLAGS="$(COMPILE_FLAGS)"; \
 
 build:
-	tar zxvf $(REDHAT.ROOT)/src/$(SOURCE).tar.gz
+	tar zxvf $(SOURCE).tgz
 	( \
-	  export ICCPATH=`which icc 2>/dev/null || true`; \
-          if test -z "$${ICCPATH}" -a \
-                  -e /etc/profile.d/modules.sh; then \
-            . /etc/profile.d/modules.sh; \
-            module load intel; \
-          fi; \
-	  export CC=icc; \
+	  $(COMPILERSETUP); \
+	  $(NETWORKSETUP); \
+	  export CC=$(CCOMP); \
 	  export CFLAGS="$(COMPILE_FLAGS)"; \
-	  export CXX=icpc; \
+	  export CXX=$(CPPCOMP); \
 	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
-	  export FC=ifort; \
+	  export FC=$(FCOMP); \
 	  export FCFLAGS="$(COMPILE_FLAGS)"; \
-	  export F77=ifort; \
-	  export FFLAGS="$(COMPILE_FLAGS)"; \
+	  export PREFIX=$(PKGROOT); \
 	  cd $(SOURCE); \
-	  ./configure \
-	    --prefix=$(PKGROOT) --disable-dlopen --enable-mca-static \
-	    --enable-mpi-threads --enable-static --with-mpi-f90-size=large \
-	    --with-mx=$(MXHOME) --without-openib --with-platform=optimized \
-	    --with-tm=/opt/torque; \
+	  ./configure $(CONFIG_OPTS); \
 	  make \
 	)
 
 # Clean immediately after install to free disk space
 install::
 	mkdir -p $(INSTDIR)
+	if [ ! -d $(PKGROOT) ]; then mkdir -p $(PKGROOT); fi
+	mount --bind $(INSTDIR) $(PKGROOT)
 	( \
-	  export ICCPATH=`which icc 2>/dev/null || true`; \
-          if test -z "$${ICCPATH}" -a \
-                  -e /etc/profile.d/modules.sh; then \
-            . /etc/profile.d/modules.sh; \
-            module load intel; \
-          fi; \
+	  $(COMPILERSETUP); \
 	  cd $(SOURCE); \
-	  make prefix=$(INSTDIR) install \
+	  make install \
 	)
-	rm -rf $(SOURCE)
+	umount $(PKGROOT)
+	rm -fr $(SOURCE)
 
 clean::
-	rm -rf $(SOURCE)
+	rm -fr $(SOURCE)

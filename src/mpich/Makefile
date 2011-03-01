@@ -7,7 +7,7 @@
 # 		         www.rocksclusters.org
 # 		        version 4.3 (Mars Hill)
 #
-# Copyright (c) 2000 - 2007 The Regents of the University of California.
+# Copyright (c) 2000 - 2011 The Regents of the University of California.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -53,42 +53,74 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # @Copyright@
-#
 
-PKGROOT = /opt/mpich2/pgi/mx
-INSTDIR = $(ROOT)/$(PKGROOT)
-SOURCE = mpich2-$(VERSION)
+ifndef ROLLCOMPILER
+  ROLLCOMPILER = gnu
+endif
+ifndef ROLLNETWORK
+  ROLLNETWORK = eth
+endif
+
+PKGROOT = /opt/mpich/$(ROLLCOMPILER)/$(ROLLNETWORK)
+SOURCE = mpich-$(VERSION)
 REDHAT.ROOT = $(PWD)/../../
+
+INSTDIR = $(ROOT)/$(PKGROOT)
 RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 
 -include $(ROCKSROOT)/etc/Rules.mk
 
-MXHOME = /opt/mx
-COMPILE_FLAGS = -I$(MXHOME)/include -O
+COMPILERSETUP = \
+  if test -e /etc/profile.d/modules.sh; then \
+    . /etc/profile.d/modules.sh; \
+    module load $(ROLLCOMPILER); \
+  fi
+
+CCOMP = gcc
+CPPCOMP = g++
+FCOMP = gfortran
+F90COMP = gfortran
+COMPILE_FLAGS = -O2
+ifeq ("$(ROLLCOMPILER)", "intel")
+  CCOMP = icc
+  CPPCOMP = icpc
+  FCOMP = ifort
+  F90COMP = ifort
+  COMPILE_FLAGS = -O
+else ifeq ("$(ROLLCOMPILER)", "pgi")
+  CCOMP = pgcc
+  CPPCOMP = pgCC
+  FCOMP = pgf77
+  F90COMP = pgf90
+  COMPILE_FLAGS = -O
+endif
+
+CONFIG_OPTS = --prefix=$(PKGROOT) -opt="-O"  --enable-sharedlib
+ifeq ("$(ROLLNETWORK)", "mx")
+  MXHOME = /opt/mx
+  COMPILE_FLAGS += -I$(MXHOME)/include
+  CONFIG_OPTS += -lib="-Wl,-rpath,$(MXHOME)/lib64,-rpath,$(MXHOME)/lib -L$(MXHOME)/lib64 -L$(MXHOME)/lib -lmyriexpress" --with-device=ch_mx
+else
+  CONFIG_OPTS += --with-device=ch_p4
+endif
 
 build:
-	tar zxvf $(REDHAT.ROOT)/src/$(SOURCE).tgz
+	tar zxvf $(SOURCE).tgz
+	cp patch-files/mpirun.ch_mx.pl.in $(SOURCE)/mpid/ch_mx/
+	cp patch-files/mxmpi_conf.c $(SOURCE)/mpid/ch_mx/
 	( \
-	  export PGCCPATH=`which pgcc 2>/dev/null || true`; \
-          if test -z "$${PGCCPATH}" -a \
-                  -e /etc/profile.d/modules.sh; then \
-            . /etc/profile.d/modules.sh; \
-            module load pgi; \
-          fi; \
-	  export CC=pgcc; \
+	  $(COMPILERSETUP); \
+	  export CC=$(CCOMP); \
 	  export CFLAGS="$(COMPILE_FLAGS)"; \
-	  export CXX=pgCC; \
-	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
-	  export F90=pgf90; \
-	  export F90FLAGS="$(COMPILE_FLAGS)"; \
-	  export FC=pgf77; \
+	  export CXX=$(CPPCOMP); \
+          export FC=$(FCOMP); \
 	  export FFLAGS="$(COMPILE_FLAGS)"; \
+	  export F90=$(F90COMP); \
+	  export F90FLAGS="$(COMPILE_FLAGS)"; \
 	  export PREFIX=$(PKGROOT); \
-	  export LD_LIBRARY_PATH=$(MXHOME)/lib:$$LD_LIBRARY_PATH; \
+	  export RSHCOMMAND=ssh; \
 	  cd $(SOURCE); \
-	  ./configure --prefix=$(PKGROOT) \
-	    --with-device=ch3:nemesis:mx --enable-sharedlibs=gcc \
-	    --with-mx-include=$(MXHOME)/include --with-mx-lib=$(MXHOME)/lib; \
+	  ./configure $(CONFIG_OPTS); \
 	  make \
 	)
 
@@ -98,6 +130,7 @@ install::
 	if [ ! -d $(PKGROOT) ]; then mkdir -p $(PKGROOT); fi
 	mount --bind $(INSTDIR) $(PKGROOT)
 	( \
+	  $(COMPILERSETUP); \
 	  cd $(SOURCE); \
 	  make install \
 	)

@@ -7,7 +7,7 @@
 # 		         www.rocksclusters.org
 # 		        version 4.3 (Mars Hill)
 # 
-# Copyright (c) 2000 - 2007 The Regents of the University of California.
+# Copyright (c) 2000 - 2011 The Regents of the University of California.
 # All rights reserved.	
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -63,11 +63,11 @@ REDHAT.ROOT = $(PWD)/../../
 default: $(NAME).spec ../$(NAME)-$(VERSION).tar.gz
 
 html: predoc
-	cp images/select-mpimx.png images/roll-select-rolls.png
+	cp images/select-mpi.png images/roll-select-rolls.png
 	jw --backend html --dsl $(PWD)/rocks.dsl#html index.sgml
 
 pdf: predoc
-	cp images/select-mpimx.png images/roll-select-rolls.png
+	cp images/select-mpi.png images/roll-select-rolls.png
 	jw --backend pdf --dsl $(PWD)/rocks.dsl#print index.sgml
 
 build: html pdf

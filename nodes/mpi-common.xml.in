@@ -3,33 +3,30 @@
 <kickstart>
 
 <description>
-MPI libraries for MX and PGI compilers
+MPI libraries
 http://www.mcs.anl.gov/research/projects/mpi/mpich1
 http://www.mcs.anl.gov/research/projects/mpich2
 http://www.open-mpi.org
 </description>
 
 <copyright>
-Copyright (c) 2000 - 2009 The Regents of the University of California.
+Copyright (c) 2000 - 2011 The Regents of the University of California.
 All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 </copyright>
 
 <changelog>
 </changelog>
 
-<package>mpich_mx_pgi</package>
-<!--
-Note: MPICH2 doesn't compile w/PGI 8.0 due to compiler bugs.
-<package>mpich2_mx_pgi</package>
--->
-<package>openmpi_mx_pgi</package>
+<package>mpich_ROLLCOMPILER_ROLLNETWORK</package>
+<package>mpich2_ROLLCOMPILER_ROLLNETWORK</package>
+<package>openmpi_ROLLCOMPILER_ROLLNETWORK</package>
 
 <post>
 # The openmpi build seems to have a bug in its libtool processing; it
 # references $(INTSTALL)/lib in its lib/*.la files instead of $(INSTALL)/lib64.
 # This is a cheap/quick fix.
 /usr/bin/perl -pi -e 's#/opt/torque/lib\b#/opt/torque/lib64#g' \
-                     /opt/openmpi/pgi/mx/lib/*.la
+                     /opt/openmpi/ROLLCOMPILER/ROLLNETWORK/lib/*.la
 </post>
 
 </kickstart>

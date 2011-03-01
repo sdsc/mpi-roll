@@ -6,7 +6,7 @@
 # 		         www.rocksclusters.org
 # 		        version 4.3 (Mars Hill)
 # 
-# Copyright (c) 2000 - 2007 The Regents of the University of California.
+# Copyright (c) 2000 - 2011 The Regents of the University of California.
 # All rights reserved.	
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -52,6 +52,41 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
 # @Copyright@
+#
+# $Log$
+# Revision 1.5  2011/03/01 19:12:22  jhayes
+# Support ROLLCOMPILER and ROLLNETWORK make variables.  Upgrade mpich2 version.
+#
+# Revision 1.2  2011/02/16 19:18:27  jhayes
+# Update copyrights.
+#
+# Revision 1.1  2010/07/20 20:52:31  jpg
+#
+#
+# source for amber
+#
+# Jerry
+#
+# Revision 1.1  2010/05/14 20:45:14  jpg
+#
+#
+# amber files
+#
+# Jerry
+#
+# Revision 1.1  2010/02/08 01:06:51  jhayes
+# Add build files.
+#
+# Revision 1.1  2009/07/29 03:21:52  jpg
+#
+#  nwchem Makefile linux.mk
+#
+# Revision 1.1  2009/05/17 19:56:22  jpg
+#
+#
+# Changed the build target in the Makefile so that one can pick a build target,and "actvte"
+# target(99.99% of the time it's *UNX). Next, I will add FORTRAN targets where the GAMESS build scripts allows for a choice
+#
 #
 
 SRCDIRS = `find . -type d -maxdepth 1 \

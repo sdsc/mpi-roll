@@ -3,21 +3,21 @@
 <kickstart>
 
 <description>
-MPI libraries for MX roll documentation
+MPI libraries roll documentation
 http://www.mcs.anl.gov/research/projects/mpi/mpich1
 http://www.mcs.anl.gov/research/projects/mpich2
 http://www.open-mpi.org
 </description>
 
 <copyright>
-Copyright (c) 2000 - 2009 The Regents of the University of California.
+Copyright (c) 2000 - 2011 The Regents of the University of California.
 All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 </copyright>
 
 <changelog>
 </changelog>
 
-<package>roll-mpimx-usersguide</package>
+<package>roll-mpi-usersguide</package>
 
 <post>
 </post>

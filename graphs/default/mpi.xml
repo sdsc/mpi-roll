@@ -1,0 +1,45 @@
+<?xml version="1.0" standalone="no"?>
+
+<graph>
+
+<description>
+MPI libraries
+http://www.mcs.anl.gov/research/projects/mpi/mpich1
+http://www.mcs.anl.gov/research/projects/mpich2
+http://www.open-mpi.org
+</description>
+
+<copyright>
+Copyright (c) 2000 - 2011 The Regents of the University of California.
+All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
+</copyright>
+
+<changelog>
+</changelog>
+
+<edge from="base">
+  <to>mpi-common</to>
+</edge>
+<order head="base">
+  <tail>mpi-common</tail>
+</order>
+
+<edge from="envmodules-common">
+  <to>mpi-modules-common</to>
+</edge>
+<order head="envmodules-common">
+  <tail>mpi-modules-common</tail>
+</order>
+
+<edge from="server">
+  <to>mpi-doc</to>
+</edge>
+<order head="server">
+  <tail>mpi-doc</tail>
+</order>
+
+<order head="mpi-common">
+  <tail>mpi-modules-common</tail>
+</order>
+
+</graph>
