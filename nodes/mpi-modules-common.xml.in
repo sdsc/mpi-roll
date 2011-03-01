@@ -1,0 +1,109 @@
+<?xml version="1.0" standalone="no"?>
+
+<kickstart>
+
+<description>
+MPI libraries modules files
+http://www.mcs.anl.gov/research/projects/mpi/mpich1
+http://www.mcs.anl.gov/research/projects/mpich2
+http://www.open-mpi.org
+</description>
+
+<copyright>
+Copyright (c) 2000 - 2011 The Regents of the University of California.
+All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
+</copyright>
+
+<changelog>
+</changelog>
+
+<post>
+
+COMPS='
+ROLLCOMPILER
+'
+NETS='
+ROLLNETWORK
+'
+
+for COMP in ${COMPS}; do
+  for NET in ${NETS}; do
+
+# MPICH
+
+/bin/mkdir -m 0755 -p /opt/modulefiles/mpi/.${COMP}/mpich_${NET}
+
+/bin/cat > /opt/modulefiles/mpi/.${COMP}/mpich_${NET}/1.2.7 << END
+#%Module1.0
+module-whatis "mpich_${NET} mpi stack"
+module-whatis "Version: 1.2.7"
+set mpiHome /opt/mpich/${COMP}/${NET}
+setenv MPIHOME \$mpiHome
+prepend-path PATH \$mpiHome/bin
+prepend-path LD_LIBRARY_PATH \$mpiHome/lib
+END
+/bin/chmod 0644 /opt/modulefiles/mpi/.${COMP}/mpich_${NET}/1.2.7
+
+/bin/cat > /opt/modulefiles/mpi/.${COMP}/mpich_${NET}/.version.1.2.7 << END
+#%Module1.0
+set ModulesVersion "1.2.7"
+END
+/bin/chmod 0644 /opt/modulefiles/mpi/.${COMP}/mpich_${NET}/.version.1.2.7
+
+/bin/ln -s /opt/modulefiles/mpi/.${COMP}/mpich_${NET}/.version.1.2.7 \
+           /opt/modulefiles/mpi/.${COMP}/mpich_${NET}/.version
+
+# MPICH2
+
+/bin/mkdir -m 0755 -p /opt/modulefiles/mpi/.${COMP}/mpich2_${NET}
+
+/bin/cat > /opt/modulefiles/mpi/.${COMP}/mpich2_${NET}/1.0.7 << END
+#%Module1.0
+module-whatis "mpich2_${NET} mpi stack"
+module-whatis "Version: 1.0.7"
+set mpiHome /opt/mpich2/${COMP}/${NET}
+setenv MPIHOME \$mpiHome
+prepend-path PATH \$mpiHome/bin
+prepend-path LD_LIBRARY_PATH \$mpiHome/lib
+END
+/bin/chmod 0644 /opt/modulefiles/mpi/.${COMP}/mpich2_${NET}/1.0.7
+
+/bin/cat > /opt/modulefiles/mpi/.${COMP}/mpich2_${NET}/.version.1.0.7 << END
+#%Module1.0
+set ModulesVersion "1.0.7"
+END
+/bin/chmod 0644 /opt/modulefiles/mpi/.${COMP}/mpich2_${NET}/.version.1.0.7
+
+/bin/ln -s /opt/modulefiles/mpi/.${COMP}/mpich2_${NET}/.version.1.0.7 \
+           /opt/modulefiles/mpi/.${COMP}/mpich2_${NET}/.version
+
+# OPENMPI
+
+/bin/mkdir -m 0755 -p /opt/modulefiles/mpi/.${COMP}/openmpi_${NET}
+
+/bin/cat > /opt/modulefiles/mpi/.${COMP}/openmpi_${NET}/1.4.1 << END
+#%Module1.0
+module-whatis "openmpi_${NET} mpi stack"
+module-whatis "Version: 1.4.1"
+set mpiHome /opt/openmpi/${COMP}/${NET}
+setenv MPIHOME \$mpiHome
+prepend-path PATH \$mpiHome/bin
+prepend-path LD_LIBRARY_PATH \$mpiHome/lib
+END
+/bin/chmod 0644 /opt/modulefiles/mpi/.${COMP}/openmpi_${NET}/1.4.1
+
+/bin/cat > /opt/modulefiles/mpi/.${COMP}/openmpi_${NET}/.version.1.4.1 << END
+#%Module1.0
+set ModulesVersion "1.4.1"
+END
+/bin/chmod 0644 /opt/modulefiles/mpi/.${COMP}/openmpi_${NET}/.version.1.4.1
+
+/bin/ln -s /opt/modulefiles/mpi/.${COMP}/openmpi_${NET}/.version.1.4.1 \
+           /opt/modulefiles/mpi/.${COMP}/openmpi_${NET}/.version
+
+  done
+done
+
+</post>
+
+</kickstart>
