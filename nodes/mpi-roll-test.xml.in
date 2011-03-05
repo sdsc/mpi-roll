@@ -1,0 +1,127 @@
+<?xml version="1.0" standalone="no"?>
+
+<kickstart>
+
+<description>
+MPI roll installation test.
+</description>
+
+<copyright>
+Copyright (c) 2000 - 2011 The Regents of the University of California.
+All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
+</copyright>
+
+<changelog>
+</changelog>
+
+<post>
+
+/bin/mkdir -m 0755 /root/rolltests
+
+<file name="/root/rolltests/mpi.t" perms="0755">
+<![CDATA[#!/usr/bin/perl -w
+
+use Test::More qw(no_plan);
+
+my $appliance = $#ARGV >= 0 ? $ARGV[0] :
+                -d '/export/rocks/install' ? 'Frontend' : 'Compute';
+my $isCompute = $appliance eq 'Compute';
+my $isFe = $appliance eq 'Frontend';
+my $isLogin = $appliance eq 'Login';
+my $output;
+
+my $NODECOUNT = 4;
+my $LASTNODE = $NODECOUNT - 1;
+my $TESTFILE = 'rollmpi';
+my $SUBMITUSER = 'diag';
+my $SUBMITDIR = "/home/$SUBMITUSER/mpiroll";
+`sudo -u $SUBMITUSER mkdir $SUBMITDIR`;
+
+open(OUT, ">$TESTFILE.c");
+print OUT <<END;
+#include <stdio.h>
+#include <mpi.h>
+
+int main (int argc, char **argv) {
+  int rank, size;
+  MPI_Init(&argc, &argv);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
+  printf("Hello from process %d of %d\\n", rank, size);
+  MPI_Finalize();
+  return 0;
+}
+END
+close(OUT);
+
+my $modulecmd = "$ENV{MODULESHOME}/bin/modulecmd";
+
+my @COMPILERS = (
+  'ROLLCOMPILER',
+);
+my @NETWORKS = (
+  'ROLLNETWORK',
+);
+my @MPIS = ('mpich', 'mpich2', 'openmpi');
+foreach my $COMPILER (@COMPILERS) {
+  foreach my $NETWORK (@NETWORKS) {
+    foreach my $MPI (@MPIS) {
+
+      my $SUBMITERR = "$SUBMITDIR/$TESTFILE.$COMPILER.$NETWORK.$MPI.err";
+      my $SUBMITEXE = "$SUBMITDIR/$TESTFILE.$COMPILER.$NETWORK.$MPI.exe";
+      my $SUBMITOUT = "$SUBMITDIR/$TESTFILE.$COMPILER.$NETWORK.$MPI.out";
+
+      $output = `$modulecmd bash clear yes; $modulecmd bash load $COMPILER; $modulecmd bash load ${MPI}_$NETWORK`;
+      $output =~ s/;\s*$//;
+      $output = `eval "$output; mpicc -o $TESTFILE $TESTFILE.c"`;
+      ok(-x $TESTFILE, "mpicc $COMPILER/$NETWORK/$MPI");
+
+      SKIP: {
+
+        skip 'No exe', 1 if ! -x $TESTFILE;
+        `sudo -u $SUBMITUSER cp $TESTFILE $SUBMITEXE`;
+
+        open(OUT, ">$TESTFILE.qsub");
+        print OUT <<END;
+#!/bin/csh
+#PBS -l nodes=$NODECOUNT
+#PBS -l walltime=5:00
+#PBS -e $SUBMITERR
+#PBS -o $SUBMITOUT
+#PBS -V
+#PBS -m n
+cd $SUBMITDIR
+module clear yes
+module load $COMPILER
+module load ${MPI}_$NETWORK
+mpirun -v -machinefile \$PBS_NODEFILE -np $NODECOUNT $SUBMITEXE
+END
+        close(OUT);
+        $output = `sudo -u $SUBMITUSER qsub $TESTFILE.qsub`;
+        $output =~ /(\d+)/;
+        my $jobId = $1;
+        while(`qstat $jobId` =~ / (Q|R) /) {
+          sleep(1);
+        }
+        for(my $sec = 0; $sec < 60; $sec++) {
+          last if -f $SUBMITOUT;
+          sleep(1);
+        }
+        $output = `sudo -u $SUBMITUSER cat $SUBMITOUT`;
+        like($output, qr/process $LASTNODE of $NODECOUNT/, "mpirun $COMPILER/$NETWORK/$MPI");
+
+      }
+
+      `rm -f $TESTFILE`;
+
+    }
+  }
+}
+`rm -f $TESTFILE*`;
+`sudo -u $SUBMITUSER rm -fr $SUBMITDIR`;
+]]>
+</file>
+
+</post>
+
+</kickstart> 
