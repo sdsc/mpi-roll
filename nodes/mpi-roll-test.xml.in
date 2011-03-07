@@ -62,19 +62,28 @@ my @COMPILERS = (
 my @NETWORKS = (
   'ROLLNETWORK',
 );
-my @MPIS = ('mpich', 'mpich2', 'openmpi');
-foreach my $COMPILER (@COMPILERS) {
-  foreach my $NETWORK (@NETWORKS) {
-    foreach my $MPI (@MPIS) {
+my @MPIS = (
+  'mpich',
+  'mpich2',
+  'openmpi',
+);
+foreach my $MPI (@MPIS) {
+  foreach my $COMPILER (@COMPILERS) {
+    foreach my $NETWORK (@NETWORKS) {
 
-      my $SUBMITERR = "$SUBMITDIR/$TESTFILE.$COMPILER.$NETWORK.$MPI.err";
-      my $SUBMITEXE = "$SUBMITDIR/$TESTFILE.$COMPILER.$NETWORK.$MPI.exe";
-      my $SUBMITOUT = "$SUBMITDIR/$TESTFILE.$COMPILER.$NETWORK.$MPI.out";
+      my $SUBMITERR = "$SUBMITDIR/$TESTFILE.$MPI.$COMPILER.$NETWORK.err";
+      my $SUBMITEXE = "$SUBMITDIR/$TESTFILE.$MPI.$COMPILER.$NETWORK.exe";
+      my $SUBMITOUT = "$SUBMITDIR/$TESTFILE.$MPI.$COMPILER.$NETWORK.out";
 
-      $output = `$modulecmd bash clear yes; $modulecmd bash load $COMPILER; $modulecmd bash load ${MPI}_$NETWORK`;
+      my $command = "$modulecmd bash clear yes; " .
+                    "$modulecmd bash load $COMPILER ${MPI}_$NETWORK";
+      $output = `$command`;
       $output =~ s/;\s*$//;
-      $output = `eval "$output; mpicc -o $TESTFILE $TESTFILE.c"`;
-      ok(-x $TESTFILE, "mpicc $COMPILER/$NETWORK/$MPI");
+      $command = "eval '$output'; which mpicc; mpicc -o $TESTFILE $TESTFILE.c";
+      $output = `$command`;
+      $output =~ /(\S*mpicc)/;
+      my $mpicc = $1 || 'mpicc';
+      ok(-x $TESTFILE, "Compile with $mpicc");
 
       SKIP: {
 
@@ -92,8 +101,8 @@ foreach my $COMPILER (@COMPILERS) {
 #PBS -m n
 cd $SUBMITDIR
 module clear yes
-module load $COMPILER
-module load ${MPI}_$NETWORK
+module load $COMPILER ${MPI}_$NETWORK
+which mpirun
 mpirun -v -machinefile \$PBS_NODEFILE -np $NODECOUNT $SUBMITEXE
 END
         close(OUT);
@@ -108,7 +117,9 @@ END
           sleep(1);
         }
         $output = `sudo -u $SUBMITUSER cat $SUBMITOUT`;
-        like($output, qr/process $LASTNODE of $NODECOUNT/, "mpirun $COMPILER/$NETWORK/$MPI");
+        $output =~ /(\S*mpirun)/;
+        my $mpirun = $1 || 'mpirun';
+        like($output, qr/process $LASTNODE of $NODECOUNT/, "Run with $mpirun");
 
       }
 
