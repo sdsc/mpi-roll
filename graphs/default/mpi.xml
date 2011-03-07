@@ -38,6 +38,13 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
   <tail>mpi-doc</tail>
 </order>
 
+<edge from="base">
+  <to>mpi-roll-test</to>
+</edge>
+<order head="base">
+  <tail>mpi-roll-test</tail>
+</order>
+
 <order head="mpi-common">
   <tail>mpi-modules-common</tail>
 </order>
