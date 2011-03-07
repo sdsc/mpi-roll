@@ -106,10 +106,6 @@ ifeq ("$(ROLLNETWORK)", "mx")
   NETWORKSETUP = export LD_LIBRARY_PATH=$(MXHOME)/lib:$$LD_LIBRARY_PATH
 endif
 
-#	  export FFLAGS="$(COMPILE_FLAGS)"; \
-#	  export F90=$(F90COMP); \
-#	  export F90FLAGS="$(COMPILE_FLAGS)"; \
-
 build:
 	tar zxvf $(SOURCE).tgz
 	( \
