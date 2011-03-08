@@ -90,6 +90,7 @@ foreach my $MPI (@MPIS) {
         skip 'No exe', 1 if ! -x $TESTFILE;
         `sudo -u $SUBMITUSER cp $TESTFILE $SUBMITEXE`;
 
+        my $fileopt = $MPI eq "mpich2" ? "" : "-machinefile \$PBS_NODEFILE";
         open(OUT, ">$TESTFILE.qsub");
         print OUT <<END;
 #!/bin/csh
@@ -99,11 +100,20 @@ foreach my $MPI (@MPIS) {
 #PBS -o $SUBMITOUT
 #PBS -V
 #PBS -m n
-cd $SUBMITDIR
 module clear yes
 module load $COMPILER ${MPI}_$NETWORK
+if ("$MPI" == "mpich2") then
+  echo 'secretword=whatever' > ~/.mpd.conf
+  chmod 600 ~/.mpd.conf
+  mpdboot -n $NODECOUNT -f \$PBS_NODEFILE
+endif
+cd $SUBMITDIR
 which mpirun
-mpirun -v -machinefile \$PBS_NODEFILE -np $NODECOUNT $SUBMITEXE
+mpirun $fileopt -np $NODECOUNT $SUBMITEXE
+if ("$MPI" = "mpich2") then
+  mpdallexit
+  rm -f ~/.mpd.conf
+endif
 END
         close(OUT);
         $output = `sudo -u $SUBMITUSER qsub $TESTFILE.qsub`;
