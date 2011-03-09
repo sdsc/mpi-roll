@@ -4,7 +4,6 @@
 
 <description>
 MPI libraries modules files
-http://www.mcs.anl.gov/research/projects/mpi/mpich1
 http://www.mcs.anl.gov/research/projects/mpich2
 http://www.open-mpi.org
 </description>
@@ -28,30 +27,6 @@ ROLLNETWORK
 
 for COMP in ${COMPS}; do
   for NET in ${NETS}; do
-
-# MPICH
-
-/bin/mkdir -m 0755 -p /opt/modulefiles/mpi/.${COMP}/mpich_${NET}
-
-/bin/cat > /opt/modulefiles/mpi/.${COMP}/mpich_${NET}/1.2.7 << END
-#%Module1.0
-module-whatis "mpich_${NET} mpi stack"
-module-whatis "Version: 1.2.7"
-set mpiHome /opt/mpich/${COMP}/${NET}
-setenv MPIHOME \$mpiHome
-prepend-path PATH \$mpiHome/bin
-prepend-path LD_LIBRARY_PATH \$mpiHome/lib
-END
-/bin/chmod 0644 /opt/modulefiles/mpi/.${COMP}/mpich_${NET}/1.2.7
-
-/bin/cat > /opt/modulefiles/mpi/.${COMP}/mpich_${NET}/.version.1.2.7 << END
-#%Module1.0
-set ModulesVersion "1.2.7"
-END
-/bin/chmod 0644 /opt/modulefiles/mpi/.${COMP}/mpich_${NET}/.version.1.2.7
-
-/bin/ln -s /opt/modulefiles/mpi/.${COMP}/mpich_${NET}/.version.1.2.7 \
-           /opt/modulefiles/mpi/.${COMP}/mpich_${NET}/.version
 
 # MPICH2
 
