@@ -18,7 +18,7 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 </changelog>
 
 <package>mpich2_ROLLCOMPILER_ROLLNETWORK</package>
-<package>mvapich_ROLLCOMPILER_ROLLNETWORK</package>
+<package>mvapich2_ROLLCOMPILER_ROLLNETWORK</package>
 <package>openmpi_ROLLCOMPILER_ROLLNETWORK</package>
 
 <post>
