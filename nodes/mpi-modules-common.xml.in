@@ -33,7 +33,7 @@ for COMP in ${COMPS}; do
 
 /bin/mkdir -m 0755 -p /opt/modulefiles/mpi/.${COMP}/mpich2_${NET}
 
-/bin/cat > /opt/modulefiles/mpi/.${COMP}/mpich2_${NET}/1.0.7 << END
+/bin/cat &gt; /opt/modulefiles/mpi/.${COMP}/mpich2_${NET}/1.0.7 &lt;&lt; END
 #%Module1.0
 module-whatis "mpich2_${NET} mpi stack"
 module-whatis "Version: 1.0.7"
@@ -44,7 +44,7 @@ prepend-path LD_LIBRARY_PATH \$mpiHome/lib
 END
 /bin/chmod 0644 /opt/modulefiles/mpi/.${COMP}/mpich2_${NET}/1.0.7
 
-/bin/cat > /opt/modulefiles/mpi/.${COMP}/mpich2_${NET}/.version.1.0.7 << END
+/bin/cat &gt; /opt/modulefiles/mpi/.${COMP}/mpich2_${NET}/.version.1.0.7 &lt;&lt; END
 #%Module1.0
 set ModulesVersion "1.0.7"
 END
@@ -57,7 +57,7 @@ END
 
 /bin/mkdir -m 0755 -p /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}
 
-/bin/cat > /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}/1.6 << END
+/bin/cat &gt; /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}/1.6 &lt;&lt; END
 #%Module1.0
 module-whatis "mvapich2_${NET} mpi stack"
 module-whatis "Version: 1.6"
@@ -68,7 +68,7 @@ prepend-path LD_LIBRARY_PATH \$mpiHome/lib
 END
 /bin/chmod 0644 /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}/1.6
 
-/bin/cat > /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}/.version.1.6 << END
+/bin/cat &gt; /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}/.version.1.6 &lt;&lt; END
 #%Module1.0
 set ModulesVersion "1.6"
 END
@@ -81,7 +81,7 @@ END
 
 /bin/mkdir -m 0755 -p /opt/modulefiles/mpi/.${COMP}/openmpi_${NET}
 
-/bin/cat > /opt/modulefiles/mpi/.${COMP}/openmpi_${NET}/1.4.1 << END
+/bin/cat &gt; /opt/modulefiles/mpi/.${COMP}/openmpi_${NET}/1.4.1 &lt;&lt; END
 #%Module1.0
 module-whatis "openmpi_${NET} mpi stack"
 module-whatis "Version: 1.4.1"
@@ -92,7 +92,7 @@ prepend-path LD_LIBRARY_PATH \$mpiHome/lib
 END
 /bin/chmod 0644 /opt/modulefiles/mpi/.${COMP}/openmpi_${NET}/1.4.1
 
-/bin/cat > /opt/modulefiles/mpi/.${COMP}/openmpi_${NET}/.version.1.4.1 << END
+/bin/cat &gt; /opt/modulefiles/mpi/.${COMP}/openmpi_${NET}/.version.1.4.1 &lt;&lt; END
 #%Module1.0
 set ModulesVersion "1.4.1"
 END
