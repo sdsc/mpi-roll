@@ -6,6 +6,7 @@
 MPI roll installation test.
 http://www.mcs.anl.gov/research/projects/mpich2
 http://www.open-mpi.org
+http://mvapich.cse.ohio-state.edu
 </description>
 
 <copyright>
@@ -66,6 +67,7 @@ my @NETWORKS = (
 );
 my @MPIS = (
   'mpich2',
+  'mvapich2',
   'openmpi',
 );
 foreach my $MPI (@MPIS) {

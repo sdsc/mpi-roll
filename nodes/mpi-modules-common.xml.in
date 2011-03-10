@@ -6,6 +6,7 @@
 MPI libraries modules files
 http://www.mcs.anl.gov/research/projects/mpich2
 http://www.open-mpi.org
+http://mvapich.cse.ohio-state.edu
 </description>
 
 <copyright>
@@ -51,6 +52,30 @@ END
 
 /bin/ln -s /opt/modulefiles/mpi/.${COMP}/mpich2_${NET}/.version.1.0.7 \
            /opt/modulefiles/mpi/.${COMP}/mpich2_${NET}/.version
+
+# MVAPICH2
+
+/bin/mkdir -m 0755 -p /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}
+
+/bin/cat > /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}/1.6 << END
+#%Module1.0
+module-whatis "mvapich2_${NET} mpi stack"
+module-whatis "Version: 1.6"
+set mpiHome /opt/mvapich2/${COMP}/${NET}
+setenv MPIHOME \$mpiHome
+prepend-path PATH \$mpiHome/bin
+prepend-path LD_LIBRARY_PATH \$mpiHome/lib
+END
+/bin/chmod 0644 /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}/1.6
+
+/bin/cat > /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}/.version.1.6 << END
+#%Module1.0
+set ModulesVersion "1.6"
+END
+/bin/chmod 0644 /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}/.version.1.6
+
+/bin/ln -s /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}/.version.1.6 \
+           /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}/.version
 
 # OPENMPI
 
