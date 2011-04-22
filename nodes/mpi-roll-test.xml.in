@@ -91,9 +91,11 @@ foreach my $MPI (@MPIS) {
       SKIP: {
 
         skip 'No exe', 1 if ! -x $TESTFILE;
+        skip 'Not submit machine', 1 if ! $isFe && ! $isLogin;
         `sudo -u $SUBMITUSER cp $TESTFILE $SUBMITEXE`;
 
-        my $fileopt = $MPI eq "mpich2" ? "" : "-machinefile \$PBS_NODEFILE";
+        my $fileopt = $MPI eq "openmpi" ?
+                      "-machinefile \$PBS_NODEFILE" : "-f \$PBS_NODEFILE";
         open(OUT, ">$TESTFILE.qsub");
         print OUT <<END;
 #!/bin/csh
@@ -103,22 +105,13 @@ foreach my $MPI (@MPIS) {
 #PBS -o $SUBMITOUT
 #PBS -V
 #PBS -m n
-module clear yes
-module load $COMPILER ${MPI}_$NETWORK
-if ("$MPI" == "mpich2") then
-  echo 'secretword=whatever' > ~/.mpd.conf
-  chmod 600 ~/.mpd.conf
-  mpdboot -n $NODECOUNT -f \$PBS_NODEFILE
-endif
 cd $SUBMITDIR
 which mpirun
 mpirun $fileopt -np $NODECOUNT $SUBMITEXE
-if ("$MPI" = "mpich2") then
-  mpdallexit
-  rm -f ~/.mpd.conf
-endif
 END
         close(OUT);
+        # Add a line to the submitter's .bashrc to load the necessary modules
+        $output = `sudo -u $SUBMITUSER bash -c 'echo "echo mpirolltest > /dev/null; module load $COMPILER ${MPI}_$NETWORK" >> /home/$SUBMITUSER/.bashrc'`;
         $output = `sudo -u $SUBMITUSER qsub $TESTFILE.qsub`;
         $output =~ /(\d+)/;
         my $jobId = $1;
@@ -133,6 +126,8 @@ END
         $output =~ /(\S*mpirun)/;
         my $mpirun = $1 || 'mpirun';
         like($output, qr/process $LASTNODE of $NODECOUNT/, "Run with $mpirun");
+        # Remove the .bashrc line we added earlier
+        $output = `sudo -u $SUBMITUSER perl -pi -e 's/.*mpirolltest.*//s' /home/$SUBMITUSER/.bashrc`;
 
       }
 
