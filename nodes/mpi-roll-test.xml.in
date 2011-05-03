@@ -86,6 +86,8 @@ foreach my $MPI (@MPIS) {
       $output = `$command`;
       $output =~ /(\S*mpicc)/;
       my $mpicc = $1 || 'mpicc';
+      my $mpirun = $mpicc;
+      $mpirun =~ s/mpicc/mpirun/;
       ok(-x $TESTFILE, "Compile with $mpicc");
 
       SKIP: {
@@ -106,12 +108,11 @@ foreach my $MPI (@MPIS) {
 #PBS -V
 #PBS -m n
 cd $SUBMITDIR
-which mpirun
-mpirun $fileopt -np $NODECOUNT $SUBMITEXE
+$mpirun $fileopt -np $NODECOUNT $SUBMITEXE
 END
         close(OUT);
-        # Add a line to the submitter's .bashrc to load the necessary modules
-        $output = `sudo -u $SUBMITUSER bash -c 'echo "echo mpirolltest > /dev/null; module load $COMPILER ${MPI}_$NETWORK" >> /home/$SUBMITUSER/.bashrc'`;
+        # Add a line to the submitter's .bashrc to load the compiler module
+        $output = `sudo -u $SUBMITUSER bash -c 'echo "echo mpirolltest > /dev/null; module load $COMPILER" >> /home/$SUBMITUSER/.bashrc'`;
         $output = `sudo -u $SUBMITUSER qsub $TESTFILE.qsub`;
         $output =~ /(\d+)/;
         my $jobId = $1;
@@ -123,8 +124,6 @@ END
           sleep(1);
         }
         $output = `sudo -u $SUBMITUSER cat $SUBMITOUT`;
-        $output =~ /(\S*mpirun)/;
-        my $mpirun = $1 || 'mpirun';
         like($output, qr/process $LASTNODE of $NODECOUNT/, "Run with $mpirun");
         # Remove the .bashrc line we added earlier
         $output = `sudo -u $SUBMITUSER perl -pi -e 's/.*mpirolltest.*//s' /home/$SUBMITUSER/.bashrc`;
