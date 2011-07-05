@@ -107,6 +107,8 @@ else ifeq ("$(ROLLNETWORK)", "mx")
 #                 --with-mx-include=$(MXHOME)/include \
 #                 --with-mx-lib=$(MXHOME)/lib64
   NETWORKSETUP = export LD_LIBRARY_PATH=$(MXHOME)/lib:$$LD_LIBRARY_PATH
+else ifeq ("$(ROLLNETWORK)", "ib")
+  CONFIG_OPTS += --with-rdma=gen2 --with-ib-include=/usr/include/infiniband --with-ib-libpath=/usr/lib64
 endif
 
 build:
