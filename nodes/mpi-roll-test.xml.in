@@ -72,10 +72,7 @@ my @NETWORKS = (
   'ROLLNETWORK',
 );
 my @MPIS = (
-  'mpich',
-  'mpich2',
-  'mvapich2',
-  'openmpi',
+  'ROLLMPI',
 );
 
 # mpi-common.xml

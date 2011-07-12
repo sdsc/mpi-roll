@@ -30,6 +30,9 @@ ROLLNETWORK
 for COMP in ${COMPS}; do
   for NET in ${NETS}; do
 
+    /bin/echo "ROLLMPI" | /bin/grep -s 'mpich\>'
+    if test $? == 0; then
+
 # MPICH
 
 /bin/mkdir -m 0755 -p /opt/modulefiles/mpi/.${COMP}/mpich_${NET}
@@ -53,6 +56,11 @@ END
 
 /bin/ln -s /opt/modulefiles/mpi/.${COMP}/mpich_${NET}/.version.1.2.7 \
            /opt/modulefiles/mpi/.${COMP}/mpich_${NET}/.version
+
+    fi
+
+    /bin/echo "ROLLMPI" | /bin/grep -s mpich2
+    if test $? == 0; then
 
 # MPICH2
 
@@ -78,6 +86,11 @@ END
 /bin/ln -s /opt/modulefiles/mpi/.${COMP}/mpich2_${NET}/.version.1.0.7 \
            /opt/modulefiles/mpi/.${COMP}/mpich2_${NET}/.version
 
+    fi
+
+    /bin/echo "ROLLMPI" | /bin/grep -s mvapich2
+    if test $? == 0; then
+
 # MVAPICH2
 
 /bin/mkdir -m 0755 -p /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}
@@ -102,6 +115,11 @@ END
 /bin/ln -s /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}/.version.1.6 \
            /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}/.version
 
+    fi
+
+    /bin/echo "ROLLMPI" | /bin/grep -s openmpi
+    if test $? == 0; then
+
 # OPENMPI
 
 /bin/mkdir -m 0755 -p /opt/modulefiles/mpi/.${COMP}/openmpi_${NET}
@@ -125,6 +143,8 @@ END
 
 /bin/ln -s /opt/modulefiles/mpi/.${COMP}/openmpi_${NET}/.version.1.4.1 \
            /opt/modulefiles/mpi/.${COMP}/openmpi_${NET}/.version
+
+    fi
 
   done
 done

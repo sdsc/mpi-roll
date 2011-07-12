@@ -1,9 +1,10 @@
-This roll source supports building with different compilers and for different
-network fabrics.  By default, it builds using the gnu compilers for ethernet.
-To build for a different configuration, use the ROLLCOMPILER and ROLLNETWORK
+This roll source supports building specified flavors of MPI with different
+compilers and for different network fabrics.  By default, it builds mpich,
+mpich2, mvapich2, and openmpi using the gnu compilers for ethernet.  To build
+for a different configuration, use the ROLLMPI, ROLLCOMPILER and ROLLNETWORK
 make variables, e.g.,
 
-make ROLLCOMPILER=intel ROLLNETWORK=mx
+make ROLLMPI='mpich2 openmpi' ROLLCOMPILER=intel ROLLNETWORK=mx
 
 The build process currently supports one or more of the values "intel" and
 "gnu" for the ROLLCOMPILER variable, defaulting to "gnu".  It uses any
@@ -11,8 +12,8 @@ ROLLNETWORK variable value(s) to load appropriate openmpi modules, assuming
 that there are modules named openmpi_$(ROLLNETWORK) available (e.g.,
 openmpi_ib, openmpi_mx, etc.).
 
-If the ROLLCOMPILER and/or ROLLNETWORK variables are specified, their values
-are incorporated into the names of the produced roll and rpms, e.g.,
+The ROLLMPI, ROLLCOMPILER, and ROLLNETWORK variables values are incorporated
+into the names of the produced roll and rpms, e.g.,
 
 make ROLLCOMPILER=intel ROLLNETWORK=ib
 
