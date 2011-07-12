@@ -77,7 +77,7 @@ COMPILERSETUP = \
   fi
 
 CCOMP = gcc
-CPPCOM = g++
+CPPCOMP = g++
 FCOMP = gfortran
 F90COMP = gfortran
 COMPILE_FLAGS = -O2
