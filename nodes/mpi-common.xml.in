@@ -4,6 +4,7 @@
 
 <description>
 MPI libraries
+http://www.mcs.anl.gov/research/projects/mpi/mpich1
 http://www.mcs.anl.gov/research/projects/mpich2
 http://www.open-mpi.org
 http://mvapich.cse.ohio-state.edu
@@ -17,6 +18,7 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 <changelog>
 </changelog>
 
+<package>mpich_ROLLCOMPILER_ROLLNETWORK</package>
 <package>mpich2_ROLLCOMPILER_ROLLNETWORK</package>
 <package>mvapich2_ROLLCOMPILER_ROLLNETWORK</package>
 <package>openmpi_ROLLCOMPILER_ROLLNETWORK</package>

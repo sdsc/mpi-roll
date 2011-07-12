@@ -4,6 +4,7 @@
 
 <description>
 MPI roll installation test.
+http://www.mcs.anl.gov/research/projects/mpi/mpich1
 http://www.mcs.anl.gov/research/projects/mpich2
 http://www.open-mpi.org
 http://mvapich.cse.ohio-state.edu
@@ -71,6 +72,7 @@ my @NETWORKS = (
   'ROLLNETWORK',
 );
 my @MPIS = (
+  'mpich',
   'mpich2',
   'mvapich2',
   'openmpi',
