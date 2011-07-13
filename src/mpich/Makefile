@@ -107,7 +107,8 @@ endif
 
 build:
 	tar zxvf $(SOURCE).tgz
-	cp patch-files/* $(SOURCE)/mpid/ch_mx
+	cp patch-files/mpirun.ch_mx.pl.in patch-files/mxmpi_conf.c \
+	   $(SOURCE)/mpid/ch_mx/
 	( \
 	  $(COMPILERSETUP); \
 	  $(NETWORKSETUP); \

@@ -65,16 +65,17 @@ default:
 copyright rpm pkg clean::
 	for i in $(SRCDIRS) ; do \
 	  grep -q ROLLCOMPILER $$i/version.mk; \
-	  if test $$? == 0; then \
-	    echo "$(ROLLMPI)" | grep -q "\<$$i\>"; \
-	    if test $? == 0; then \
-	      for c in $(ROLLCOMPILER); do \
-	        for n in $(ROLLNETWORK); do \
-	          echo make $@ in $$i with ROLLCOMPILER=$$c ROLLNETWORK=$$n; \
-	          (cd $$i; $(MAKE) ROLLCOMPILER=$$c ROLLNETWORK=$$n $@); \
+	  if test $$? -eq 0; then \
+	    for m in $(ROLLMPI); do \
+	      if test $$i = "./$$m"; then \
+	        for c in $(ROLLCOMPILER); do \
+	          for n in $(ROLLNETWORK); do \
+	            echo make $@ in $$i with ROLLCOMPILER=$$c ROLLNETWORK=$$n; \
+	            (cd $$i; $(MAKE) ROLLCOMPILER=$$c ROLLNETWORK=$$n $@); \
+	          done; \
 	        done; \
-	      done; \
-	    fi; \
+	      fi; \
+	    done; \
 	  else \
 	    (cd $$i; $(MAKE) $@) ; \
 	  fi; \
