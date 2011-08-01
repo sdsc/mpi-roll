@@ -112,7 +112,7 @@ foreach my $mpi (@MPIS) {
             if $appliance ne 'Frontend' && $submitHosts !~ /$hostName/;
           `sudo -u $SUBMITUSER cp $TESTFILE $SUBMITEXE`;
 
-          my $fileopt = $mpi eq "openmpi" ?
+          my $fileopt = $mpi =~ /^(openmpi|mpich)$/ ?
                         "-machinefile \$PBS_NODEFILE" : "-f \$PBS_NODEFILE";
           open(OUT, ">$TESTFILE.qsub");
           print OUT <<END;
