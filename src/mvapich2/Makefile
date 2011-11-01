@@ -76,23 +76,32 @@ COMPILERSETUP = \
     module load $(ROLLCOMPILER); \
   fi
 
-CCOMP = gcc
-CPPCOMP = g++
-COMPILE_FLAGS = -O2
-F77COMP = g77
-F90COMP = gfortran
+CC=gcc
+CXX=g++
+F77=g77
+FC=gfortran
+FFLAGS=-O2
+FCFLAGS=-O2
+CFLAGS=-O2
+CXXFLAGS=-O2
 ifeq ("$(ROLLCOMPILER)", "intel")
-  CCOMP = icc
-  CPPCOMP = icpc
-  FCOMP = ifort
-  F90COMP = ifort
-  COMPILE_FLAGS = -O
+  CC=icc
+  CXX=icpc
+  F77=ifort
+  FC=ifort
+  FFLAGS=-O
+  FCFLAGS=-O
+  CFLAGS=-O
+  CXXFLAGS=-O
 else ifeq ("$(ROLLCOMPILER)", "pgi")
-  CCOMP = pgcc
-  CPPCOMP = pgCC
-  FCOMP = pgf77
-  F90COMP = pgf90
-  COMPILE_FLAGS = -O
+  CC=pgcc
+  CXX=pgCC
+  F77=pgf77
+  FC=pgf90
+  FFLAGS=-O
+  FCFLAGS=-O
+  CFLAGS=-O
+  CXXFLAGS=-O
 endif
 
 CONFIG_OPTS = --prefix=$(PKGROOT) --enable-sharedlibs=gcc
@@ -108,7 +117,7 @@ else ifeq ("$(ROLLNETWORK)", "mx")
 #                 --with-mx-lib=$(MXHOME)/lib64
   NETWORKSETUP = export LD_LIBRARY_PATH=$(MXHOME)/lib:$$LD_LIBRARY_PATH
 else ifeq ("$(ROLLNETWORK)", "ib")
-  CONFIG_OPTS += --with-rdma=gen2 --with-ib-include=/usr/include/infiniband --with-ib-libpath=/usr/lib64
+  CONFIG_OPTS += --enable-f77 --enable-fc --enable-shared --with-rdma=gen2 --with-ib-include=/usr/include/infiniband --with-ib-libpath=/usr/lib64
 endif
 
 build:
@@ -116,14 +125,14 @@ build:
 	( \
 	  $(COMPILERSETUP); \
 	  $(NETWORKSETUP); \
-	  export CC=$(CCOMP); \
-	  export CFLAGS=$(COMPILE_FLAGS); \
-	  export CXX=$(CPPCOMP); \
-	  export CXXFLAGS=$(COMPILE_FLAGS); \
-	  export F77=$(FCOMP); \
-	  export FFLAGS=$(COMPILE_FLAGS); \
-	  export F90=$(F90COMP); \
-	  export F90FLAGS=$(COMPILE_FLAGS); \
+          export CC=$(CC); \
+          export CXX=$(CXX); \
+          export F77=$(F77); \
+          export FC=$(FC); \
+          export FFLAGS=$(FFLAGS); \
+          export FCFLAGS=$(FCFLAGS); \
+          export CFLAGS=$(CFLAGS); \
+          export CXXFLAGS=$(CXXFLAGS); \
 	  cd $(SOURCE); \
 	  ./configure $(CONFIG_OPTS); \
 	  make \
