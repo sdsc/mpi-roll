@@ -97,12 +97,14 @@ endif
 
 CONFIG_OPTS = --prefix=$(PKGROOT) -opt="-O" --enable-sharedlib
 NETWORKSETUP = cat /dev/null
+LINKOPT=-Wl,-rpath,$(MXHOME)/lib64,-rpath,$(MXHOME)/lib -L$(MXHOME)/lib64 -L$(MXHOME)/lib
 ifeq ("$(ROLLNETWORK)", "mx")
   MXHOME = /opt/mx
   COMPILE_FLAGS += -I$(MXHOME)/include
   CONFIG_OPTS += --with-device=ch_mx \
                  -lib="-Wl,-rpath,$(MXHOME)/lib64,-rpath,$(MXHOME)/lib -L$(MXHOME)/lib64 -L$(MXHOME)/lib -lmyriexpress"
   NETWORKSETUP = export LD_LIBRARY_PATH=$(MXHOME)/lib:$$LD_LIBRARY_PATH
+  LINKOPT +=  -lmyriexpress
 endif
 
 build:
@@ -119,7 +121,7 @@ build:
 	  export FC=$(FCOMP); \
 	  export F90FLAGS="$(COMPILE_FLAGS)"; \
 	  export FFLAGS="$(COMPILE_FLAGS)"; \
-	  export LINKOPT="-Wl,-rpath,$(MXHOME)/lib64,-rpath,$(MXHOME)/lib -L$(MXHOME)/lib64 -L$(MXHOME)/lib -lmyriexpress"; \
+	  export LINKOPT="$(LINKOPT)"; \
 	  export PREFIX=$(PKGROOT); \
 	  export RSHCOMMAND=ssh; \
 	  cd $(SOURCE); \

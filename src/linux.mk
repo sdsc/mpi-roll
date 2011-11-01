@@ -54,6 +54,11 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.6  2011/11/01 19:56:12  jpg
+#
+#
+# temporarily block mpich until I can eliminate mx dependencies
+#
 # Revision 1.5  2011/03/01 19:12:22  jhayes
 # Support ROLLCOMPILER and ROLLNETWORK make variables.  Upgrade mpich2 version.
 #
@@ -91,4 +96,5 @@
 
 SRCDIRS = `find . -type d -maxdepth 1 \
 	-not -name CVS \
+        -not -name mpich \
 	-not -name .`
