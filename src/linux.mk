@@ -54,6 +54,11 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.7  2011/11/06 01:59:13  jpg
+#
+#
+# turned back on mpich
+#
 # Revision 1.6  2011/11/01 19:56:12  jpg
 #
 #
@@ -96,5 +101,4 @@
 
 SRCDIRS = `find . -type d -maxdepth 1 \
 	-not -name CVS \
-        -not -name mpich \
 	-not -name .`
