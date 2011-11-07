@@ -105,7 +105,7 @@ module-whatis "Version: 1.7"
 set mpiHome /opt/mvapich2/${COMP}/${NET}
 setenv MPIHOME \$mpiHome
 prepend-path PATH \$mpiHome/bin
-prepend-path LD_LIBRARY_PATH \$mpiHome/lib
+prepend-path LD_LIBRARY_PATH \$mpiHome/lib:/opt/mvapich2/lib
 END
 /bin/chmod 0644 /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}/1.7
 
