@@ -54,6 +54,11 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.9  2011/11/07 23:07:00  jpg
+#
+#
+# reset this to old version
+#
 # Revision 1.8  2011/11/07 22:54:08  jpg
 #
 #
@@ -104,7 +109,6 @@
 #
 #
 
-SRCDIRS = mvapich2
-#SRCDIRS = `find . -type d -maxdepth 1 \
-#	-not -name CVS \
-#	-not -name .`
+SRCDIRS = `find . -type d -maxdepth 1 \
+	-not -name CVS \
+	-not -name .`
