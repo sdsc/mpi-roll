@@ -54,6 +54,11 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.8  2011/11/07 22:54:08  jpg
+#
+#
+# added limic2 for mvapich2
+#
 # Revision 1.7  2011/11/06 01:59:13  jpg
 #
 #
@@ -99,6 +104,7 @@
 #
 #
 
-SRCDIRS = `find . -type d -maxdepth 1 \
-	-not -name CVS \
-	-not -name .`
+SRCDIRS = mvapich2
+#SRCDIRS = `find . -type d -maxdepth 1 \
+#	-not -name CVS \
+#	-not -name .`

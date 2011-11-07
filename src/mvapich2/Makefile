@@ -104,7 +104,7 @@ else ifeq ("$(ROLLCOMPILER)", "pgi")
   CXXFLAGS=-O
 endif
 
-CONFIG_OPTS = --prefix=$(PKGROOT) --enable-sharedlibs=gcc
+CONFIG_OPTS = --prefix=$(PKGROOT) --enable-sharedlibs=gcc --with-limic2=//opt/mvapich2
 NETWORKSETUP = cat /dev/null
 ifeq ("$(ROLLNETWORK)", "eth")
   CONFIG_OPTS += --with-device=ch3:sock
@@ -125,6 +125,14 @@ build:
 	( \
 	  $(COMPILERSETUP); \
 	  $(NETWORKSETUP); \
+          export LD_LIBRARY_PATH=/opt/mvapich2/lib:$${LD_LIBRARY_PATH};  \
+          if test ! -s $(ROOT)/opt/mvapich2/liblimic2.a ; then \
+             mkdir -p /opt/mvapich2; \
+             cd $(SOURCE)/limic2-0.5.5; \
+             ./configure --prefix=/opt/mvapich2; \
+             make; \
+             make install; \
+          fi; \
           export CC=$(CC); \
           export CXX=$(CXX); \
           export F77=$(F77); \
@@ -133,7 +141,7 @@ build:
           export FCFLAGS=$(FCFLAGS); \
           export CFLAGS=$(CFLAGS); \
           export CXXFLAGS=$(CXXFLAGS); \
-	  cd $(SOURCE); \
+	  cd $(PWD)/$(SOURCE); \
 	  ./configure $(CONFIG_OPTS); \
 	  make \
 	)
@@ -141,7 +149,7 @@ build:
 # Clean immediately after install to free disk space
 install::
 	mkdir -p $(INSTDIR)
-	if [ ! -d $(PKGROOT) ]; then mkdir -p $(PKGROOT); fi
+	if [ ! -d  $(PKGROOT) ]; then mkdir -p $(PKGROOT); fi
 	mount --bind $(INSTDIR) $(PKGROOT)
 	( \
 	  $(COMPILERSETUP); \
