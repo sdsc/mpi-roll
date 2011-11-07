@@ -101,7 +101,7 @@ END
 /bin/cat &gt; /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}/1.7 &lt;&lt; END
 #%Module1.0
 module-whatis "mvapich2_${NET} mpi stack"
-module-whatis "Version: 1.6"
+module-whatis "Version: 1.7"
 set mpiHome /opt/mvapich2/${COMP}/${NET}
 setenv MPIHOME \$mpiHome
 prepend-path PATH \$mpiHome/bin
