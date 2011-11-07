@@ -125,7 +125,7 @@ build:
 	( \
 	  $(COMPILERSETUP); \
 	  $(NETWORKSETUP); \
-          export LD_LIBRARY_PATH=/opt/mvapich2/lib:$${LD_LIBRARY_PATH};  \
+          export LD_LIBRARY_PATH=$(ROOT)/opt/mvapich2/lib:$${LD_LIBRARY_PATH};  \
           if test ! -s $(ROOT)/opt/mvapich2/liblimic2.a ; then \
              mkdir -p /opt/mvapich2; \
              cd $(SOURCE)/limic2-0.5.5; \
