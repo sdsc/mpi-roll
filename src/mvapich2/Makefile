@@ -104,7 +104,7 @@ else ifeq ("$(ROLLCOMPILER)", "pgi")
   CXXFLAGS=-O
 endif
 
-CONFIG_OPTS = --prefix=$(PKGROOT) --enable-sharedlibs=gcc --with-limic2=//opt/mvapich2
+CONFIG_OPTS = --prefix=$(PKGROOT) --enable-sharedlibs=gcc
 NETWORKSETUP = cat /dev/null
 ifeq ("$(ROLLNETWORK)", "eth")
   CONFIG_OPTS += --with-device=ch3:sock
@@ -117,7 +117,7 @@ else ifeq ("$(ROLLNETWORK)", "mx")
 #                 --with-mx-lib=$(MXHOME)/lib64
   NETWORKSETUP = export LD_LIBRARY_PATH=$(MXHOME)/lib:$$LD_LIBRARY_PATH
 else ifeq ("$(ROLLNETWORK)", "ib")
-  CONFIG_OPTS += --enable-f77 --enable-fc --enable-shared --with-rdma=gen2 --with-ib-include=/usr/include/infiniband --with-ib-libpath=/usr/lib64 --enable-3dtorus-support
+  CONFIG_OPTS += --enable-f77 --enable-fc --enable-shared --with-rdma=gen2 --with-ib-include=/usr/include/infiniband --with-ib-libpath=/usr/lib64 --enable-3dtorus-support --with-limic2=/$(PWD)/$(SOURCE)/limic2dist
 endif
 
 build:
@@ -125,13 +125,14 @@ build:
 	( \
 	  $(COMPILERSETUP); \
 	  $(NETWORKSETUP); \
-          export LD_LIBRARY_PATH=$(ROOT)/opt/mvapich2/lib:$${LD_LIBRARY_PATH};  \
-          if test ! -s $(ROOT)/opt/mvapich2/liblimic2.a ; then \
-             mkdir -p /opt/mvapich2; \
-             cd $(SOURCE)/limic2-0.5.5; \
-             ./configure --prefix=/opt/mvapich2; \
+          cd $(SOURCE); \
+          if test $(ROLLNETWORK) = "ib"; then; \
+             mkdir limic2dist; \
+             cd  limic2-0.5.5; \
+             ./configure --prefix=$(PWD)/$(SOURCE)/limic2dist; \
              make; \
              make install; \
+             export LD_LIBRARY_PATH=$(PWD)/$(SOURCE)/limic2dist/lib:$${LD_LIBRARY_PATH};  \
           fi; \
           export CC=$(CC); \
           export CXX=$(CXX); \
@@ -154,7 +155,11 @@ install::
 	( \
 	  $(COMPILERSETUP); \
 	  cd $(SOURCE); \
-	  make install \
+	  make install; \
+          if test $(ROLLNETWORK) = "ib"; then \
+              cd limic2dist; \
+              cp  -r * /opt/mvapich2/lib; \
+          fi \
 	)
 	umount $(PKGROOT)
 	rm -fr $(SOURCE)
