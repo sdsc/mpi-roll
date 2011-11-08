@@ -126,7 +126,7 @@ build:
 	  $(COMPILERSETUP); \
 	  $(NETWORKSETUP); \
           cd $(SOURCE); \
-          if test $(ROLLNETWORK) = "ib"; then; \
+          if test $(ROLLNETWORK) = "ib"; then \
              mkdir limic2dist; \
              cd  limic2-0.5.5; \
              ./configure --prefix=$(PWD)/$(SOURCE)/limic2dist; \
