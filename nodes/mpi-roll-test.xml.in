@@ -20,7 +20,7 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 
 <post>
 
-/bin/mkdir -m 0755 /root/rolltests
+/bin/mkdir -p -m 0755 /root/rolltests
 
 <file name="/root/rolltests/mpi.t" perms="0755">
 <![CDATA[#!/usr/bin/perl -w

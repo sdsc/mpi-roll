@@ -76,7 +76,7 @@ module-whatis "Version: 1.0.7"
 set mpiHome /opt/mpich2/${COMP}/${NET}
 setenv MPIHOME \$mpiHome
 prepend-path PATH \$mpiHome/bin
-prepend-path LD_LIBRARY_PATH \$mpiHome/lib
+prepend-path LD_LIBRARY_PATH \$mpiHome/lib:\$mpiHome/lib/share
 END
 /bin/chmod 0644 /opt/modulefiles/mpi/.${COMP}/mpich2_${NET}/1.0.7
 
