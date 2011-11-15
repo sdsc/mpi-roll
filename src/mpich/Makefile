@@ -81,7 +81,10 @@ CPPCOMP = g++
 FCOMP = gfortran
 F90COMP = gfortran
 COMPILE_FLAGS = -O2
-ifeq ("$(ROLLCOMPILER)", "intel")
+ifeq ("$(ROLLCOMPILER)", "gnu")
+  # Suppress PAC_PROG_F77_CMDARGS's "extern getarg", which fails w/gfortran
+  COMPILERSETUP += ; export F77_GETARGDECL=" "
+else ifeq ("$(ROLLCOMPILER)", "intel")
   CCOMP = icc
   CPPCOMP = icpc
   FCOMP = ifort
