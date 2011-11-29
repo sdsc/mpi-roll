@@ -104,7 +104,7 @@ else ifeq ("$(ROLLCOMPILER)", "pgi")
   CXXFLAGS=-O
 endif
 
-CONFIG_OPTS = --prefix=$(PKGROOT) --enable-sharedlibs=gcc
+CONFIG_OPTS = --prefix=$(PKGROOT) --enable-sharedlibs=gcc --with-hwloc
 NETWORKSETUP = cat /dev/null
 ifeq ("$(ROLLNETWORK)", "eth")
   CONFIG_OPTS += --with-device=ch3:sock
