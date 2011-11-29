@@ -54,6 +54,11 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.10  2011/11/29 23:53:11  jpg
+#
+#
+# skipping mpich
+#
 # Revision 1.9  2011/11/07 23:07:00  jpg
 #
 #
@@ -111,4 +116,5 @@
 
 SRCDIRS = `find . -type d -maxdepth 1 \
 	-not -name CVS \
+        -not -name mpich \
 	-not -name .`
