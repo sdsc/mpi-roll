@@ -98,24 +98,24 @@ END
 
 /bin/mkdir -m 0755 -p /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}
 
-/bin/cat &gt; /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}/1.8 &lt;&lt; END
+/bin/cat &gt; /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}/1.8a1p1 &lt;&lt; END
 #%Module1.0
 module-whatis "mvapich2_${NET} mpi stack"
-module-whatis "Version: 1.8"
+module-whatis "Version: 1.8a1p1"
 set mpiHome /opt/mvapich2/${COMP}/${NET}
 setenv MPIHOME \$mpiHome
 prepend-path PATH \$mpiHome/bin
 prepend-path LD_LIBRARY_PATH \$mpiHome/lib:/opt/mvapich2/lib
 END
-/bin/chmod 0644 /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}/1.8
+/bin/chmod 0644 /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}/1.8a1p1
 
-/bin/cat &gt; /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}/.version.1.8 &lt;&lt; END
+/bin/cat &gt; /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}/.version.1.8a1p1 &lt;&lt; END
 #%Module1.0
-set ModulesVersion "1.8"
+set ModulesVersion "1.8a1p1"
 END
-/bin/chmod 0644 /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}/.version.1.8
+/bin/chmod 0644 /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}/.version.1.8a1p1
 
-/bin/ln -s /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}/.version.1.8 \
+/bin/ln -s /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}/.version.1.8a1p1 \
            /opt/modulefiles/mpi/.${COMP}/mvapich2_${NET}/.version
 
     fi
