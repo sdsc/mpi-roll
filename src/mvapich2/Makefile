@@ -158,11 +158,11 @@ install::
 	  make install; \
           if test $(ROLLNETWORK) = "ib"; then \
               cd limic2dist; \
-              cp  -r * /opt/mvapich2/lib; \
+              cp  -r  * $(PKGROOT); \
           fi \
 	)
 	umount $(PKGROOT)
-	rm -fr $(SOURCE)
+ 	rm -rf $(SOURCE) 
 
 clean::
 	rm -fr $(SOURCE)
