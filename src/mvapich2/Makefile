@@ -162,7 +162,7 @@ install::
           fi \
 	)
 	umount $(PKGROOT)
- 	rm -rf $(SOURCE) 
+	rm -rf $(SOURCE) 
 
 clean::
 	rm -fr $(SOURCE)
