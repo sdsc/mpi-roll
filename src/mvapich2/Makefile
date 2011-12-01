@@ -129,7 +129,7 @@ build:
           if test $(ROLLNETWORK) = "ib"; then \
              mkdir limic2dist; \
              cd  limic2-0.5.5; \
-             ./configure --prefix=$(PWD)/$(SOURCE)/limic2dist; \
+             ./configure --prefix=$(PWD)/$(SOURCE)/limic2dist --enable-module; \
              make; \
              make install; \
              export LD_LIBRARY_PATH=$(PWD)/$(SOURCE)/limic2dist/lib:$${LD_LIBRARY_PATH};  \
