@@ -78,7 +78,7 @@ COMPILERSETUP = \
 
 CC=gcc
 CXX=g++
-F77=g77
+F77=gfortran
 FC=gfortran
 FFLAGS=-O2
 FCFLAGS=-O2
