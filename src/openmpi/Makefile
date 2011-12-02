@@ -80,7 +80,7 @@ CCOMP = gcc
 CPPCOMP = g++
 FCOMP = gfortran
 F90COMP = gfortran
-COMPILE_FLAGS = -O2 -mtune=core2 -march=core2 -mfpmath=sse -msse3 -g -fPIC
+COMPILE_FLAGS = -O2 -mtune=core2 -march=core2 -mfpmath=sse -msse3 -g -fPIC -ffree-line-length-none
 ifeq ("$(ROLLCOMPILER)", "intel")
   CCOMP = icc
   CPPCOMP = icpc
