@@ -116,7 +116,7 @@ build:
 	  export FFLAGS="$(COMPILE_FLAGS)"; \
 	  export FC=$(F90COMP); \
 	  export FCFLAGS="$(COMPILE_FLAGS)"; \
-          cp patch-files/mpi_scatterv_f90.f90.sh  $(SOURCE)/mpi/mpi/f90/scripts; \
+          cp patch-files/mpi_scatterv_f90.f90.sh  $(SOURCE)/ompi/mpi/f90/scripts; \
 	  cd $(SOURCE); \
 	  ./configure $(CONFIG_OPTS); \
  	  make \
