@@ -117,7 +117,7 @@ else ifeq ("$(ROLLNETWORK)", "mx")
 #                 --with-mx-lib=$(MXHOME)/lib64
   NETWORKSETUP = export LD_LIBRARY_PATH=$(MXHOME)/lib:$$LD_LIBRARY_PATH
 else ifeq ("$(ROLLNETWORK)", "ib")
-  CONFIG_OPTS += --enable-f77 --enable-fc --enable-shared --enable-fast=none --with-ib-include=/usr/include/infiniband --with-ib-libpath=/usr/lib64 --enable-3dtorus-support --with-limic2=/$(PWD)/$(SOURCE)/limic2dist
+  CONFIG_OPTS += --enable-f77 --enable-fc --enable-shared --enable-hybrid --with-ib-include=/usr/include/infiniband --with-ib-libpath=/usr/lib64 --enable-3dtorus-support --with-limic2=/$(PWD)/$(SOURCE)/limic2dist
 endif
 
 build:
