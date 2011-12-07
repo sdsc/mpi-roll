@@ -18,17 +18,16 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 <changelog>
 </changelog>
 
-<package>mpich_ROLLCOMPILER_ROLLNETWORK</package>
-<package>mpich2_ROLLCOMPILER_ROLLNETWORK</package>
-<package>mvapich2_ROLLCOMPILER_ROLLNETWORK</package>
-<package>openmpi_ROLLCOMPILER_ROLLNETWORK</package>
+<package>ROLLMPI_ROLLCOMPILER_ROLLNETWORK</package>
 
 <post>
 # The openmpi build seems to have a bug in its libtool processing; it
-# references $(INTSTALL)/lib in its lib/*.la files instead of $(INSTALL)/lib64.
+# references $(INSTALL)/lib in its lib/*.la files instead of $(INSTALL)/lib64.
 # This is a cheap/quick fix.
-/usr/bin/perl -pi -e 's#/opt/torque/lib\b#/opt/torque/lib64#g' \
-                     /opt/openmpi/ROLLCOMPILER/ROLLNETWORK/lib/*.la
+if test -d /opt/openmpi; then
+  /usr/bin/perl -pi -e 's#/opt/torque/lib\b#/opt/torque/lib64#g' \
+                       /opt/openmpi/ROLLCOMPILER/ROLLNETWORK/lib/*.la
+fi
 </post>
 
 </kickstart>
