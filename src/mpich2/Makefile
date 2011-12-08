@@ -64,8 +64,6 @@ endif
 PKGROOT = /opt/mpich2/$(ROLLCOMPILER)/$(ROLLNETWORK)
 SOURCE = mpich2-$(VERSION)
 REDHAT.ROOT = $(PWD)/../../
-
-INSTDIR = $(ROOT)/$(PKGROOT)
 RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 
 -include $(ROCKSROOT)/etc/Rules.mk
@@ -125,16 +123,16 @@ build:
 
 # Clean immediately after install to free disk space
 install::
-	mkdir -p $(INSTDIR)
+	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
 	if [ ! -d $(PKGROOT) ]; then mkdir -p $(PKGROOT); fi
-	mount --bind $(INSTDIR) $(PKGROOT)
+	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
 	( \
 	  $(COMPILERSETUP); \
 	  cd $(SOURCE); \
 	  make install \
 	)
 	umount $(PKGROOT)
-	rm -fr $(SOURCE)
+	$(MAKE) clean
 
 clean::
 	rm -fr $(SOURCE)
