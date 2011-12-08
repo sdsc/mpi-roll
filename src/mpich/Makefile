@@ -129,7 +129,7 @@ build:
 
 # Clean immediately after install to free disk space
 install::
-	mkdir -p $(ROOT)/$(PKGROOT)
+	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
 	if [ ! -d $(PKGROOT) ]; then mkdir -p $(PKGROOT); fi
 	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
 	( \
