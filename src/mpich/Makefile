@@ -64,8 +64,6 @@ endif
 PKGROOT = /opt/mpich/$(ROLLCOMPILER)/$(ROLLNETWORK)
 SOURCE = mpich-$(VERSION)
 REDHAT.ROOT = $(PWD)/../../
-
-INSTDIR = $(ROOT)/$(PKGROOT)
 RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 
 -include $(ROCKSROOT)/etc/Rules.mk
@@ -100,14 +98,12 @@ endif
 
 CONFIG_OPTS = --prefix=$(PKGROOT) -opt="-O" --enable-sharedlib
 NETWORKSETUP = cat /dev/null
-LINKOPT=-Wl,-rpath,$(MXHOME)/lib64,-rpath,$(MXHOME)/lib -L$(MXHOME)/lib64 -L$(MXHOME)/lib
 ifeq ("$(ROLLNETWORK)", "mx")
   MXHOME = /opt/mx
   COMPILE_FLAGS += -I$(MXHOME)/include
   CONFIG_OPTS += --with-device=ch_mx \
                  -lib="-Wl,-rpath,$(MXHOME)/lib64,-rpath,$(MXHOME)/lib -L$(MXHOME)/lib64 -L$(MXHOME)/lib -lmyriexpress"
   NETWORKSETUP = export LD_LIBRARY_PATH=$(MXHOME)/lib:$$LD_LIBRARY_PATH
-  LINKOPT +=  -lmyriexpress
 endif
 
 build:
@@ -124,7 +120,6 @@ build:
 	  export FC=$(FCOMP); \
 	  export F90FLAGS="$(COMPILE_FLAGS)"; \
 	  export FFLAGS="$(COMPILE_FLAGS)"; \
-	  export LINKOPT="$(LINKOPT)"; \
 	  export PREFIX=$(PKGROOT); \
 	  export RSHCOMMAND=ssh; \
 	  cd $(SOURCE); \
@@ -134,16 +129,16 @@ build:
 
 # Clean immediately after install to free disk space
 install::
-	mkdir -p $(INSTDIR)
+	mkdir -p $(ROOT)/$(PKGROOT)
 	if [ ! -d $(PKGROOT) ]; then mkdir -p $(PKGROOT); fi
-	mount --bind $(INSTDIR) $(PKGROOT)
+	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
 	( \
 	  $(COMPILERSETUP); \
 	  cd $(SOURCE); \
 	  make install \
 	)
 	umount $(PKGROOT)
-	rm -fr $(SOURCE)
+	$(MAKE) clean
 
 clean::
 	rm -fr $(SOURCE)
