@@ -21,6 +21,7 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 <package>ROLLMPI_ROLLCOMPILER_ROLLNETWORK</package>
 
 <post>
+
 # The openmpi build seems to have a bug in its libtool processing; it
 # references $(INSTALL)/lib in its lib/*.la files instead of $(INSTALL)/lib64.
 # This is a cheap/quick fix.
@@ -28,6 +29,19 @@ if test -d /opt/openmpi; then
   /usr/bin/perl -pi -e 's#/opt/torque/lib\b#/opt/torque/lib64#g' \
                        /opt/openmpi/ROLLCOMPILER/ROLLNETWORK/lib/*.la
 fi
+
+# Install the limic kernel object if it came w/the roll build.
+if test -d /opt/mvapich2/limic.ko; then
+  cp /opt/mvapich2/limic.ko /lib/modules/`uname -r`/extra/
+<file name="/etc/rc.d/rocksconfig.d/post-97-limic" perms="0755">
+#!/bin/sh
+
+/sbin/modprobe limic
+/bin/sleep 1
+/bin/chmod 644 /dev/limic
+</file> 
+fi
+
 </post>
 
 </kickstart>

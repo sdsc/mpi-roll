@@ -156,7 +156,8 @@ install::
 	  cd $(SOURCE); \
 	  make install; \
 	  if test "$(ROLLNETWORK)" = "ib"; then \
-	    cp -r limic2dist/* $(PKGROOT); \
+	    cp -r limic2dist/* $(ROOT)/$(PKGROOT); \
+	    cp ../limic.ko $(ROOT)/opt/mvapich2; \
 	  fi \
 	)
 	umount $(PKGROOT)
