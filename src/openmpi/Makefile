@@ -64,8 +64,6 @@ endif
 PKGROOT = /opt/openmpi/$(ROLLCOMPILER)/$(ROLLNETWORK)
 SOURCE = openmpi-$(VERSION)
 REDHAT.ROOT = $(PWD)/../../
-
-INSTDIR = $(ROOT)/$(PKGROOT)
 RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 
 -include $(ROCKSROOT)/etc/Rules.mk
@@ -116,21 +114,21 @@ build:
 	  export FFLAGS="$(COMPILE_FLAGS)"; \
 	  export FC=$(F90COMP); \
 	  export FCFLAGS="$(COMPILE_FLAGS)"; \
-          cp patch-files/mpi_scatterv_f90.f90.sh  $(SOURCE)/ompi/mpi/f90/scripts; \
+	  cp patch-files/mpi_scatterv_f90.f90.sh $(SOURCE)/ompi/mpi/f90/scripts; \
 	  cd $(SOURCE); \
 	  ./configure $(CONFIG_OPTS); \
- 	  make \
+	  make \
 	)
 
 # Clean immediately after install to free disk space
 install::
-	mkdir -p $(INSTDIR)
+	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
 	( \
 	  $(COMPILERSETUP); \
 	  cd $(SOURCE); \
-	  make prefix=$(INSTDIR) install \
+	  make prefix=$(ROOT)/$(PKGROOT) install \
 	)
-	rm -fr $(SOURCE)
+	$(MAKE) clean
 
 clean::
 	rm -fr $(SOURCE)
