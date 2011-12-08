@@ -64,8 +64,6 @@ endif
 PKGROOT = /opt/mvapich2/$(ROLLCOMPILER)/$(ROLLNETWORK)
 SOURCE = mvapich2-$(VERSION)
 REDHAT.ROOT = $(PWD)/../../
-
-INSTDIR = $(ROOT)/$(PKGROOT)
 RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 
 -include $(ROCKSROOT)/etc/Rules.mk
@@ -104,20 +102,21 @@ else ifeq ("$(ROLLCOMPILER)", "pgi")
   CXXFLAGS=-O
 endif
 
-CONFIG_OPTS = --prefix=$(PKGROOT) --enable-sharedlibs=gcc --with-hwloc
+CONFIG_OPTS = \
+  --prefix=$(PKGROOT) --enable-shared --enable-sharedlibs=gcc --with-hwloc
 NETWORKSETUP = cat /dev/null
 ifeq ("$(ROLLNETWORK)", "eth")
   CONFIG_OPTS += --with-device=ch3:sock
 else ifeq ("$(ROLLNETWORK)", "mx")
   MXHOME = /opt/mx
   COMPILE_FLAGS += -I$(MXHOME)/include
-  CONFIG_OPTS += --with-device=ch3:nemesis:mx \
-                 --with-mx=$(MXHOME)
-#                 --with-mx-include=$(MXHOME)/include \
-#                 --with-mx-lib=$(MXHOME)/lib64
+  CONFIG_OPTS += --with-device=ch3:nemesis:mx --with-mx=$(MXHOME)
   NETWORKSETUP = export LD_LIBRARY_PATH=$(MXHOME)/lib:$$LD_LIBRARY_PATH
 else ifeq ("$(ROLLNETWORK)", "ib")
-  CONFIG_OPTS += --enable-f77 --enable-fc --enable-shared --enable-hybrid --with-ib-include=/usr/include/infiniband --with-ib-libpath=/usr/lib64 --enable-3dtorus-support --with-limic2=/$(PWD)/$(SOURCE)/limic2dist
+  CONFIG_OPTS += --enable-f77 --enable-fc --enable-hybrid \
+                 --with-ib-include=/usr/include/infiniband \
+                 --with-ib-libpath=/usr/lib64 --enable-3dtorus-support \
+                 --with-limic2=/$(PWD)/$(SOURCE)/limic2dist
 endif
 
 build:
@@ -125,23 +124,23 @@ build:
 	( \
 	  $(COMPILERSETUP); \
 	  $(NETWORKSETUP); \
-          cd $(SOURCE); \
-          if test $(ROLLNETWORK) = "ib"; then \
-             mkdir limic2dist; \
-             cd  limic2-0.5.5; \
-             ./configure --prefix=$(PWD)/$(SOURCE)/limic2dist --enable-module; \
-             make; \
-             make install; \
-             export LD_LIBRARY_PATH=$(PWD)/$(SOURCE)/limic2dist/lib:$${LD_LIBRARY_PATH};  \
-          fi; \
-          export CC=$(CC); \
-          export CXX=$(CXX); \
-          export F77=$(F77); \
-          export FC=$(FC); \
-          export FFLAGS=$(FFLAGS); \
-          export FCFLAGS=$(FCFLAGS); \
-          export CFLAGS=$(CFLAGS); \
-          export CXXFLAGS=$(CXXFLAGS); \
+	  cd $(SOURCE); \
+	  if test "$(ROLLNETWORK)" = "ib"; then \
+	    mkdir limic2dist; \
+	    cd limic2-0.5.5; \
+	    ./configure --prefix=$(PWD)/$(SOURCE)/limic2dist --enable-module; \
+	    make; \
+	    make install; \
+	    export LD_LIBRARY_PATH=$(PWD)/$(SOURCE)/limic2dist/lib:$${LD_LIBRARY_PATH};  \
+	  fi; \
+	  export CC=$(CC); \
+	  export CXX=$(CXX); \
+	  export F77=$(F77); \
+	  export FC=$(FC); \
+	  export FFLAGS=$(FFLAGS); \
+	  export FCFLAGS=$(FCFLAGS); \
+	  export CFLAGS=$(CFLAGS); \
+	  export CXXFLAGS=$(CXXFLAGS); \
 	  cd $(PWD)/$(SOURCE); \
 	  ./configure $(CONFIG_OPTS); \
 	  make \
@@ -149,20 +148,19 @@ build:
 
 # Clean immediately after install to free disk space
 install::
-	mkdir -p $(INSTDIR)
+	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
 	if [ ! -d  $(PKGROOT) ]; then mkdir -p $(PKGROOT); fi
-	mount --bind $(INSTDIR) $(PKGROOT)
+	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
 	( \
 	  $(COMPILERSETUP); \
 	  cd $(SOURCE); \
 	  make install; \
-          if test $(ROLLNETWORK) = "ib"; then \
-              cd limic2dist; \
-              cp  -r  * $(PKGROOT); \
-          fi \
+	  if test "$(ROLLNETWORK)" = "ib"; then \
+	    cp -r limic2dist/* $(PKGROOT); \
+	  fi \
 	)
 	umount $(PKGROOT)
-	rm -rf $(SOURCE) 
+	$(MAKE) clean
 
 clean::
 	rm -fr $(SOURCE)
