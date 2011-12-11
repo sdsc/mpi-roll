@@ -116,7 +116,7 @@ else ifeq ("$(ROLLNETWORK)", "ib")
   CONFIG_OPTS += --enable-f77 --enable-fc --enable-hybrid \
                  --with-ib-include=/usr/include/infiniband \
                  --with-ib-libpath=/usr/lib64 --enable-3dtorus-support \
-                 --with-limic2=/$(PWD)/$(SOURCE)/limic2dist
+                 --with-limic2=$(PKGROOT)
 endif
 
 build:
@@ -126,12 +126,15 @@ build:
 	  $(NETWORKSETUP); \
 	  cd $(SOURCE); \
 	  if test "$(ROLLNETWORK)" = "ib"; then \
-	    mkdir limic2dist; \
 	    cd limic2-0.5.5; \
-	    ./configure --prefix=$(PWD)/$(SOURCE)/limic2dist --enable-module; \
+	    mkdir -p $(ROOT)/$(PKGROOT); \
+	    if [ ! -d  $(PKGROOT) ]; then mkdir -p $(PKGROOT); fi; \
+	    mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT); \
+	    ./configure --prefix=$(PKGROOT) --enable-module; \
 	    make; \
 	    make install; \
-	    export LD_LIBRARY_PATH=$(PWD)/$(SOURCE)/limic2dist/lib:$${LD_LIBRARY_PATH};  \
+	    umount $(PKGROOT); \
+            export LD_LIBRARY_PATH=$(PKGROOT)/lib:$${LD_LIBRARY_PATH};  \
 	  fi; \
 	  export CC=$(CC); \
 	  export CXX=$(CXX); \
@@ -142,8 +145,16 @@ build:
 	  export CFLAGS=$(CFLAGS); \
 	  export CXXFLAGS=$(CXXFLAGS); \
 	  cd $(PWD)/$(SOURCE); \
+	  if test "$(ROLLNETWORK)" = "ib"; then \
+	    mkdir -p $(ROOT)/$(PKGROOT); \
+	    if [ ! -d  $(PKGROOT) ]; then mkdir -p $(PKGROOT); fi; \
+	    mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT); \
+          fi; \
 	  ./configure $(CONFIG_OPTS); \
-	  make \
+	  make; \
+	  if test "$(ROLLNETWORK)" = "ib"; then \
+            umount $(PKGROOT); \
+          fi \
 	)
 
 # Clean immediately after install to free disk space
@@ -155,10 +166,6 @@ install::
 	  $(COMPILERSETUP); \
 	  cd $(SOURCE); \
 	  make install; \
-	  if test "$(ROLLNETWORK)" = "ib"; then \
-	    cp -r limic2dist/* $(ROOT)/$(PKGROOT); \
-	    cp ../limic.ko $(ROOT)/opt/mvapich2; \
-	  fi \
 	)
 	umount $(PKGROOT)
 	$(MAKE) clean
