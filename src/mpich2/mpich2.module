@@ -3,7 +3,6 @@
 
 cat > ROOT_PKGROOTMODULEROOT/VERSION <<END
 #%Module1.0
-#%Module1.0
 module-whatis "mpich2_ROLLNETWORK mpi stack"
 module-whatis "Version: VERSION"
 set mpiHome /opt/mpich2/ROLLCOMPILER/ROLLNETWORK

@@ -138,8 +138,8 @@ install::
 	  cd $(SOURCE); \
 	  make install \
 	)
-	cat mpich.module | perl -pi -e "s!MODULEROOT!/opt/modulefiles/mpi/.$(ROLLCOMPILER)/mpich!g;s!VERSION!$(VERSION)!g" \
-          > $(REDHAT.ROOT)/src/build-gordon-modules/$(NAME)
+	cat mpich.module | perl -pi -e "s!MODULEROOT!/opt/modulefiles/mpi/.$(ROLLCOMPILER)/mpich!g;s!VERSION!$(VERSION)!g;s!ROLLCOMPILER!$(ROLLCOMPILER)!g;s!ROLLNETWORK!$(ROLLNETWORK)!g" \
+          > $(REDHAT.ROOT)/src/build-gordon-modules/$(NAME).module
 	umount $(PKGROOT)
 	$(MAKE) clean
 
