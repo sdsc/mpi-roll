@@ -130,7 +130,7 @@ build:
 # Clean immediately after install to free disk space
 install::
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
-	mkdir -p $(REDHAT.ROOT)/src/build-gordon-modules
+	mkdir -p $(REDHAT.ROOT)/src/build-mpi-modules
 	if [ ! -d $(PKGROOT) ]; then mkdir -p $(PKGROOT); fi
 	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
 	( \
@@ -139,7 +139,7 @@ install::
 	  make install \
 	)
 	cat mpich.module | perl -pi -e "s!MODULEROOT!/opt/modulefiles/mpi/.$(ROLLCOMPILER)/mpich!g;s!VERSION!$(VERSION)!g;s!ROLLCOMPILER!$(ROLLCOMPILER)!g;s!ROLLNETWORK!$(ROLLNETWORK)!g" \
-          > $(REDHAT.ROOT)/src/build-gordon-modules/$(NAME).module
+          > $(REDHAT.ROOT)/src/build-mpi-modules/$(NAME).module
 	umount $(PKGROOT)
 	$(MAKE) clean
 

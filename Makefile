@@ -91,11 +91,11 @@ default:
 	$(MAKE) ROLLCOMPILER="$(ROLLCOMPILER)" ROLLNETWORK="$(ROLLNETWORK)" ROLLMPI="$(ROLLMPI)" roll
 
 clean::
-	rm -f _arch bootstrap.py src/build-*
+	rm -f _arch bootstrap.py 
 
 cvsclean: clean
 	for i in `ls nodes/*.in`; do \
 	  export o=`echo $$i | sed 's/\.in//'`; \
 	  rm -f $$o; \
 	done
-	rm -fr RPMS SRPMS 
+	rm -fr RPMS SRPMS  src/build-*
