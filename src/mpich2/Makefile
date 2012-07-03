@@ -78,19 +78,19 @@ CCOMP = gcc
 CPPCOMP = g++
 FCOMP = gfortran
 F90COMP = gfortran
-COMPILE_FLAGS = -O2
+COMPILE_FLAGS = -O2 -mavx
 ifeq ("$(ROLLCOMPILER)", "intel")
   CCOMP = icc
   CPPCOMP = icpc
   FCOMP = ifort
   F90COMP = ifort
-  COMPILE_FLAGS = -O
+  COMPILE_FLAGS = -O -xHOST
 else ifeq ("$(ROLLCOMPILER)", "pgi")
   CCOMP = pgcc
   CPPCOMP = pgCC
   FCOMP = pgf90
   F90COMP = pgf90
-  COMPILE_FLAGS = -O
+  COMPILE_FLAGS = -fast
 endif
 
 CONFIG_OPTS = --prefix=$(PKGROOT) --enable-shared --enable-sharedlibs=gcc

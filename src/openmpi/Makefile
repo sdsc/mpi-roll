@@ -78,19 +78,19 @@ CCOMP = gcc
 CPPCOMP = g++
 FCOMP = gfortran
 F90COMP = gfortran
-COMPILE_FLAGS = -O2 -mtune=core2 -march=core2 -mfpmath=sse -msse3 -g -fPIC -ffree-line-length-none
+COMPILE_FLAGS = -O2 -mavx -mtune=core2 -march=core2 -mfpmath=sse -msse3 -g -fPIC -ffree-line-length-none
 ifeq ("$(ROLLCOMPILER)", "intel")
   CCOMP = icc
   CPPCOMP = icpc
   FCOMP = ifort
   F90COMP = ifort
-  COMPILE_FLAGS = -O
+  COMPILE_FLAGS = -O -xHOST
 else ifeq ("$(ROLLCOMPILER)", "pgi")
   CCOMP = pgcc
   CPPCOMP = pgCC
   FCOMP = pgf77
   F90COMP = pgf90
-  COMPILE_FLAGS = -O
+  COMPILE_FLAGS = -fast
 endif
 
 CONFIG_OPTS = --prefix=$(PKGROOT) --disable-dlopen --enable-mca-static \

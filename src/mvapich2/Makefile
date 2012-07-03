@@ -78,28 +78,28 @@ CC=gcc
 CXX=g++
 F77=gfortran
 FC=gfortran
-FFLAGS=-O2
-FCFLAGS=-O2
-CFLAGS=-O2
-CXXFLAGS=-O2
+FFLAGS=-O2 -mavx
+FCFLAGS=-O2 -mavx
+CFLAGS=-O2 -mavx
+CXXFLAGS=-O2 -mavx
 ifeq ("$(ROLLCOMPILER)", "intel")
   CC=icc
   CXX=icpc
   F77=ifort
   FC=ifort
-  FFLAGS=-O
-  FCFLAGS=-O
-  CFLAGS=-O
-  CXXFLAGS=-O
+  FFLAGS=-O -xHOST
+  FCFLAGS=-O -xHOST
+  CFLAGS=-O -xHOST
+  CXXFLAGS=-O -xHOST
 else ifeq ("$(ROLLCOMPILER)", "pgi")
   CC=pgcc
   CXX=pgCC
   F77=pgf77
   FC=pgf90
-  FFLAGS=-O
-  FCFLAGS=-O
-  CFLAGS=-O
-  CXXFLAGS=-O
+  FFLAGS=-fast
+  FCFLAGS=-fast
+  CFLAGS=-fast
+  CXXFLAGS=-fast
 endif
 
 CONFIG_OPTS = \
