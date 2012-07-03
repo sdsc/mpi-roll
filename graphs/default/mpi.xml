@@ -25,6 +25,13 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
   <tail>mpi-common</tail>
 </order>
 
+<edge from="envmodules-common">
+  <to>mpi-modules-common</to>
+</edge>
+<order head="envmodules-common">
+  <tail>mpi-modules-common</tail>
+</order>
+
 <edge from="server">
   <to>mpi-doc</to>
 </edge>
@@ -37,6 +44,10 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 </edge>
 <order head="base">
   <tail>mpi-roll-test</tail>
+</order>
+
+<order head="mpi-common">
+  <tail>mpi-modules-common</tail>
 </order>
 
 </graph>
