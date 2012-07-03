@@ -19,6 +19,7 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 </changelog>
 
 <package>ROLLMPI_ROLLCOMPILER_ROLLNETWORK</package>
+<package>mpi-modules</package>
 
 <post>
 
