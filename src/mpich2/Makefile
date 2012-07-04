@@ -132,7 +132,7 @@ install::
 	  cd $(SOURCE); \
 	  make install \
 	)
-	cat mpich2.module | perl -pi -e "s!MODULEROOT!/opt/modulefiles/mpi/.$(ROLLCOMPILER)/mpich2!g;s!VERSION!$(VERSION)!g;s!ROLLCOMPILER!$(ROLLCOMPILER)!g;s!ROLLNETWORK!$(ROLLNETWORK)!g" \
+	cat mpich2.module | perl -pi -e "s!MODULEROOT!/opt/modulefiles/mpi/.$(ROLLCOMPILER)/mpich2_$(ROLLNETWORK)!g;s!VERSION!$(VERSION)!g;s!ROLLCOMPILER!$(ROLLCOMPILER)!g;s!ROLLNETWORK!$(ROLLNETWORK)!g" \
           > $(REDHAT.ROOT)/src/build-mpi-modules/$(NAME).module
 	umount $(PKGROOT)
 	$(MAKE) clean

@@ -129,7 +129,7 @@ install::
 	  cd $(SOURCE); \
 	  make prefix=$(ROOT)/$(PKGROOT) install \
 	)
-	cat openmpi.module | perl -pi -e "s!MODULEROOT!/opt/modulefiles/mpi/.$(ROLLCOMPILER)/openmpi!g;s!VERSION!$(VERSION)!g;s!ROLLCOMPILER!$(ROLLCOMPILER)!g;s!ROLLNETWORK!$(ROLLNETWORK)!g" \
+	cat openmpi.module | perl -pi -e "s!MODULEROOT!/opt/modulefiles/mpi/.$(ROLLCOMPILER)/openmpi_$(ROLLNETWORK)!g;s!VERSION!$(VERSION)!g;s!ROLLCOMPILER!$(ROLLCOMPILER)!g;s!ROLLNETWORK!$(ROLLNETWORK)!g" \
           > $(REDHAT.ROOT)/src/build-mpi-modules/$(NAME).module
 	$(MAKE) clean
 
