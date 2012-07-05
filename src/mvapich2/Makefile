@@ -141,10 +141,10 @@ build:
 	  export CXX=$(CXX); \
 	  export F77=$(F77); \
 	  export FC=$(FC); \
-	  export FFLAGS=$(FFLAGS); \
-	  export FCFLAGS=$(FCFLAGS); \
-	  export CFLAGS=$(CFLAGS); \
-	  export CXXFLAGS=$(CXXFLAGS); \
+	  export FFLAGS="$(FFLAGS)"; \
+	  export FCFLAGS="$(FCFLAGS)"; \
+	  export CFLAGS="$(CFLAGS)"; \
+	  export CXXFLAGS="$(CXXFLAGS)"; \
 	  cd $(PWD)/$(SOURCE); \
 	  if test "$(ROLLNETWORK)" = "ib"; then \
 	    mkdir -p $(ROOT)/$(PKGROOT); \
