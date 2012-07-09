@@ -84,13 +84,13 @@ ifeq ("$(ROLLCOMPILER)", "intel")
   CPPCOMP = icpc
   FCOMP = ifort
   F90COMP = ifort
-  COMPILE_FLAGS = -O -xHOST
+  COMPILE_FLAGS = -O -xHOST -fPIC
 else ifeq ("$(ROLLCOMPILER)", "pgi")
   CCOMP = pgcc
   CPPCOMP = pgCC
   FCOMP = pgf77
   F90COMP = pgf90
-  COMPILE_FLAGS = -fast
+  COMPILE_FLAGS = -fast -fPIC
 endif
 
 CONFIG_OPTS = --prefix=$(PKGROOT) --disable-dlopen --enable-mca-static \

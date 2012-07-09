@@ -87,19 +87,19 @@ ifeq ("$(ROLLCOMPILER)", "intel")
   CXX=icpc
   F77=ifort
   FC=ifort
-  FFLAGS=-O -xHOST
-  FCFLAGS=-O -xHOST
-  CFLAGS=-O -xHOST
-  CXXFLAGS=-O -xHOST
+  FFLAGS=-O -xHOST -fPIC
+  FCFLAGS=-O -xHOST -fPIC
+  CFLAGS=-O -xHOST -fPIC
+  CXXFLAGS=-O -xHOST -fPIC
 else ifeq ("$(ROLLCOMPILER)", "pgi")
   CC=pgcc
   CXX=pgCC
   F77=pgf77
   FC=pgf90
-  FFLAGS=-fast
-  FCFLAGS=-fast
-  CFLAGS=-fast
-  CXXFLAGS=-fast
+  FFLAGS=-fast -fPIC
+  FCFLAGS=-fast -fPIC
+  CFLAGS=-fast -fPIC
+  CXXFLAGS=-fast -fPIC
 endif
 
 CONFIG_OPTS = \
