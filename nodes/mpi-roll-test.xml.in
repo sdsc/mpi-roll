@@ -1,0 +1,205 @@
+<?xml version="1.0" standalone="no"?>
+
+<kickstart>
+
+<description>
+MPI roll installation test.
+http://www.mcs.anl.gov/research/projects/mpi/mpich1
+http://www.mcs.anl.gov/research/projects/mpich2
+http://www.open-mpi.org
+http://mvapich.cse.ohio-state.edu
+</description>
+
+<copyright>
+Copyright (c) 2000 - 2011 The Regents of the University of California.
+All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
+</copyright>
+
+<changelog>
+</changelog>
+
+<post>
+
+/bin/mkdir -p -m 0755 /root/rolltests
+
+<file name="/root/rolltests/mpi.t" perms="0755">
+<![CDATA[#!/usr/bin/perl -w
+# mpi roll installation test.  Usage:
+# mpi.t [nodetype [submituser]]
+#   where nodetype is one of "Compute", "Dbnode", "Frontend" or "Login"
+#   if not specified, the test assumes either Compute or Frontend.
+#   submituser is the login id through which jobs will be submitted to the
+#   batch queue; defaults to diag.
+
+use Test::More qw(no_plan);
+
+my $appliance = $#ARGV >= 0 ? $ARGV[0] :
+                -d '/export/rocks/install' ? 'Frontend' : 'Compute';
+my $installedOnAppliancesPattern = '.';
+my $output;
+
+my $TESTFILE = 'tmpmpi';
+
+my $NODECOUNT = 4;
+my $LASTNODE = $NODECOUNT - 1;
+my $SUBMITUSER = $ARGV[1] || 'diag';
+my $SUBMITDIR = "/home/$SUBMITUSER/mpiroll";
+`sudo -u $SUBMITUSER mkdir $SUBMITDIR`;
+
+open(OUT, ">$TESTFILE.c");
+print OUT <<END;
+#include <stdio.h>
+#include <mpi.h>
+
+int main (int argc, char **argv) {
+  int rank, size;
+  MPI_Init(&argc, &argv);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
+  printf("Hello from process %d of %d\\n", rank, size);
+  MPI_Finalize();
+  return 0;
+}
+END
+close(OUT);
+
+my $modulecmd = "$ENV{MODULESHOME}/bin/modulecmd";
+
+my @COMPILERS = (
+  'ROLLCOMPILER',
+);
+my @NETWORKS = (
+  'ROLLNETWORK',
+);
+my @MPIS = (
+  'ROLLMPI',
+);
+
+# mpi-common.xml
+foreach my $mpi (@MPIS) {
+  foreach my $compiler (@COMPILERS) {
+
+    SKIP: {       
+        
+      skip "$mpi/$compiler not installed", 2 if ! -d "/opt/$mpi/$compiler";
+
+      foreach my $network (@NETWORKS) {
+
+        my $SUBMITERR = "$SUBMITDIR/$TESTFILE.$mpi.$compiler.$network.err";
+        my $SUBMITEXE = "$SUBMITDIR/$TESTFILE.$mpi.$compiler.$network.exe";
+        my $SUBMITOUT = "$SUBMITDIR/$TESTFILE.$mpi.$compiler.$network.out";
+
+        my $command = "$modulecmd bash clear yes; " .
+                      "$modulecmd bash load $compiler ${mpi}_$network";
+        $output = `$command`;
+        $output =~ s/;\s*$//;
+        $command = "eval '$output'; which mpicc; " .
+                   "mpicc -o $TESTFILE $TESTFILE.c";
+        $output = `$command`;
+        $output =~ /(\S*mpicc)/;
+        my $mpicc = $1 || 'mpicc';
+        my $mpirun = $mpicc;
+        $mpirun =~ s/mpicc/mpirun/;
+        ok(-x $TESTFILE, "Compile with $mpicc");
+
+        SKIP: {
+
+          skip 'No exe', 1 if ! -x $TESTFILE;
+          chomp(my $hostName = `hostname`);
+          $hostName =~ s/\.local//;
+          chomp(my $submitHosts = `qmgr -c 'list server submit_hosts'`);
+          skip 'Not submit machine', 1
+            if $appliance ne 'Frontend' && $submitHosts !~ /$hostName/;
+          `sudo -u $SUBMITUSER cp $TESTFILE $SUBMITEXE`;
+
+          my $fileopt = $mpi =~ /^(openmpi|mpich)$/ ?
+                        "-machinefile \$PBS_NODEFILE" : "-f \$PBS_NODEFILE";
+          open(OUT, ">$TESTFILE.qsub");
+          print OUT <<END;
+#!/bin/csh
+#PBS -l nodes=$NODECOUNT
+#PBS -l walltime=5:00
+#PBS -e $SUBMITERR
+#PBS -o $SUBMITOUT
+#PBS -V
+#PBS -m n
+cd $SUBMITDIR
+$mpirun $fileopt -np $NODECOUNT $SUBMITEXE
+END
+          close(OUT);
+          # Add a line to the submitter's .bashrc to load the compiler module
+          $command =
+            "sudo -u $SUBMITUSER bash -c " .
+            "'echo \"echo mpirolltest > /dev/null; " .
+            "module load $compiler\" >> /home/$SUBMITUSER/.bashrc'";
+          $output = `$command`;
+          $output = `sudo -u $SUBMITUSER qsub $TESTFILE.qsub`;
+          $output =~ /(\d+)/;
+          my $jobId = $1;
+          while(`qstat $jobId` =~ / (Q|R) /) {
+            sleep(1);
+          }
+          for(my $sec = 0; $sec < 60; $sec++) {
+            last if -f $SUBMITOUT;
+            sleep(1);
+          }
+          $output = `sudo -u $SUBMITUSER cat $SUBMITOUT`;
+          like($output, qr/process $LASTNODE of $NODECOUNT/,"Run with $mpirun");
+          # Remove the .bashrc line we added earlier
+          $output =
+            "sudo -u $SUBMITUSER " .
+            "perl -pi -e 's/.*mpirolltest.*//s' /home/$SUBMITUSER/.bashrc";
+          $output = `$command`;
+
+        }
+
+        `rm -f $TESTFILE`;
+
+      }
+
+    }
+
+  }
+}
+
+`grep -s 'lib\>' /opt/openmpi/*/*/lib/*.la`;
+ok($? != 0, 'references to lib changed to lib64');
+
+# mpi-doc.xml
+SKIP: {
+  skip 'not server', 1 if $appliance ne 'Frontend';
+  ok(-d '/var/www/html/roll-documentation/mpi', 'doc installed');
+}
+
+# mpi-modules-common.xml
+my $modulesInstalled = -f '/etc/profile.d/modules.sh';
+foreach my $mpi (@MPIS) {
+  foreach my $compiler (@COMPILERS) {
+
+    SKIP: {       
+      skip "$mpi/$compiler not installed", 3 if ! -d "/opt/$mpi/$compiler";
+      foreach my $network (@NETWORKS) {
+        if($modulesInstalled) {
+          my $dir = "/opt/modulefiles/mpi/.$compiler/${mpi}_$network";
+          `/bin/ls $dir/[0-9]* 2>&1`;
+          ok($? == 0, "$mpi/$compiler/$network module installed");
+          `/bin/ls $dir/.version.[0-9]* 2>&1`;
+          ok($? == 0, "$mpi/$compiler/$network version module installed");
+          ok(-l "$dir/.version",
+             "$mpi/$compiler/$network version module link created");
+        }
+      }
+
+    }
+
+  }
+}
+
+`rm -f $TESTFILE*`;
+`sudo -u $SUBMITUSER rm -fr $SUBMITDIR`;
+]]>
+</file>
+
+</post>
+
+</kickstart> 
