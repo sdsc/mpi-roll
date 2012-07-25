@@ -110,6 +110,7 @@ build:
 	tar zxvf $(SOURCE).tgz
 	cp patch-files/mpirun.ch_mx.pl.in patch-files/mxmpi_conf.c \
 	   $(SOURCE)/mpid/ch_mx/
+	find $(SOURCE) -type f -exec perl -pi -e 's#iostream\.h#iostream#g' {} \;
 	( \
 	  $(COMPILERSETUP); \
 	  $(NETWORKSETUP); \
