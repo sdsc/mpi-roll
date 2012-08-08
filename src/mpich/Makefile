@@ -78,7 +78,7 @@ CCOMP = gcc
 CPPCOMP = g++
 FCOMP = gfortran
 F90COMP = gfortran
-COMPILE_FLAGS = -O2 -mavx
+export COMPILE_FLAGS = -mavx -O2
 ifeq ("$(ROLLCOMPILER)", "gnu")
   # Suppress PAC_PROG_F77_CMDARGS's "extern getarg", which fails w/gfortran
   COMPILERSETUP += ; export F77_GETARGDECL=" "
@@ -115,12 +115,19 @@ build:
 	  $(COMPILERSETUP); \
 	  $(NETWORKSETUP); \
 	  export CC=$(CCOMP); \
-	  export CFLAGS="$(COMPILE_FLAGS)"; \
+          if test "$(ROLLCOMPILER)" = "gnu"; then \
+             version=`gcc -v 2>&1 |grep version|awk '{print $$3}'|sed 's/\.//g'`; \
+             if test "$${version}" -lt 461; then \
+                COMPILE_FLAGS="`echo "$(COMPILE_FLAGS)"|sed 's/\-mavx //'`"; \
+             fi; \
+          fi; \
+	  export CFLAGS="$${COMPILE_FLAGS}"; \
+	  export CXXFLAGS="$${COMPILE_FLAGS}"; \
 	  export CXX=$(CPPCOMP); \
 	  export F90=$(F90COMP); \
 	  export FC=$(FCOMP); \
-	  export F90FLAGS="$(COMPILE_FLAGS)"; \
-	  export FFLAGS="$(COMPILE_FLAGS)"; \
+	  export F90FLAGS="$${COMPILE_FLAGS}"; \
+	  export FFLAGS="$${COMPILE_FLAGS}"; \
 	  export PREFIX=$(PKGROOT); \
 	  export RSHCOMMAND=ssh; \
 	  cd $(SOURCE); \
