@@ -78,7 +78,7 @@ CCOMP = gcc
 CPPCOMP = g++
 FCOMP = gfortran
 F90COMP = gfortran
-COMPILE_FLAGS = -O2 -mavx -mtune=core2 -march=core2 -mfpmath=sse -msse3 -g -fPIC -ffree-line-length-none
+COMPILE_FLAGS = -mavx -O2 -mtune=core2 -march=core2 -mfpmath=sse -msse3 -g -fPIC -ffree-line-length-none
 ifeq ("$(ROLLCOMPILER)", "intel")
   CCOMP = icc
   CPPCOMP = icpc
@@ -107,13 +107,20 @@ build:
 	( \
 	  $(COMPILERSETUP); \
 	  export CC=$(CCOMP); \
-	  export CFLAGS="$(COMPILE_FLAGS)"; \
+          COMPILE_FLAGS="$(COMPILE_FLAGS)"; \
+          if test "$(ROLLCOMPILER)" = "gnu"; then \
+             version=`gcc -v 2>&1 |grep version|awk '{print $$3}'|sed 's/\.//g'`; \
+             if test "$${version}" -lt 461; then \
+                COMPILE_FLAGS="`echo "$${COMPILE_FLAGS}"|sed 's/\-mavx //'`"; \
+             fi; \
+          fi; \
+	  export CFLAGS="$${COMPILE_FLAGS}"; \
 	  export CXX=$(CPPCOMP); \
-	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
+	  export CXXFLAGS="$${COMPILE_FLAGS}"; \
 	  export F77=$(FCOMP); \
-	  export FFLAGS="$(COMPILE_FLAGS)"; \
+	  export FFLAGS="$${COMPILE_FLAGS}"; \
 	  export FC=$(F90COMP); \
-	  export FCFLAGS="$(COMPILE_FLAGS)"; \
+	  export FCFLAGS="$${COMPILE_FLAGS}"; \
 	  cp patch-files/mpi_scatterv_f90.f90.sh $(SOURCE)/ompi/mpi/f90/scripts; \
 	  cd $(SOURCE); \
 	  ./configure $(CONFIG_OPTS); \
