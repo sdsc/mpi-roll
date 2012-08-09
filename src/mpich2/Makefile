@@ -78,7 +78,7 @@ CCOMP = gcc
 CPPCOMP = g++
 FCOMP = gfortran
 F90COMP = gfortran
-COMPILE_FLAGS = -O2 -mavx
+COMPILE_FLAGS = -mavx -O2
 ifeq ("$(ROLLCOMPILER)", "intel")
   CCOMP = icc
   CPPCOMP = icpc
@@ -110,11 +110,18 @@ build:
 	  $(COMPILERSETUP); \
 	  $(NETWORKSETUP); \
 	  export CC=$(CCOMP); \
-	  export CFLAGS="$(COMPILE_FLAGS)"; \
+          COMPILE_FLAGS="$(COMPILE_FLAGS)"; \
+          if test "$(ROLLCOMPILER)" = "gnu"; then \
+             version=`gcc -v 2>&1 |grep version|awk '{print $$3}'|sed 's/\.//g'`; \
+             if test "$${version}" -lt 461; then \
+                COMPILE_FLAGS="`echo "$${COMPILE_FLAGS}"|sed 's/\-mavx //'`"; \
+             fi; \
+          fi; \
+	  export CFLAGS="$${COMPILE_FLAGS}"; \
 	  export CXX=$(CPPCOMP); \
-	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
+	  export CXXFLAGS="$${COMPILE_FLAGS}"; \
 	  export FC=$(FCOMP); \
-	  export FCFLAGS="$(COMPILE_FLAGS)"; \
+	  export FCFLAGS="$${COMPILE_FLAGS}"; \
 	  export PREFIX=$(PKGROOT); \
 	  cd $(SOURCE); \
 	  ./configure $(CONFIG_OPTS); \
