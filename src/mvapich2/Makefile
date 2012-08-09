@@ -78,10 +78,10 @@ CC=gcc
 CXX=g++
 F77=gfortran
 FC=gfortran
-FFLAGS=-O2 -mavx
-FCFLAGS=-O2 -mavx
-CFLAGS=-O2 -mavx
-CXXFLAGS=-O2 -mavx
+FFLAGS = -mavx -O2
+FCFLAGS = -mavx -O2
+CFLAGS = -mavx -O2
+CXXFLAGS = -mavx -O2
 ifeq ("$(ROLLCOMPILER)", "intel")
   CC=icc
   CXX=icpc
@@ -140,10 +140,23 @@ build:
 	  export CXX=$(CXX); \
 	  export F77=$(F77); \
 	  export FC=$(FC); \
-	  export FFLAGS="$(FFLAGS)"; \
-	  export FCFLAGS="$(FCFLAGS)"; \
-	  export CFLAGS="$(CFLAGS)"; \
-	  export CXXFLAGS="$(CXXFLAGS)"; \
+          FFLAGS="$(FFLAGS)"; \
+          FCLAGS="$(FCLAGS)"; \
+          CFLAGS="$(CFLAGS)"; \
+          CXXFLAGS="$(CXXFLAGS)"; \
+          if test "$(ROLLCOMPILER)" = "gnu"; then \
+             version=`gcc -v 2>&1 |grep version|awk '{print $$3}'|sed 's/\.//g'`; \
+             if test "$${version}" -lt 461; then \
+                FFLAGS="`echo "$${FFLAGS}"|sed 's/\-mavx //'`"; \
+                FCLAGS="`echo "$${FCLAGS}"|sed 's/\-mavx //'`"; \
+                CFLAGS="`echo "$${CFLAGS}"|sed 's/\-mavx //'`"; \
+                CXXFLAGS="`echo "$${CXXFLAGS}"|sed 's/\-mavx //'`"; \
+             fi; \
+          fi; \
+	  export FFLAGS="$${FFLAGS}"; \
+	  export FCFLAGS="$${FCFLAGS}"; \
+	  export CFLAGS="$${CFLAGS}"; \
+	  export CXXFLAGS="$${CXXFLAGS}"; \
 	  cd $(PWD)/$(SOURCE); \
 	  if test "$(ROLLNETWORK)" = "ib"; then \
 	    mkdir -p $(ROOT)/$(PKGROOT); \
