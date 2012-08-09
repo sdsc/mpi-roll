@@ -154,7 +154,7 @@ build:
              fi; \
           fi; \
 	  export FFLAGS="$${FFLAGS}"; \
-	  export FCFLAGS="$${FCFLAGS}"; \
+	  export FCFLAGS="$${FFLAGS}"; \
 	  export CFLAGS="$${CFLAGS}"; \
 	  export CXXFLAGS="$${CXXFLAGS}"; \
 	  cd $(PWD)/$(SOURCE); \
