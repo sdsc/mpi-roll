@@ -115,6 +115,7 @@ build:
 	  $(COMPILERSETUP); \
 	  $(NETWORKSETUP); \
 	  export CC=$(CCOMP); \
+          COMPILE_FLAGS="$(COMPILE_FLAGS)"; \
           if test "$(ROLLCOMPILER)" = "gnu"; then \
              version=`gcc -v 2>&1 |grep version|awk '{print $$3}'|sed 's/\.//g'`; \
              if test "$${version}" -lt 461; then \
