@@ -157,8 +157,6 @@ build:
 	  export FCFLAGS="$${FCFLAGS}"; \
 	  export CFLAGS="$${CFLAGS}"; \
 	  export CXXFLAGS="$${CXXFLAGS}"; \
-          echo $${FCFLAGS}; \
-          exit; \
 	  cd $(PWD)/$(SOURCE); \
 	  if test "$(ROLLNETWORK)" = "ib"; then \
 	    mkdir -p $(ROOT)/$(PKGROOT); \
