@@ -141,14 +141,14 @@ build:
 	  export F77=$(F77); \
 	  export FC=$(FC); \
           FFLAGS="$(FFLAGS)"; \
-          FCLAGS="$(FCFLAGS)"; \
+          FCFLAGS="$(FCFLAGS)"; \
           CFLAGS="$(CFLAGS)"; \
           CXXFLAGS="$(CXXFLAGS)"; \
           if test "$(ROLLCOMPILER)" = "gnu"; then \
              version=`gcc -v 2>&1 |grep version|awk '{print $$3}'|sed 's/\.//g'`; \
              if test "$${version}" -lt 461; then \
                 FFLAGS="`echo "$${FFLAGS}"|sed 's/\-mavx //'`"; \
-                FCLAGS="`echo "$${FCLAGS}"|sed 's/\-mavx //'`"; \
+                FCFLAGS="`echo "$${FCFLAGS}"|sed 's/\-mavx //'`"; \
                 CFLAGS="`echo "$${CFLAGS}"|sed 's/\-mavx //'`"; \
                 CXXFLAGS="`echo "$${CXXFLAGS}"|sed 's/\-mavx //'`"; \
              fi; \
