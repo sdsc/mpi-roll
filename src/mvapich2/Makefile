@@ -141,7 +141,7 @@ build:
 	  export F77=$(F77); \
 	  export FC=$(FC); \
           FFLAGS="$(FFLAGS)"; \
-          FCLAGS="$(FCLAGS)"; \
+          FCLAGS="$(FCFLAGS)"; \
           CFLAGS="$(CFLAGS)"; \
           CXXFLAGS="$(CXXFLAGS)"; \
           if test "$(ROLLCOMPILER)" = "gnu"; then \
@@ -157,6 +157,8 @@ build:
 	  export FCFLAGS="$${FCFLAGS}"; \
 	  export CFLAGS="$${CFLAGS}"; \
 	  export CXXFLAGS="$${CXXFLAGS}"; \
+          echo $${FCFLAGS}; \
+          exit; \
 	  cd $(PWD)/$(SOURCE); \
 	  if test "$(ROLLNETWORK)" = "ib"; then \
 	    mkdir -p $(ROOT)/$(PKGROOT); \
