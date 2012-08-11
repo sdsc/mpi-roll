@@ -117,7 +117,7 @@ build:
              version=`gcc -v 2>&1 |grep version|awk '{print $$3}'|sed 's/\.//g'`; \
              if test "$${version}" -lt 461; then \
                 COMPILE_FLAGS="`echo "$${COMPILE_FLAGS}"|sed 's/\-mavx //'`"; \
-                CONFIG_OPTS="`echo "$(CONFIG_OPTS)"|sed 's/\-mavx //'`"; \
+                CONFIG_OPTS="`echo "$${CONFIG_OPTS}"|sed 's/\-mavx //'`"; \
              fi; \
           fi; \
 	  export CFLAGS="$${COMPILE_FLAGS}"; \
