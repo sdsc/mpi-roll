@@ -78,24 +78,28 @@ CCOMP = gcc
 CPPCOMP = g++
 FCOMP = gfortran
 F90COMP = gfortran
-COMPILE_FLAGS = -mavx -O2 -mtune=core2 -march=core2 -mfpmath=sse -msse3 -g -fPIC -ffree-line-length-none
+COMPILE_FLAGS = -mavx -O2 -mtune=core2 -march=core2 -mfpmath=sse -msse3 -fPIC -ffree-line-length-none
+WRAPPER_FLAGS = -mavx -O2
 ifeq ("$(ROLLCOMPILER)", "intel")
   CCOMP = icc
   CPPCOMP = icpc
   FCOMP = ifort
   F90COMP = ifort
   COMPILE_FLAGS = -O -xHOST -fPIC
+  WRAPPER_FLAGS = -O -xHOST -fPIC
 else ifeq ("$(ROLLCOMPILER)", "pgi")
   CCOMP = pgcc
   CPPCOMP = pgCC
   FCOMP = pgf77
   F90COMP = pgf90
   COMPILE_FLAGS = -fast -fPIC
+  WRAPPER_FLAGS = -fast -fPIC
 endif
 
 CONFIG_OPTS = --prefix=$(PKGROOT) --disable-dlopen --enable-mca-static \
               --enable-mpi-thread-multiple --enable-static --with-mpi-f90-size=large \
-              --with-platform=optimized --with-tm=/opt/torque
+              --with-platform=optimized --with-tm=/opt/torque --with-wrapper-cflags=$(WRAPPER_FLAGS) --with-wrapper-cxxflags=$(WRAPPER_FLAGS) --with-wrapper-fflags=$(WRAPPER_FLAGS) --with-wrapper-fcflags=$(WRAPPER_FLAGS)
+
 ifeq ("$(ROLLNETWORK)", "mx")
   MXHOME = /opt/mx
   COMPILE_FLAGS += -I$(MXHOME)/include
@@ -108,10 +112,12 @@ build:
 	  $(COMPILERSETUP); \
 	  export CC=$(CCOMP); \
           COMPILE_FLAGS="$(COMPILE_FLAGS)"; \
+          CONFIG_OPTS="$(CONFIG_OPTS)"; \
           if test "$(ROLLCOMPILER)" = "gnu"; then \
              version=`gcc -v 2>&1 |grep version|awk '{print $$3}'|sed 's/\.//g'`; \
              if test "$${version}" -lt 461; then \
                 COMPILE_FLAGS="`echo "$${COMPILE_FLAGS}"|sed 's/\-mavx //'`"; \
+                CONFIG_OPTS="`echo "$(CONFIG_OPTS)"|sed 's/\-mavx //'`"; \
              fi; \
           fi; \
 	  export CFLAGS="$${COMPILE_FLAGS}"; \
@@ -123,7 +129,7 @@ build:
 	  export FCFLAGS="$${COMPILE_FLAGS}"; \
 	  cp patch-files/mpi_scatterv_f90.f90.sh $(SOURCE)/ompi/mpi/f90/scripts; \
 	  cd $(SOURCE); \
-	  ./configure $(CONFIG_OPTS); \
+	  ./configure $${CONFIG_OPTS}; \
 	  make \
 	)
 
