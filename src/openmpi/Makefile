@@ -98,7 +98,7 @@ endif
 
 CONFIG_OPTS = --prefix=$(PKGROOT) --disable-dlopen --enable-mca-static \
               --enable-mpi-thread-multiple --enable-static --with-mpi-f90-size=large \
-              --with-platform=optimized --with-tm=/opt/torque --with-wrapper-cflags="$(WRAPPER_FLAGS)" --with-wrapper-cxxflags="$(WRAPPER_FLAGS)" --with-wrapper-fflags="$(WRAPPER_FLAGS)" --with-wrapper-fcflags="$(WRAPPER_FLAGS)"
+              --with-platform=optimized --with-tm=/opt/torque --with-wrapper-cflags=\"$(WRAPPER_FLAGS)\" --with-wrapper-cxxflags=\"$(WRAPPER_FLAGS)\" --with-wrapper-fflags=\"$(WRAPPER_FLAGS)\" --with-wrapper-fcflags=\"$(WRAPPER_FLAGS)\"
 
 ifeq ("$(ROLLNETWORK)", "mx")
   MXHOME = /opt/mx
@@ -129,7 +129,7 @@ build:
 	  export FCFLAGS="$${COMPILE_FLAGS}"; \
 	  cp patch-files/mpi_scatterv_f90.f90.sh $(SOURCE)/ompi/mpi/f90/scripts; \
 	  cd $(SOURCE); \
-	  ./configure $${CONFIG_OPTS}; \
+	  ./configure "$${CONFIG_OPTS}"; \
 	  make \
 	)
 
