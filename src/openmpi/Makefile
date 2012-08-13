@@ -79,26 +79,26 @@ CPPCOMP = g++
 FCOMP = gfortran
 F90COMP = gfortran
 COMPILE_FLAGS = -mavx -O2 -mtune=core2 -march=core2 -mfpmath=sse -msse3 -fPIC -ffree-line-length-none
-WRAPPER_FLAGS = -mavx -O2
+WRAPPER_FLAGS = -mavx
 ifeq ("$(ROLLCOMPILER)", "intel")
   CCOMP = icc
   CPPCOMP = icpc
   FCOMP = ifort
   F90COMP = ifort
   COMPILE_FLAGS = -O -xHOST -fPIC
-  WRAPPER_FLAGS = -O -xHOST -fPIC
+  WRAPPER_FLAGS = -xHOST
 else ifeq ("$(ROLLCOMPILER)", "pgi")
   CCOMP = pgcc
   CPPCOMP = pgCC
   FCOMP = pgf77
   F90COMP = pgf90
   COMPILE_FLAGS = -fast -fPIC
-  WRAPPER_FLAGS = -fast -fPIC
+  WRAPPER_FLAGS = -fast
 endif
 
 CONFIG_OPTS = --prefix=$(PKGROOT) --disable-dlopen --enable-mca-static \
               --enable-mpi-thread-multiple --enable-static --with-mpi-f90-size=large \
-              --with-platform=optimized --with-tm=/opt/torque --with-wrapper-cflags=\"$(WRAPPER_FLAGS)\" --with-wrapper-cxxflags=\"$(WRAPPER_FLAGS)\" --with-wrapper-fflags=\"$(WRAPPER_FLAGS)\" --with-wrapper-fcflags=\"$(WRAPPER_FLAGS)\"
+              --with-platform=optimized --with-tm=/opt/torque --with-wrapper-cflags='$(WRAPPER_FLAGS)' --with-wrapper-cxxflags='$(WRAPPER_FLAGS)' --with-wrapper-fflags='$(WRAPPER_FLAGS)' --with-wrapper-fcflags='$(WRAPPER_FLAGS)'
 
 ifeq ("$(ROLLNETWORK)", "mx")
   MXHOME = /opt/mx
@@ -111,25 +111,16 @@ build:
 	( \
 	  $(COMPILERSETUP); \
 	  export CC=$(CCOMP); \
-          COMPILE_FLAGS="$(COMPILE_FLAGS)"; \
-          CONFIG_OPTS="$(CONFIG_OPTS)"; \
-          if test "$(ROLLCOMPILER)" = "gnu"; then \
-             version=`gcc -v 2>&1 |grep version|awk '{print $$3}'|sed 's/\.//g'`; \
-             if test "$${version}" -lt 461; then \
-                COMPILE_FLAGS="`echo "$${COMPILE_FLAGS}"|sed 's/\-mavx //'`"; \
-                CONFIG_OPTS="`echo "$${CONFIG_OPTS}"|sed 's/\-mavx //'`"; \
-             fi; \
-          fi; \
-	  export CFLAGS="$${COMPILE_FLAGS}"; \
+	  export CFLAGS=$(COMPILE_FLAGS); \
 	  export CXX=$(CPPCOMP); \
-	  export CXXFLAGS="$${COMPILE_FLAGS}"; \
+	  export CXXFLAGS=$(COMPILE_FLAGS); \
 	  export F77=$(FCOMP); \
-	  export FFLAGS="$${COMPILE_FLAGS}"; \
+	  export FFLAGS=$(COMPILE_FLAGS); \
 	  export FC=$(F90COMP); \
-	  export FCFLAGS="$${COMPILE_FLAGS}"; \
+	  export FCFLAGS=$(COMPILE_FLAGS); \
 	  cp patch-files/mpi_scatterv_f90.f90.sh $(SOURCE)/ompi/mpi/f90/scripts; \
 	  cd $(SOURCE); \
-	  ./configure "$${CONFIG_OPTS}"; \
+	  ./configure $(CONFIG_OPTS); \
 	  make \
 	)
 
