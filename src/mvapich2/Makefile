@@ -144,19 +144,10 @@ build:
           FCFLAGS="$(FCFLAGS)"; \
           CFLAGS="$(CFLAGS)"; \
           CXXFLAGS="$(CXXFLAGS)"; \
-          if test "$(ROLLCOMPILER)" = "gnu"; then \
-             version=`gcc -v 2>&1 |grep version|awk '{print $$3}'|sed 's/\.//g'`; \
-             if test "$${version}" -lt 461; then \
-                FFLAGS="`echo "$${FFLAGS}"|sed 's/\-mavx //'`"; \
-                FCFLAGS="`echo "$${FCFLAGS}"|sed 's/\-mavx //'`"; \
-                CFLAGS="`echo "$${CFLAGS}"|sed 's/\-mavx //'`"; \
-                CXXFLAGS="`echo "$${CXXFLAGS}"|sed 's/\-mavx //'`"; \
-             fi; \
-          fi; \
-	  export FFLAGS="$${FFLAGS}"; \
-	  export FCFLAGS="$${FCFLAGS}"; \
-	  export CFLAGS="$${CFLAGS}"; \
-	  export CXXFLAGS="$${CXXFLAGS}"; \
+	  export FFLAGS="$(FFLAGS)"; \
+	  export FCFLAGS="$(FCFLAGS)"; \
+	  export CFLAGS="$(CFLAGS)"; \
+	  export CXXFLAGS="$(CXXFLAGS)"; \
 	  cd $(PWD)/$(SOURCE); \
 	  if test "$(ROLLNETWORK)" = "ib"; then \
 	    mkdir -p $(ROOT)/$(PKGROOT); \
