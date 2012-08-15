@@ -111,13 +111,13 @@ build:
 	( \
 	  $(COMPILERSETUP); \
 	  export CC=$(CCOMP); \
-	  export CFLAGS=$(COMPILE_FLAGS); \
+	  export CFLAGS="$(COMPILE_FLAGS)"; \
 	  export CXX=$(CPPCOMP); \
-	  export CXXFLAGS=$(COMPILE_FLAGS); \
+	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
 	  export F77=$(FCOMP); \
-	  export FFLAGS=$(COMPILE_FLAGS); \
+	  export FFLAGS="$(COMPILE_FLAGS)"; \
 	  export FC=$(F90COMP); \
-	  export FCFLAGS=$(COMPILE_FLAGS); \
+	  export FCFLAGS="$(COMPILE_FLAGS)"; \
 	  cp patch-files/mpi_scatterv_f90.f90.sh $(SOURCE)/ompi/mpi/f90/scripts; \
 	  cd $(SOURCE); \
 	  ./configure $(CONFIG_OPTS); \
