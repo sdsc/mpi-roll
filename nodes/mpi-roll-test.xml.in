@@ -79,8 +79,8 @@ my $modulesInstalled = -f '/etc/profile.d/modules.sh';
 foreach my $mpi (@MPIS) {
   foreach my $compiler (@COMPILERS) {
 
-    SKIP: {       
-        
+    SKIP: {
+
       skip "$mpi/$compiler not installed", 5 if ! -d "/opt/$mpi/$compiler";
 
       foreach my $network (@NETWORKS) {
@@ -144,11 +144,8 @@ END
 
         `rm -f $TESTFILE`;
 
-      }
-
-      skip "$mpi/$compiler not installed", 3 if ! -d "/opt/$mpi/$compiler";
-      foreach my $network (@NETWORKS) {
-        if($modulesInstalled) {
+        SKIP: {
+          skip 'modules not installed', 3 if ! $modulesInstalled;
           my $dir = "/opt/modulefiles/mpi/.$compiler/${mpi}_$network";
           `/bin/ls $dir/[0-9]* 2>&1`;
           ok($? == 0, "$mpi/$compiler/$network module installed");
@@ -157,6 +154,7 @@ END
           ok(-l "$dir/.version",
              "$mpi/$compiler/$network version module link created");
         }
+
       }
 
     }
