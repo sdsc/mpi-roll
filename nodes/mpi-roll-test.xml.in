@@ -63,8 +63,6 @@ int main (int argc, char **argv) {
 END
 close(OUT);
 
-my $modulecmd = "$ENV{MODULESHOME}/bin/modulecmd";
-
 my @COMPILERS = (
   'ROLLCOMPILER',
 );
@@ -75,13 +73,15 @@ my @MPIS = (
   'ROLLMPI',
 );
 
+my $modulesInstalled = -f '/etc/profile.d/modules.sh';
+
 # mpi-common.xml
 foreach my $mpi (@MPIS) {
   foreach my $compiler (@COMPILERS) {
 
     SKIP: {       
         
-      skip "$mpi/$compiler not installed", 2 if ! -d "/opt/$mpi/$compiler";
+      skip "$mpi/$compiler not installed", 5 if ! -d "/opt/$mpi/$compiler";
 
       foreach my $network (@NETWORKS) {
 
@@ -89,12 +89,11 @@ foreach my $mpi (@MPIS) {
         my $SUBMITEXE = "$SUBMITDIR/$TESTFILE.$mpi.$compiler.$network.exe";
         my $SUBMITOUT = "$SUBMITDIR/$TESTFILE.$mpi.$compiler.$network.out";
 
-        my $command = "$modulecmd bash clear yes; " .
-                      "$modulecmd bash load $compiler ${mpi}_$network";
-        $output = `$command`;
-        $output =~ s/;\s*$//;
-        $command = "eval '$output'; which mpicc; " .
-                   "mpicc -o $TESTFILE $TESTFILE.c";
+        my $setup = $modulesInstalled ?
+          ". /etc/profile.d/modules.sh; module load $compiler ${mpi}_$network" :
+          'echo > /dev/null'; # noop
+
+        my $command = "$setup; which mpicc; mpicc -o $TESTFILE $TESTFILE.c";
         $output = `$command`;
         $output =~ /(\S*mpicc)/;
         my $mpicc = $1 || 'mpicc';
@@ -124,15 +123,10 @@ foreach my $mpi (@MPIS) {
 #PBS -V
 #PBS -m n
 cd $SUBMITDIR
+$setup
 $mpirun $fileopt -np $NODECOUNT $SUBMITEXE
 END
           close(OUT);
-          # Add a line to the submitter's .bashrc to load the compiler module
-          $command =
-            "sudo -u $SUBMITUSER bash -c " .
-            "'echo \"echo mpirolltest > /dev/null; " .
-            "module load $compiler\" >> /home/$SUBMITUSER/.bashrc'";
-          $output = `$command`;
           $output = `sudo -u $SUBMITUSER qsub $TESTFILE.qsub`;
           $output =~ /(\d+)/;
           my $jobId = $1;
@@ -145,11 +139,6 @@ END
           }
           $output = `sudo -u $SUBMITUSER cat $SUBMITOUT`;
           like($output, qr/process $LASTNODE of $NODECOUNT/,"Run with $mpirun");
-          # Remove the .bashrc line we added earlier
-          $output =
-            "sudo -u $SUBMITUSER " .
-            "perl -pi -e 's/.*mpirolltest.*//s' /home/$SUBMITUSER/.bashrc";
-          $output = `$command`;
 
         }
 
@@ -157,26 +146,6 @@ END
 
       }
 
-    }
-
-  }
-}
-
-`grep -s 'lib\>' /opt/openmpi/*/*/lib/*.la`;
-ok($? != 0, 'references to lib changed to lib64');
-
-# mpi-doc.xml
-SKIP: {
-  skip 'not server', 1 if $appliance ne 'Frontend';
-  ok(-d '/var/www/html/roll-documentation/mpi', 'doc installed');
-}
-
-# mpi-modules-common.xml
-my $modulesInstalled = -f '/etc/profile.d/modules.sh';
-foreach my $mpi (@MPIS) {
-  foreach my $compiler (@COMPILERS) {
-
-    SKIP: {       
       skip "$mpi/$compiler not installed", 3 if ! -d "/opt/$mpi/$compiler";
       foreach my $network (@NETWORKS) {
         if($modulesInstalled) {
@@ -193,6 +162,15 @@ foreach my $mpi (@MPIS) {
     }
 
   }
+}
+
+`grep -s 'lib\>' /opt/openmpi/*/*/lib/*.la`;
+ok($? != 0, 'references to lib changed to lib64');
+
+# mpi-doc.xml
+SKIP: {
+  skip 'not server', 1 if $appliance ne 'Frontend';
+  ok(-d '/var/www/html/roll-documentation/mpi', 'doc installed');
 }
 
 `rm -f $TESTFILE*`;
