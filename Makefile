@@ -67,6 +67,9 @@ endif
 empty:=
 space:=$(empty) $(empty)
 ROLLSUFFIX = _$(subst $(space),+,$(ROLLCOMPILER))_$(subst $(space),+,$(ROLLNETWORK))_$(subst $(space),+,$(ROLLMPI))
+ifneq ("$(ROLLOPTS)", "") then
+  ROLLSUFFIX += _$(subst $(space),+,$(ROLLOPTS))
+endif
 
 -include $(ROLLSROOT)/etc/Rolls.mk
 
