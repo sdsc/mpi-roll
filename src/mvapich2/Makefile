@@ -79,28 +79,21 @@ CC=gcc
 CXX=g++
 F77=gfortran
 FC=gfortran
-FFLAGS = -mavx -O2
-FCFLAGS = -mavx -O2
-CFLAGS = -mavx -O2
-CXXFLAGS = -mavx -O2
+COMPILE_FLAGS = -O2
 ifeq ("$(ROLLCOMPILER)", "intel")
   CC=icc
   CXX=icpc
   F77=ifort
   FC=ifort
-  FFLAGS=-O -xHOST -fPIC
-  FCFLAGS=-O -xHOST -fPIC
-  CFLAGS=-O -xHOST -fPIC
-  CXXFLAGS=-O -xHOST -fPIC
+  COMPILE_FLAGS = -O -xHOST -fPIC
 else ifeq ("$(ROLLCOMPILER)", "pgi")
   CC=pgcc
   CXX=pgCC
   F77=pgf77
   FC=pgf90
-  FFLAGS=-fast -fPIC
-  FCFLAGS=-fast -fPIC
-  CFLAGS=-fast -fPIC
-  CXXFLAGS=-fast -fPIC
+  COMPILE_FLAGS = -fast -fPIC
+else ifneq ("$(ROLLOPTS)", "$(subst avx,,$(ROLLOPTS))")
+  COMPILE_FLAGS += -mavx
 endif
 
 CONFIG_OPTS = \
@@ -141,14 +134,14 @@ build:
 	  export CXX=$(CXX); \
 	  export F77=$(F77); \
 	  export FC=$(FC); \
-          FFLAGS="$(FFLAGS)"; \
-          FCFLAGS="$(FCFLAGS)"; \
-          CFLAGS="$(CFLAGS)"; \
-          CXXFLAGS="$(CXXFLAGS)"; \
-	  export FFLAGS="$(FFLAGS)"; \
-	  export FCFLAGS="$(FCFLAGS)"; \
-	  export CFLAGS="$(CFLAGS)"; \
-	  export CXXFLAGS="$(CXXFLAGS)"; \
+          FFLAGS="$(COMPILE_FLAGS)"; \
+          FCFLAGS="$(COMPILE_FLAGS)"; \
+          CFLAGS="$(COMPILE_FLAGS)"; \
+          CXXFLAGS="$(COMPILE_FLAGS)"; \
+	  export FFLAGS="$(COMPILE_FLAGS)"; \
+	  export FCFLAGS="$(COMPILE_FLAGS)"; \
+	  export CFLAGS="$(COMPILE_FLAGS)"; \
+	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
 	  cd $(PWD)/$(SOURCE); \
 	  if test "$(ROLLNETWORK)" = "ib"; then \
 	    mkdir -p $(ROOT)/$(PKGROOT); \

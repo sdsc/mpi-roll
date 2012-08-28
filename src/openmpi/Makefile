@@ -79,8 +79,8 @@ CCOMP = gcc
 CPPCOMP = g++
 FCOMP = gfortran
 F90COMP = gfortran
-COMPILE_FLAGS = -mavx -O2 -mtune=core2 -march=core2 -mfpmath=sse -msse3 -fPIC -ffree-line-length-none
-WRAPPER_FLAGS = -mavx
+COMPILE_FLAGS = -O2 -mtune=core2 -march=core2 -mfpmath=sse -msse3 -fPIC -ffree-line-length-none
+WRAPPER_FLAGS =
 ifeq ("$(ROLLCOMPILER)", "intel")
   CCOMP = icc
   CPPCOMP = icpc
@@ -95,6 +95,9 @@ else ifeq ("$(ROLLCOMPILER)", "pgi")
   F90COMP = pgf90
   COMPILE_FLAGS = -fast -fPIC
   WRAPPER_FLAGS = -fast
+else ifneq ("$(ROLLOPTS)", "$(subst avx,,$(ROLLOPTS))")
+  COMPILE_FLAGS += -mavx
+  WRAPPER_FLAGS = -mavx
 endif
 
 CONFIG_OPTS = --prefix=$(PKGROOT) --disable-dlopen --enable-mca-static \

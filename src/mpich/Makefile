@@ -79,11 +79,8 @@ CCOMP = gcc
 CPPCOMP = g++
 FCOMP = gfortran
 F90COMP = gfortran
-export COMPILE_FLAGS = -mavx -O2
-ifeq ("$(ROLLCOMPILER)", "gnu")
-  # Suppress PAC_PROG_F77_CMDARGS's "extern getarg", which fails w/gfortran
-  COMPILERSETUP += ; export F77_GETARGDECL=" "
-else ifeq ("$(ROLLCOMPILER)", "intel")
+export COMPILE_FLAGS = -O2
+ifeq ("$(ROLLCOMPILER)", "intel")
   CCOMP = icc
   CPPCOMP = icpc
   FCOMP = ifort
@@ -95,6 +92,9 @@ else ifeq ("$(ROLLCOMPILER)", "pgi")
   FCOMP = pgf90
   F90COMP = pgf90
   COMPILE_FLAGS = -fast -fPIC
+else
+  # Suppress PAC_PROG_F77_CMDARGS's "extern getarg", which fails w/gfortran
+  COMPILERSETUP += ; export F77_GETARGDECL=" "
 endif
 
 CONFIG_OPTS = --prefix=$(PKGROOT) -opt="-O" --enable-sharedlib
