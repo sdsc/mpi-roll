@@ -1,10 +1,20 @@
 This roll source supports building specified flavors of MPI with different
-compilers and for different network fabrics.  By default, it builds mpich,
-mpich2, mvapich2, and openmpi using the gnu compilers for ethernet.  To build
-for a different configuration, use the ROLLMPI, ROLLCOMPILER and ROLLNETWORK
-make variables, e.g.,
+compilers, for different network fabrics, and optional integration with the gridengine and Torque load managers.  By default, it builds mpich,
+mpich2, mvapich2, and openmpi using the gnu compilers for ethernet with 
+NO integration with load managers. To compile in load manager support for
+openmpi set either SGE, or TORQUE variables to any value. 
 
-make ROLLMPI='mpich2 openmpi' ROLLCOMPILER=intel ROLLNETWORK=mx
+To build for a different configuration, use the  
+ROLLMPI, ROLLCOMPILER and ROLLNETWORK make variables, e.g.
+
+make ROLLMPI='mpich2 openmpi' ROLLCOMPILER=intel ROLLNETWORK=mx TORQUE=True
+
+to add support for TORQUE (not you must have torque installed for the compile
+of openmpi to complete properly).
+
+Similarly, if you want SGE, the above would be 
+make ROLLMPI='mpich2 openmpi' ROLLCOMPILER=intel ROLLNETWORK=mx SGE=True
+
 
 The build process currently supports one or more of the values "intel", "pgi",
 and "gnu" for the ROLLCOMPILER variable, defaulting to "gnu".  It uses any
