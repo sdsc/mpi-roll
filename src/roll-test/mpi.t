@@ -1,25 +1,4 @@
-<?xml version="1.0" standalone="no"?>
-
-<kickstart>
-
-<description>
-MPI roll installation test.
-</description>
-
-<copyright>
-Copyright (c) 2000 - 2011 The Regents of the University of California.
-All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
-</copyright>
-
-<changelog>
-</changelog>
-
-<post>
-
-/bin/mkdir -p -m 0755 /root/rolltests
-
-<file name="/root/rolltests/mpi.t" perms="0755">
-<![CDATA[#!/usr/bin/perl -w
+#!/usr/bin/perl -w
 # mpi roll installation test.  Usage:
 # mpi.t [nodetype [submituser]]
 #   where nodetype is one of "Compute", "Dbnode", "Frontend" or "Login"
@@ -59,15 +38,9 @@ int main (int argc, char **argv) {
 END
 close(OUT);
 
-my @COMPILERS = (
-  'ROLLCOMPILER',
-);
-my @NETWORKS = (
-  'ROLLNETWORK',
-);
-my @MPIS = (
-  'ROLLMPI',
-);
+my @COMPILERS = split(/\s+/, 'ROLLCOMPILER');
+my @NETWORKS = split(/\s+/, 'ROLLNETWORK');
+my @MPIS = split(/\s+/, 'ROLLMPI');
 
 my $modulesInstalled = -f '/etc/profile.d/modules.sh';
 
@@ -167,11 +140,5 @@ SKIP: {
   ok(-d '/var/www/html/roll-documentation/mpi', 'doc installed');
 }
 
-`rm -f $TESTFILE*`;
+`rm -fr $TESTFILE*`;
 `sudo -u $SUBMITUSER rm -fr $SUBMITDIR`;
-]]>
-</file>
-
-</post>
-
-</kickstart> 

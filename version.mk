@@ -1,4 +1,4 @@
-ROLLNAME = mpi$(ROLLSUFFIX)
+ROLLNAME = mpi
 RELEASE  = 4
 COLOR    = orange
 

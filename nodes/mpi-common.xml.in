@@ -20,6 +20,7 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 
 <package>ROLLMPI_ROLLCOMPILER_ROLLNETWORK</package>
 <package>mpi-modules</package>
+<package>mpi-roll-test</package>
 
 <post>
 
