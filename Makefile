@@ -59,7 +59,7 @@ ifndef ROLLCOMPILER
   ROLLCOMPILER = gnu
 endif
 ifndef ROLLMPI
-  ROLLMPI = mpich mpich2 mvapich2 openmpi
+  ROLLMPI = openmpi
 endif
 ifndef ROLLNETWORK
   ROLLNETWORK = eth

@@ -99,6 +99,13 @@ else ifneq ("$(ROLLOPTS)", "$(subst avx,,$(ROLLOPTS))")
   COMPILE_FLAGS += -mavx
   WRAPPER_FLAGS = -mavx
 endif
+LOADMGR =
+ifneq ("$(ROLLOPTS)", "$(subst sge,,$(ROLLOPTS))")
+  LOADMGR += --with-sge
+endif
+ifneq ("$(ROLLOPTS)", "$(subst torque,,$(ROLLOPTS))")
+  LOADMGR += --with-tm /opt/torque
+endif
 
 CONFIG_OPTS = --prefix=$(PKGROOT) --disable-dlopen --enable-mca-static \
               --enable-mpi-thread-multiple --enable-static --with-mpi-f90-size=medium \
