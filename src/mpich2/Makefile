@@ -108,7 +108,7 @@ ifeq ("$(ROLLNETWORK)", "mx")
 endif
 
 build:
-	tar zxvf $(SOURCE).tgz
+	tar zxvf $(SOURCE).tar.gz
 	( \
 	  $(COMPILERSETUP); \
 	  $(NETWORKSETUP); \
