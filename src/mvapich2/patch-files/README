@@ -1,0 +1,3 @@
+limic2-0.5.5.tgz
+  Replacement for broken limic packaged in mvapich2-1.9a2.tgz.  Can probably
+  be removed for next version of mvapich2.

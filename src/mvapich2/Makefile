@@ -114,62 +114,41 @@ else ifeq ("$(ROLLNETWORK)", "ib")
 endif
 
 build:
+
+install::
 	tar zxvf $(SOURCE).tgz
+	tar zxvf patch-files/limic2-0.5.5.tgz
+	rm -fr $(SOURCE)/limic2-0.5.5
+	mv limic2-0.5.5 $(SOURCE)/
+	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
+	-mkdir -p $(PKGROOT)
+	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
 	( \
 	  $(COMPILERSETUP); \
 	  $(NETWORKSETUP); \
-	  cd $(SOURCE); \
-	  if test "$(ROLLNETWORK)" = "ib"; then \
-	    cd limic2-0.5.5; \
-	    mkdir -p $(ROOT)/$(PKGROOT); \
-	    if [ ! -d  $(PKGROOT) ]; then mkdir -p $(PKGROOT); fi; \
-	    mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT); \
-	    ./configure --prefix=$(PKGROOT) --enable-module; \
-	    make; \
-	    make install; \
-	    umount $(PKGROOT); \
-            export LD_LIBRARY_PATH=$(PKGROOT)/lib:$${LD_LIBRARY_PATH};  \
-	  fi; \
 	  export CC=$(CC); \
 	  export CXX=$(CXX); \
 	  export F77=$(F77); \
 	  export FC=$(FC); \
-          FFLAGS="$(COMPILE_FLAGS)"; \
-          FCFLAGS="$(COMPILE_FLAGS)"; \
-          CFLAGS="$(COMPILE_FLAGS)"; \
-          CXXFLAGS="$(COMPILE_FLAGS)"; \
 	  export FFLAGS="$(COMPILE_FLAGS)"; \
 	  export FCFLAGS="$(COMPILE_FLAGS)"; \
 	  export CFLAGS="$(COMPILE_FLAGS)"; \
 	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
-	  cd $(PWD)/$(SOURCE); \
-	  if test "$(ROLLNETWORK)" = "ib"; then \
-	    mkdir -p $(ROOT)/$(PKGROOT); \
-	    if [ ! -d  $(PKGROOT) ]; then mkdir -p $(PKGROOT); fi; \
-	    mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT); \
-          fi; \
+	  cd $(SOURCE)/limic2-0.5.5; \
+	  ./configure --prefix=$(PKGROOT) --enable-module; \
+	  make; \
+	  make install; \
+	  export LD_LIBRARY_PATH=$(PKGROOT)/lib:$${LD_LIBRARY_PATH}; \
+	  cd ..; \
 	  ./configure $(CONFIG_OPTS); \
 	  make; \
-	  if test "$(ROLLNETWORK)" = "ib"; then \
-            umount $(PKGROOT); \
-          fi \
+	  make install \
 	)
-
-# Clean immediately after install to free disk space
-install::
-	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
+	umount $(PKGROOT)
+	-rmdir -p $(PKGROOT)
 	mkdir -p $(REDHAT.ROOT)/src/build-mpi-modules
-	if [ ! -d  $(PKGROOT) ]; then mkdir -p $(PKGROOT); fi
-	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
-	( \
-	  $(COMPILERSETUP); \
-	  cd $(SOURCE); \
-	  make install; \
-	)
 	cat mvapich2.module | perl -pi -e "s!MODULEROOT!/opt/modulefiles/mpi/.$(ROLLCOMPILER)/mvapich2_$(ROLLNETWORK)!g;s!VERSION!$(VERSION)!g;s!ROLLCOMPILER!$(ROLLCOMPILER)!g;s!ROLLNETWORK!$(ROLLNETWORK)!g" \
           > $(REDHAT.ROOT)/src/build-mpi-modules/$(NAME).module
-	umount $(PKGROOT)
-	$(MAKE) clean
 
 clean::
 	rm -fr $(SOURCE)
