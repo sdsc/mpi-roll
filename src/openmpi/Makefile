@@ -116,6 +116,8 @@ ifeq ("$(ROLLNETWORK)", "mx")
   COMPILE_FLAGS += -I$(MXHOME)/include
   CONFIG_OPTS += --with-mx=$(MXHOME) --without-openib
 endif
+else ifeq ("$(ROLLNETWORK)", "ib")
+  CONFIG_OPTS += --with-knem=$(PKGROOT)
 
 build:
 	tar zxvf $(SOURCE).tar.gz
