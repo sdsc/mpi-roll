@@ -115,12 +115,14 @@ ifeq ("$(ROLLNETWORK)", "mx")
   MXHOME = /opt/mx
   COMPILE_FLAGS += -I$(MXHOME)/include
   CONFIG_OPTS += --with-mx=$(MXHOME) --without-openib
-endif
 else ifeq ("$(ROLLNETWORK)", "ib")
   CONFIG_OPTS += --with-knem=$(PKGROOT)
+endif
 
 build:
 	tar zxvf $(SOURCE).tar.gz
+	tar zxvf patch-files/knem-1.0.0.tar.gz
+	mv knem-1.0.0 $(SOURCE)/
 	( \
 	  $(COMPILERSETUP); \
 	  export CC=$(CCOMP); \
@@ -131,7 +133,11 @@ build:
 	  export FFLAGS="$(COMPILE_FLAGS)"; \
 	  export FC=$(F90COMP); \
 	  export FCFLAGS="$(COMPILE_FLAGS)"; \
-	  cd $(SOURCE); \
+	  cd $(SOURCE)/knem-1.0.0; \
+	  ./configure --prefix=$(PKGROOT); \
+	  make; \
+	  make install; \
+	  cd ..; \
 	  ./configure $(CONFIG_OPTS); \
 	  make \
 	)
