@@ -93,7 +93,7 @@ else ifeq ("$(ROLLCOMPILER)", "pgi")
   CPPCOMP = pgCC
   FCOMP = pgf77
   F90COMP = pgf90
-  COMPILE_FLAGS = -fast -fPIC
+  COMPILE_FLAGS = -fast -fPIC -noswitcherror
   WRAPPER_FLAGS = -fast
 else ifneq ("$(ROLLOPTS)", "$(subst avx,,$(ROLLOPTS))")
   COMPILE_FLAGS += -mavx
