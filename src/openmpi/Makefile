@@ -116,7 +116,7 @@ ifeq ("$(ROLLNETWORK)", "mx")
   COMPILE_FLAGS += -I$(MXHOME)/include
   CONFIG_OPTS += --with-mx=$(MXHOME) --without-openib
 else ifeq ("$(ROLLNETWORK)", "ib")
-  CONFIG_OPTS += --with-knem=$(PKGROOT)
+  CONFIG_OPTS += --with-knem=$(PKGROOT)/include
 endif
 
 build:
