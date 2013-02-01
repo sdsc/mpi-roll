@@ -122,6 +122,9 @@ endif
 build:
 	tar zxvf $(SOURCE).tar.gz
 	tar zxvf patch-files/knem-1.0.0.tar.gz
+	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
+	mkdir -p -m 755 $(PKGROOT)
+	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
 	mv knem-1.0.0 $(SOURCE)/
 	( \
 	  $(COMPILERSETUP); \
@@ -141,16 +144,20 @@ build:
 	  ./configure $(CONFIG_OPTS); \
 	  make \
 	)
+	umount $(PKGROOT)
 
 # Clean immediately after install to free disk space
 install::
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
+	mkdir -p -m 755 $(PKGROOT)
+	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
 	mkdir -p $(REDHAT.ROOT)/src/build-mpi-modules
 	( \
 	  $(COMPILERSETUP); \
 	  cd $(SOURCE); \
-	  make prefix=$(ROOT)/$(PKGROOT) install \
+	  make prefix=$(PKGROOT) install \
 	)
+	umount $(PKGROOT)
 	cat openmpi.module | perl -pi -e "s!MODULEROOT!/opt/modulefiles/mpi/.$(ROLLCOMPILER)/openmpi_$(ROLLNETWORK)!g;s!VERSION!$(VERSION)!g;s!ROLLCOMPILER!$(ROLLCOMPILER)!g;s!ROLLNETWORK!$(ROLLNETWORK)!g" \
           > $(REDHAT.ROOT)/src/build-mpi-modules/$(NAME).module
 	$(MAKE) clean
