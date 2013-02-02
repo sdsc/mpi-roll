@@ -117,8 +117,7 @@ ifeq ("$(ROLLNETWORK)", "mx")
   COMPILE_FLAGS += -I$(MXHOME)/include
   CONFIG_OPTS += --with-mx=$(MXHOME) --without-openib
 else ifeq ("$(ROLLNETWORK)", "ib")
-  CONFIG_OPTS += --with-knem=$(PKGROOT)
-  CPPFLAGS = -I$(PKGROOT)/include
+  CONFIG_OPTS += --with-knem=$(PKGROOT) --includedir=$(PKGROOT)/include
 endif
 
 build:
@@ -156,7 +155,6 @@ install::
 	mkdir -p $(REDHAT.ROOT)/src/build-mpi-modules
 	( \
 	  $(COMPILERSETUP); \
-          export CPPFLAGS="$(CPPFLAGS)"; \
 	  cd $(SOURCE); \
 	  make prefix=$(PKGROOT) install \
 	)
