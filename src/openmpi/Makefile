@@ -111,12 +111,14 @@ CONFIG_OPTS = --prefix=$(PKGROOT) --disable-dlopen --enable-mca-static \
               --enable-mpi-thread-multiple --enable-static --with-mpi-f90-size=medium \
               --with-platform=optimized $(LOADMGR) --with-wrapper-cflags='$(WRAPPER_FLAGS)' --with-wrapper-cxxflags='$(WRAPPER_FLAGS)' --with-wrapper-fflags='$(WRAPPER_FLAGS)' --with-wrapper-fcflags='$(WRAPPER_FLAGS)'
 
+CPPFLAGS=
 ifeq ("$(ROLLNETWORK)", "mx")
   MXHOME = /opt/mx
   COMPILE_FLAGS += -I$(MXHOME)/include
   CONFIG_OPTS += --with-mx=$(MXHOME) --without-openib
 else ifeq ("$(ROLLNETWORK)", "ib")
   CONFIG_OPTS += --with-knem=$(PKGROOT)
+  CPPFLAGS = -I$(PKGROOT)/include
 endif
 
 build:
@@ -154,6 +156,7 @@ install::
 	mkdir -p $(REDHAT.ROOT)/src/build-mpi-modules
 	( \
 	  $(COMPILERSETUP); \
+          export CPPFLAGS="$(CPPFLAGS)"; \
 	  cd $(SOURCE); \
 	  make prefix=$(PKGROOT) install \
 	)
