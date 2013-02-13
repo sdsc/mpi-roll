@@ -35,12 +35,18 @@ fi
 # Install the limic kernel object if it came w/the roll build.
 if test -d /opt/mvapich2/limic.ko; then
   cp /opt/mvapich2/limic.ko /lib/modules/`uname -r`/extra/
+# Install the knem kernel object if it came w/the roll build.
+if test -d /opt/openmpi/ROLLCOMPILER/ROLLNETWORK/lib/knem.ko; then
+  cp /opt/openmpi/ROLLCOMPILER/ROLLNETWORK/knem.ko /lib/modules/`uname -r`/extra/
 <file name="/etc/rc.d/rocksconfig.d/post-97-limic" perms="0755">
 #!/bin/sh
-
 /sbin/modprobe limic
 /bin/sleep 1
 /bin/chmod 644 /dev/limic
+
+/sbin/modprobe knem
+/bin/sleep 1
+/bin/chmod 644 /dev/knem
 </file> 
 fi
 
