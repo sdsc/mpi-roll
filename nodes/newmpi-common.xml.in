@@ -40,20 +40,18 @@ if test -d /opt/mvapich2/limic.ko; then
 /sbin/modprobe limic
 /bin/sleep 1
 /bin/chmod 644 /dev/limic
-</file> 
-fi
-
-# Install the knem kernel object if it came w/the roll build.
-if test -d /opt/openmpi/knem.ko; then
-  cp /opt/openmpi/knem.ko /lib/modules/`uname -r`/extra/
-<file name="/etc/rc.d/rocksconfig.d/post-97-knem" perms="0755">
-#!/bin/sh
-/sbin/modprobe knem
-/bin/sleep 1
-/bin/chmod 644 /dev/knem
 </file>
 fi
 
+# Install the knem kernel object if it came w/the roll build.
+if test -d /opt/openmpi/ROLLCOMPILER/ROLLNETWORK/lib/knem.ko; then
+  cp /opt/openmpi/knem.ko /lib/modules/`uname -r`/extra/
+<file name="/etc/rc.d/rocksconfig.d/post-97-knem" perms="0755">
+/sbin/modprobe knem
+/bin/sleep 1
+/bin/chmod 644 /dev/knem
+</file> 
+fi
 
 </post>
 
