@@ -156,8 +156,8 @@ install::
 	( \
 	  $(COMPILERSETUP); \
 	  cd $(SOURCE); \
-	  make prefix=$(PKGROOT) install \
-          cp knem-1.0.0/driver/linux/knem.ko $(PKGROOT)/lib
+	  make prefix=$(PKGROOT) install; \
+	  cp knem-1.0.0/driver/linux/knem.ko $(PKGROOT)/lib \
 	)
 	umount $(PKGROOT)
 	cat openmpi.module | perl -pi -e "s!MODULEROOT!/opt/modulefiles/mpi/.$(ROLLCOMPILER)/openmpi_$(ROLLNETWORK)!g;s!VERSION!$(VERSION)!g;s!ROLLCOMPILER!$(ROLLCOMPILER)!g;s!ROLLNETWORK!$(ROLLNETWORK)!g" \
