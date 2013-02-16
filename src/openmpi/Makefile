@@ -141,6 +141,8 @@ build:
 	  ./configure --prefix=$(PKGROOT); \
 	  make; \
 	  make install; \
+          mkdir $(REDHAT.ROOT)/src/build-knem; \
+          cp -r $(PKGROOT)/* $(REDHAT.ROOT)/src/build-knem; \
 	  cd ..; \
 	  ./configure $(CONFIG_OPTS); \
 	  make \
@@ -156,6 +158,7 @@ install::
 	( \
 	  $(COMPILERSETUP); \
 	  cd $(SOURCE); \
+          cp -r $(REDHAT.ROOT)/src/build-knem/* $(PKGROOT); \
 	  make prefix=$(PKGROOT) install; \
 	  cp knem-1.0.0/driver/linux/knem.ko $(ROOT)/opt/openmpi \
 	)
