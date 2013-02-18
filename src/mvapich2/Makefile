@@ -144,7 +144,9 @@ install::
 	  make; \
 	  make install \
 	)
-	find . -name limic.ko -exec cp {} $(PKGROOT)/../..; \
+	if test ! -e $(PKGROOT)/../../limic.ko; then \
+	    find . -name limic.ko -exec cp {} $(PKGROOT)/../..; \ \
+        fi
 	umount $(PKGROOT)
 	-rmdir -p $(PKGROOT)
 	mkdir -p $(REDHAT.ROOT)/src/build-mpi-modules

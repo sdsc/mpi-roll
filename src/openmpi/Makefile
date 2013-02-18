@@ -160,9 +160,10 @@ install::
 	  cd $(SOURCE); \
           cp -r $(REDHAT.ROOT)/src/build-knem/* $(PKGROOT); \
 	  make prefix=$(PKGROOT) install; \
-	  cp knem-1.0.0/driver/linux/knem.ko $(ROOT)/opt/openmpi \
 	)
-	find . -name knem.ko -exec cp {} $(PKGROOT)/../..; \
+	if test ! -e $(PKGROOT)/../../knem.ko; then \
+	    find . -name knem.ko -exec cp {} $(PKGROOT)/../..; \ \
+        fi
 	umount $(PKGROOT)
 	cat openmpi.module | perl -pi -e "s!MODULEROOT!/opt/modulefiles/mpi/.$(ROLLCOMPILER)/openmpi_$(ROLLNETWORK)!g;s!VERSION!$(VERSION)!g;s!ROLLCOMPILER!$(ROLLCOMPILER)!g;s!ROLLNETWORK!$(ROLLNETWORK)!g" \
           > $(REDHAT.ROOT)/src/build-mpi-modules/$(NAME).module
