@@ -145,7 +145,7 @@ install::
 	  make install \
 	)
 	if test ! -e $(PKGROOT)/../../limic.ko; then \
-	    find . -name limic.ko -exec cp {} $(PKGROOT)/../..; \ \
+	    find . -name limic.ko -exec cp {} $(PKGROOT)/../..; \
         fi
 	umount $(PKGROOT)
 	-rmdir -p $(PKGROOT)
