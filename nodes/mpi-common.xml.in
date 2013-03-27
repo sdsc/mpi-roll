@@ -33,8 +33,9 @@ if test -d /opt/openmpi; then
 fi
 
 # Install the limic kernel object if it came w/the roll build.
-if test -d /opt/mvapich2/limic.ko; then
-  cp /opt/mvapich2/limic.ko /lib/modules/`uname -r`/extra/
+kos=`find /opt/mvapich2 -name limic.ko | head -1`
+if test -n "$kos"; then
+  cp $kos /lib/modules/`uname -r`/extra/
 <file name="/etc/rc.d/rocksconfig.d/post-97-limic" perms="0755">
 #!/bin/sh
 /sbin/modprobe limic
@@ -44,8 +45,9 @@ if test -d /opt/mvapich2/limic.ko; then
 fi
 
 # Install the knem kernel object if it came w/the roll build.
-if test -d /opt/openmpi/knem.ko; then
-  cp /opt/openmpi/knem.ko /lib/modules/`uname -r`/extra/
+kos=`find /opt/openmpi -name knem.ko | head -1`
+if test -n "$kos"; then
+  cp $kos /lib/modules/`uname -r`/extra/
 <file name="/etc/rc.d/rocksconfig.d/post-97-knem" perms="0755">
 #!/bin/sh
 /sbin/modprobe knem
