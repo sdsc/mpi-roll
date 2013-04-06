@@ -19,7 +19,7 @@ my $NODECOUNT = 4;
 my $LASTNODE = $NODECOUNT - 1;
 my $SUBMITUSER = $ARGV[1] || 'diag';
 my $SUBMITDIR = "/home/$SUBMITUSER/mpiroll";
-`sudo -u $SUBMITUSER mkdir $SUBMITDIR`;
+`su -c "mkdir $SUBMITDIR" $SUBMITUSER`;
 
 open(OUT, ">$TESTFILE.c");
 print OUT <<END;
@@ -78,7 +78,7 @@ foreach my $mpi (@MPIS) {
           chomp(my $submitHosts = `qmgr -c 'list server submit_hosts'`);
           skip 'Not submit machine', 1
             if $appliance ne 'Frontend' && $submitHosts !~ /$hostName/;
-          `sudo -u $SUBMITUSER cp $TESTFILE $SUBMITEXE`;
+          `su -c "cp $TESTFILE $SUBMITEXE" $SUBMITUSER`;
 
           my $fileopt = $mpi =~ /^(openmpi|mpich)$/ ?
                         "-machinefile \$PBS_NODEFILE" : "-f \$PBS_NODEFILE";
@@ -96,7 +96,7 @@ $setup
 $mpirun $fileopt -np $NODECOUNT $SUBMITEXE
 END
           close(OUT);
-          $output = `sudo -u $SUBMITUSER /opt/torque/bin/qsub $TESTFILE.qsub`;
+          $output = `su -c "/opt/torque/bin/qsub $TESTFILE.qsub" $SUBMITUSER`;
           $output =~ /(\d+)/;
           my $jobId = $1;
           while(`/opt/torque/bin/qstat $jobId` =~ / (Q|R) /) {
@@ -106,7 +106,7 @@ END
             last if -f $SUBMITOUT;
             sleep(1);
           }
-          $output = `sudo -u $SUBMITUSER cat $SUBMITOUT`;
+          $output = `su -c "cat $SUBMITOUT" $SUBMITUSER`;
           like($output, qr/process $LASTNODE of $NODECOUNT/,"Run with $mpirun");
 
         }
@@ -141,4 +141,4 @@ SKIP: {
 }
 
 `rm -fr $TESTFILE*`;
-`sudo -u $SUBMITUSER rm -fr $SUBMITDIR`;
+`su -c "rm -fr $SUBMITDIR" $SUBMITUSER`;
