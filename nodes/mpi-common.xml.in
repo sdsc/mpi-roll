@@ -45,7 +45,7 @@ if test -n "$kos"; then
   /sbin/depmod -a
   /sbin/modprobe limic
   /bin/sleep 1
-  /bin/chmod 644 /dev/limic
+  /bin/chmod 666 /dev/limic
 fi
 </file> 
 
@@ -57,7 +57,7 @@ if test -n "$kos"; then
   /sbin/depmod -a
   /sbin/modprobe knem
   /bin/sleep 1
-  /bin/chmod 644 /dev/knem
+  /bin/chmod 666 /dev/knem
 fi
 </file>
 
