@@ -7,8 +7,6 @@ module-whatis "mvapich2_ROLLNETWORK mpi stack"
 module-whatis "Version: VERSION"
 set mpiHome /opt/mvapich2/ROLLCOMPILER/ROLLNETWORK
 setenv MPIHOME \$mpiHome
-setenv MV2_NUM_HCAS 1
-setenv MV2_IBA_HCA mlx4_0
 prepend-path PATH \$mpiHome/bin
 prepend-path LD_LIBRARY_PATH \$mpiHome/lib
 

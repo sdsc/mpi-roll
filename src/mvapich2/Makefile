@@ -109,7 +109,7 @@ else ifeq ("$(ROLLNETWORK)", "mx")
 else ifeq ("$(ROLLNETWORK)", "ib")
   CONFIG_OPTS += --enable-f77 --enable-fc --enable-hybrid \
                  --with-ib-include=/usr/include/infiniband \
-                 --with-ib-libpath=/usr/lib64 --enable-3dtorus-support \
+                 --with-ib-libpath=/usr/lib64 \
                  --with-limic2=$(PKGROOT)
 endif
 
