@@ -74,7 +74,7 @@ foreach my $mpi (@MPIS) {
 
           skip 'No exe', 1 if ! -x $TESTFILE;
           chomp(my $hostName = `hostname`);
-          $hostName =~ s/\.local//;
+          $hostName =~ s/\..*//;
           chomp(my $submitHosts = `qmgr -c 'list server submit_hosts'`);
           skip 'Not submit machine', 1
             if $appliance ne 'Frontend' && $submitHosts !~ /$hostName/;
