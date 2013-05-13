@@ -1,3 +1,5 @@
 NAME    = openmpi_$(ROLLCOMPILER)_$(ROLLNETWORK)
 VERSION = 1.6.3
 RELEASE = 0
+
+RPM.EXTRAS = "AutoReq: no"
