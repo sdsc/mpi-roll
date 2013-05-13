@@ -113,6 +113,10 @@ else ifeq ("$(ROLLNETWORK)", "ib")
                  --with-limic2=$(PKGROOT)
 endif
 
+ifneq ("$(ROLLOPTS)", "$(subst torus,,$(ROLLOPTS))")
+  CONFIG_OPTS += --enable-3dtorus-support
+endif
+
 build:
 
 install::

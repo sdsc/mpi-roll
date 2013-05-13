@@ -29,4 +29,5 @@ defaulting to "eth".
 This roll also supports the ROLLOPTS make variable.  If it contains 'avx',
 options are passed to the compiler to produce AVX instructions.  If ROLLOPTS
 contains one or both of 'torque' and 'sge', then openmpi is built to integrate
-with the specified scheduler(s).
+with the specified scheduler(s).  If ROLLOPTS contains 'torus', then mvapich2
+is compiled with 3d torus support.
