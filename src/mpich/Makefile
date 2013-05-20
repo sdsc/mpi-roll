@@ -85,13 +85,13 @@ ifeq ("$(ROLLCOMPILER)", "intel")
   CPPCOMP = icpc
   FCOMP = ifort
   F90COMP = ifort
-  COMPILE_FLAGS = -O -xHOST -fPIC
+  COMPILE_FLAGS = -O -fPIC
 else ifeq ("$(ROLLCOMPILER)", "pgi")
   CCOMP = pgcc
   CPPCOMP = pgCC
   FCOMP = pgf90
   F90COMP = pgf90
-  COMPILE_FLAGS = -fast -fPIC
+  COMPILE_FLAGS = -fPIC
 else
   # Suppress PAC_PROG_F77_CMDARGS's "extern getarg", which fails w/gfortran
   COMPILERSETUP += ; export F77_GETARGDECL=" "

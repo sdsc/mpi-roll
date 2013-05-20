@@ -86,15 +86,15 @@ ifeq ("$(ROLLCOMPILER)", "intel")
   CPPCOMP = icpc
   FCOMP = ifort
   F90COMP = ifort
-  COMPILE_FLAGS = -O -xHOST -fPIC
-  WRAPPER_FLAGS = -xHOST
+  COMPILE_FLAGS = -O   -fPIC
+  WRAPPER_FLAGS = -O
 else ifeq ("$(ROLLCOMPILER)", "pgi")
   CCOMP = pgcc
   CPPCOMP = pgCC
   FCOMP = pgf77
   F90COMP = pgf90
-  COMPILE_FLAGS = -fast -fPIC -noswitcherror
-  WRAPPER_FLAGS = -fast
+  COMPILE_FLAGS = -fPIC -noswitcherror
+  WRAPPER_FLAGS = -O
 else ifneq ("$(ROLLOPTS)", "$(subst avx,,$(ROLLOPTS))")
   COMPILE_FLAGS += -mavx
   WRAPPER_FLAGS = -mavx

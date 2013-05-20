@@ -85,13 +85,13 @@ ifeq ("$(ROLLCOMPILER)", "intel")
   CXX=icpc
   F77=ifort
   FC=ifort
-  COMPILE_FLAGS = -O -xHOST -fPIC
+  COMPILE_FLAGS = -O -fPIC
 else ifeq ("$(ROLLCOMPILER)", "pgi")
   CC=pgcc
   CXX=pgCC
   F77=pgf77
   FC=pgf90
-  COMPILE_FLAGS = -fast -fPIC
+  COMPILE_FLAGS = -fPIC
 else ifneq ("$(ROLLOPTS)", "$(subst avx,,$(ROLLOPTS))")
   COMPILE_FLAGS += -mavx
 endif
