@@ -122,7 +122,7 @@ endif
 
 build:
 	tar zxvf $(SOURCE).tar.gz
-	tar zxvf patch-files/knem-1.0.0.tar.gz
+	tar zxvf patch-files/knem-1.1.0.tar.gz
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
 	mkdir -p -m 755 $(PKGROOT)
 	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
