@@ -140,13 +140,13 @@ install::
 	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
 	  cd $(SOURCE)/limic2-0.5.5; \
 	  ./configure --prefix=$(PKGROOT) --enable-module; \
-	  make; \
-	  make install; \
+	  make -j 16 ; \
+	  make  -j 16 install; \
 	  export LD_LIBRARY_PATH=$(PKGROOT)/lib:$${LD_LIBRARY_PATH}; \
 	  cd ..; \
 	  ./configure $(CONFIG_OPTS); \
-	  make; \
-	  make install \
+	  make -j 16 ; \
+	  make  -j 16 install \
 	)
 	find . -name limic.ko -exec cp {} $(PKGROOT)/lib/ \;
 	umount $(PKGROOT)

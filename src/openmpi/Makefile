@@ -139,13 +139,13 @@ build:
 	  export FCFLAGS="$(COMPILE_FLAGS)"; \
 	  cd $(SOURCE)/knem-1.0.0; \
 	  ./configure --prefix=$(PKGROOT); \
-	  make; \
-	  make install; \
+	  make -j 16; \
+	  make  -j 16 install; \
           mkdir $(REDHAT.ROOT)/src/build-knem; \
           cp -r $(PKGROOT)/* $(REDHAT.ROOT)/src/build-knem; \
 	  cd ..; \
 	  ./configure $(CONFIG_OPTS); \
-	  make \
+	  make -j 16 \
 	)
 	umount $(PKGROOT)
 
@@ -158,7 +158,7 @@ install::
 	  $(COMPILERSETUP); \
 	  cd $(SOURCE); \
           cp -r $(REDHAT.ROOT)/src/build-knem/* $(PKGROOT); \
-	  make prefix=$(PKGROOT) install; \
+	  make -j 16 prefix=$(PKGROOT) install; \
 	)
 	find . -name knem.ko -exec cp {} $(PKGROOT)/lib/ \;
 	umount $(PKGROOT)

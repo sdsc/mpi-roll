@@ -127,7 +127,7 @@ build:
 	  export RSHCOMMAND=ssh; \
 	  cd $(SOURCE); \
 	  ./configure $(CONFIG_OPTS); \
-	  make \
+	  make -j 16 \
 	)
 
 # Clean immediately after install to free disk space
@@ -139,7 +139,7 @@ install::
 	( \
 	  $(COMPILERSETUP); \
 	  cd $(SOURCE); \
-	  make install \
+	  make -j 16 install \
 	)
 	cat mpich.module | perl -pi -e "s!MODULEROOT!/opt/modulefiles/mpi/.$(ROLLCOMPILER)/mpich_$(ROLLNETWORK)!g;s!VERSION!$(VERSION)!g;s!ROLLCOMPILER!$(ROLLCOMPILER)!g;s!ROLLNETWORK!$(ROLLNETWORK)!g" \
           > $(REDHAT.ROOT)/src/build-mpi-modules/$(NAME).module
