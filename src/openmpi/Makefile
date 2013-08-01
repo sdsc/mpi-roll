@@ -126,7 +126,7 @@ build:
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
 	mkdir -p -m 755 $(PKGROOT)
 	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
-	mv knem-1.0.0 $(SOURCE)/
+	mv knem-1.1.0 $(SOURCE)/
 	( \
 	  $(COMPILERSETUP); \
 	  export CC=$(CCOMP); \
@@ -137,7 +137,7 @@ build:
 	  export FFLAGS="$(COMPILE_FLAGS)"; \
 	  export FC=$(F90COMP); \
 	  export FCFLAGS="$(COMPILE_FLAGS)"; \
-	  cd $(SOURCE)/knem-1.0.0; \
+	  cd $(SOURCE)/knem-1.1.0; \
 	  ./configure --prefix=$(PKGROOT); \
 	  make -j 16; \
 	  make  -j 16 install; \
