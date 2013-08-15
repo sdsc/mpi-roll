@@ -121,9 +121,6 @@ build:
 
 install::
 	tar zxvf $(SOURCE).tgz
-	tar zxvf patch-files/limic2-0.5.5.tgz
-	rm -fr $(SOURCE)/limic2-0.5.5
-	mv limic2-0.5.5 $(SOURCE)/
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
 	-mkdir -p $(PKGROOT)
 	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
@@ -138,7 +135,7 @@ install::
 	  export FCFLAGS="$(COMPILE_FLAGS)"; \
 	  export CFLAGS="$(COMPILE_FLAGS)"; \
 	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
-	  cd $(SOURCE)/limic2-0.5.5; \
+	  cd $(SOURCE)/limic2-0.5.6; \
 	  ./configure --prefix=$(PKGROOT) --enable-module; \
 	  make -j 16 ; \
 	  make  -j 16 install; \
