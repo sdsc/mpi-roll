@@ -79,13 +79,13 @@ CC=gcc
 CXX=g++
 F77=gfortran
 FC=gfortran
-COMPILE_FLAGS = -O2
+COMPILE_FLAGS = -fPIC
 ifeq ("$(ROLLCOMPILER)", "intel")
   CC=icc
   CXX=icpc
   F77=ifort
   FC=ifort
-  COMPILE_FLAGS = -O -fPIC
+  COMPILE_FLAGS = -fPIC
 else ifeq ("$(ROLLCOMPILER)", "pgi")
   CC=pgcc
   CXX=pgCC
@@ -110,7 +110,8 @@ else ifeq ("$(ROLLNETWORK)", "ib")
   CONFIG_OPTS += --enable-f77 --enable-fc --enable-hybrid \
                  --with-ib-include=/usr/include/infiniband \
                  --with-ib-libpath=/usr/lib64 \
-                 --with-limic2=$(PKGROOT)
+                 --with-limic2=$(PKGROOT) \
+                 --enable-fast=O3
 endif
 
 ifneq ("$(ROLLOPTS)", "$(subst torus,,$(ROLLOPTS))")
