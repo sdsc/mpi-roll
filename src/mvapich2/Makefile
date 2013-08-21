@@ -61,7 +61,7 @@ ifndef ROLLNETWORK
   ROLLNETWORK = eth
 endif
 
-PKGROOT = /opt/mvapich2/$(ROLLCOMPILER)/$(ROLLNETWORK)
+PKGROOT = /tmp/opt/mvapich2/$(ROLLCOMPILER)/$(ROLLNETWORK)
 SOURCE = mvapich2-$(VERSION)
 REDHAT.ROOT = $(PWD)/../../
 RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
@@ -79,19 +79,19 @@ CC=gcc
 CXX=g++
 F77=gfortran
 FC=gfortran
-COMPILE_FLAGS = -fPIC
+COMPILE_FLAGS = -fPIC -O3
 ifeq ("$(ROLLCOMPILER)", "intel")
   CC=icc
   CXX=icpc
   F77=ifort
   FC=ifort
-  COMPILE_FLAGS = -fPIC
+  COMPILE_FLAGS = -fPIC -O3
 else ifeq ("$(ROLLCOMPILER)", "pgi")
   CC=pgcc
   CXX=pgCC
   F77=pgf77
   FC=pgf90
-  COMPILE_FLAGS = -fPIC
+  COMPILE_FLAGS = -fPIC -O3
 else ifneq ("$(ROLLOPTS)", "$(subst avx,,$(ROLLOPTS))")
   COMPILE_FLAGS += -mavx
 endif
@@ -124,7 +124,6 @@ install::
 	tar zxvf $(SOURCE).tgz
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
 	-mkdir -p $(PKGROOT)
-	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
 	( \
 	  $(COMPILERSETUP); \
 	  $(NETWORKSETUP); \
@@ -147,7 +146,6 @@ install::
 	  make  -j 16 install \
 	)
 	find . -name limic.ko -exec cp {} $(PKGROOT)/lib/ \;
-	umount $(PKGROOT)
 	-rmdir -p $(PKGROOT)
 	mkdir -p $(REDHAT.ROOT)/src/build-mpi-modules
 	cat mvapich2.module | perl -pi -e "s!MODULEROOT!/opt/modulefiles/mpi/.$(ROLLCOMPILER)/mvapich2_$(ROLLNETWORK)!g;s!VERSION!$(VERSION)!g;s!ROLLCOMPILER!$(ROLLCOMPILER)!g;s!ROLLNETWORK!$(ROLLNETWORK)!g" \
