@@ -124,6 +124,7 @@ install::
 	tar zxvf $(SOURCE).tgz
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
 	-mkdir -p $(PKGROOT)
+	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
 	( \
 	  $(COMPILERSETUP); \
 	  $(NETWORKSETUP); \
@@ -145,8 +146,9 @@ install::
 	  make -j 16 ; \
 	  make  -j 16 install \
 	)
-	find . -name limic.ko -exec cp {} $(PKGROOT)/lib/ \;
+	umount $(PKGROOT)
 	-rmdir -p $(PKGROOT)
+	find . -name limic.ko -exec cp {} $(PKGROOT)/lib/ \;
 	mkdir -p $(REDHAT.ROOT)/src/build-mpi-modules
 	cat mvapich2.module | perl -pi -e "s!MODULEROOT!/opt/modulefiles/mpi/.$(ROLLCOMPILER)/mvapich2_$(ROLLNETWORK)!g;s!VERSION!$(VERSION)!g;s!ROLLCOMPILER!$(ROLLCOMPILER)!g;s!ROLLNETWORK!$(ROLLNETWORK)!g" \
           > $(REDHAT.ROOT)/src/build-mpi-modules/$(NAME).module
