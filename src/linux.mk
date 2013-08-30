@@ -57,7 +57,4 @@
 SRCDIRS = `find . -maxdepth 1 -type d \
 	-not -name CVS \
         -not -name mpi-modules \
-        -not -name mvapich2 \
-        -not -name openmpi \
-        -not -name mpich2 \
-	-not -name .` mvapich2 mpi-modules
+	-not -name .` mpi-modules

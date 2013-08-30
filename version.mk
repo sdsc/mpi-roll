@@ -1,5 +1,5 @@
 ROLLNAME = mpi
-RELEASE  = 2
+RELEASE  = 5
 COLOR    = orange
 
 REDHAT.ROOT = $(PWD)
