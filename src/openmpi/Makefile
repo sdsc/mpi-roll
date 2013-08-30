@@ -104,7 +104,7 @@ ifneq ("$(ROLLOPTS)", "$(subst sge,,$(ROLLOPTS))")
   LOADMGR += --with-sge
 endif
 ifneq ("$(ROLLOPTS)", "$(subst torque,,$(ROLLOPTS))")
-  LOADMGR += --with-tm /opt/torque
+  LOADMGR += --with-tm=/opt/torque
 endif
 
 CONFIG_OPTS = --prefix=$(PKGROOT) --disable-dlopen --enable-mca-static \
