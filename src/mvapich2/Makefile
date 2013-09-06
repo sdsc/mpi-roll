@@ -118,7 +118,7 @@ ifneq ("$(ROLLOPTS)", "$(subst torus,,$(ROLLOPTS))")
   CONFIG_OPTS += --enable-3dtorus-support
 endif
 ifneq ("$(ROLLOPTS)", "$(subst torque,,$(ROLLOPTS))")
-  LOADMGR += --with-pbs=/opt/torque
+  CONDIG_OPTS += --with-pbs=/opt/torque
 endif
 
 build:
