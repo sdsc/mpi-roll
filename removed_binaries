@@ -1,0 +1,28 @@
+28379     8b0314243eadecf00c93521fc41a906cea3befa8  src/mpich/patch-files/mpirun.ch_mx.pl.in
+21955     4c7007721c75f0771287d9dd0c14532ae92fbc4a  src/mpich/patch-files/mxmpi_conf.c
+
+16454069  a63396b57c5b61b3f60b8b04f58e9fdc6b6ad132  src/mpich/mpich-1.2.7.tgz
+16554106  195469a91116f58a1addc3dcc2786fd98c2a858d  src/mpich2-1.0.7rc2.tgz
+22826035  24f7e642e8e147769e91de61feb7fc069ea77b1a  src/mpich2/mpich2-1.5.tar.gz
+19502854  e15472f11d36a74e10b0266938e64fc5f409a6d1  src/mpich2/mpich2-1.4.1p1.tgz
+19492001  64760137273dc550ce42046f44be5c1cd954c853  src/mpich2/mpich2-1.3.2p1.tgz
+
+175486    ee1706221ef12bcac5c65dead1d3e2978e5ed691  src/mvapich2/limic.ko
+25935687  16f87470229afbd82b33bf20136d5d140cc9be59  src/mvapich2/mvapich2-1.9a2.tgz
+23239787  f506018877604980b29062af23f0700da2ca6fd9  src/mvapich2/mvapich2-1.6.tgz
+22847083  543303e6073221831058fdf8587374b680d89fc6  src/mvapich2/mvapich2-1.9a.tgz
+22415110  620c650bb1cae929a1b26b9eff596d80dbe6fbbe  src/mvapich2/mvapich2-1.8a1p1.tgz
+22317207  3e6e304a8a2a528728f8bcd3af56f8ecdff0bec3  src/mvapich2/mvapich2-1.7.tgz
+19141289  9d4393eee4c618ae90d6a3e17690f24a0280987c  src/mvapich2/mvapich2-1.9.tgz
+303424    14b4842215c92f370709ae50f6a4de98edce9b41  src/mvapich2/patch-files/limic2-0.5.5.tgz
+
+15513056  627e3464833db29bb1afa0aa389f79ec2cc1e8ba  src/openmpi/openmpi-1.6.5.tar.gz
+14768388  8328e2c960b86b356f76b3c290a721ed465341de  src/openmpi/openmpi-1.6.3.tar.gz
+14653874  8a8554821e6193c7e25ca899aec4a57642fa0cec  src/openmpi/openmpi-1.6.tar.gz
+12001108  f46b4589ec80c42d1a2137ac7d0966c69683969b  src/openmpi/openmpi-1.5.4.tar.gz
+10101353  256a4a4c90ba0ecfd6ad3bc085f8e2d911e14b68  src/openmpi/openmpi-1.4.4.tar.gz
+9960381   2d63c6d0f5eea11bae386445dd280f8b807fe2c9  src/openmpi/openmpi-1.4.1.tar.gz
+10061737  d6a4def9f1d88804e895b8a2f0066be371d95123  src/openmpi-1.3.3.tgz
+315175    cdaa04545c4fe9724cb5c971ddb050675c4ba459  src/openmpi/patch-files/knem-1.1.0.tar.gz
+294866    e60a67b73e035bb5f97dd2b055502ba9cd07d73b  src/openmpi/patch-files/knem-1.0.0.tar.gz
+97080     ec71968aef5ef3ca0bfad114b16d1fa7703e4788  src/openmpi/patch-files/mpi_scatterv_f90.f90
