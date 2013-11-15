@@ -109,8 +109,7 @@ ifeq ("$(ROLLNETWORK)", "mx")
 endif
 
 build: $(SRC_DIRS)
-	cp patch-files/mpirun.ch_mx.pl.in patch-files/mxmpi_conf.c \
-	   $(SOURCE)/mpid/ch_mx/
+	cp $(MPICH_PATCH_FILES) $(SOURCE)/mpid/ch_mx/
 	find $(SOURCE) -type f -exec perl -pi -e 's#iostream\.h#iostream#g' {} \;
 	( \
 	  $(COMPILERSETUP); \
