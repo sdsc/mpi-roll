@@ -62,11 +62,12 @@ ifndef ROLLNETWORK
 endif
 
 PKGROOT = /opt/mvapich2/$(ROLLCOMPILER)/$(ROLLNETWORK)
-SOURCE = mvapich2-$(VERSION)
+SOURCE = $(MVAPICH2_SOURCE_DIR)
 REDHAT.ROOT = $(PWD)/../../
 RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 
 -include $(ROCKSROOT)/etc/Rules.mk
+include pull.mk
 
 COMPILERSETUP = \
   if test -e /etc/profile.d/modules.sh; then \
@@ -121,10 +122,9 @@ ifneq ("$(ROLLOPTS)", "$(subst torque,,$(ROLLOPTS))")
   CONFIG_OPTS += --with-pbs=/opt/torque
 endif
 
-build:
+build: $(SRC_DIRS)
 
 install::
-	tar zxvf $(SOURCE).tgz
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
 	-mkdir -p $(PKGROOT)
 	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
