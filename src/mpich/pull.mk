@@ -17,7 +17,7 @@ VERIFY.OPTS             = hash-object -t blob
 VERIFY.HASHES           = binary_hashes
 
 # ALL packages are part of SRC_PKGS
-SRC_PKGS = $(TAR_GZ_PKGS) $(TAR_BZ2_PKGS) $(TGZ_PKGS) $(ZIP_PKGS)
+SRC_PKGS = $(TAR_GZ_PKGS) $(TAR_BZ2_PKGS) $(TGZ_PKGS) $(ZIP_PKGS) $(BARE_FILES)
 
 # Download the required packages, verify size and hash...
 .PHONY : download $(SRC_PKGS)
