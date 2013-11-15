@@ -62,11 +62,12 @@ ifndef ROLLNETWORK
 endif
 
 PKGROOT = /opt/mpich/$(ROLLCOMPILER)/$(ROLLNETWORK)
-SOURCE = mpich-$(VERSION)
+SOURCE = $(MPICH_SOURCE_DIR)
 REDHAT.ROOT = $(PWD)/../../
 RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 
 -include $(ROCKSROOT)/etc/Rules.mk
+include pull.mk
 
 COMPILERSETUP = \
   if test -e /etc/profile.d/modules.sh; then \
@@ -107,8 +108,7 @@ ifeq ("$(ROLLNETWORK)", "mx")
   NETWORKSETUP = export LD_LIBRARY_PATH=$(MXHOME)/lib:$$LD_LIBRARY_PATH
 endif
 
-build:
-	tar zxvf $(SOURCE).tgz
+build: $(SRC_DIRS)
 	cp patch-files/mpirun.ch_mx.pl.in patch-files/mxmpi_conf.c \
 	   $(SOURCE)/mpid/ch_mx/
 	find $(SOURCE) -type f -exec perl -pi -e 's#iostream\.h#iostream#g' {} \;
