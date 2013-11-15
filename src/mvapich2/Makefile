@@ -151,7 +151,7 @@ install::
 	)
 	umount $(PKGROOT)
 	-rmdir -p $(PKGROOT)
-	find . -name limic.ko -exec cp {} $(ROOT)/$(PKGROOT)/lib/ \;
+	find . -name $(LIMIC_NAME) -exec cp {} $(ROOT)/$(PKGROOT)/lib/ \;
 	mkdir -p $(REDHAT.ROOT)/src/build-mpi-modules
 	cat mvapich2.module | perl -pi -e "s!MODULEROOT!/opt/modulefiles/mpi/.$(ROLLCOMPILER)/mvapich2_$(ROLLNETWORK)!g;s!VERSION!$(VERSION)!g;s!ROLLCOMPILER!$(ROLLCOMPILER)!g;s!ROLLNETWORK!$(ROLLNETWORK)!g" \
           > $(REDHAT.ROOT)/src/build-mpi-modules/$(NAME).module
