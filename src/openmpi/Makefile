@@ -62,11 +62,12 @@ ifndef ROLLNETWORK
 endif
 
 PKGROOT = /opt/openmpi/$(ROLLCOMPILER)/$(ROLLNETWORK)
-SOURCE = openmpi-$(VERSION)
+SOURCE = $(OPENMPI_SOURCE_DIR)
 REDHAT.ROOT = $(PWD)/../../
 RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 
 -include $(ROCKSROOT)/etc/Rules.mk
+include pull.mk
 
 COMPILERSETUP = \
   if test -e /etc/profile.d/modules.sh; then \
@@ -120,13 +121,11 @@ else ifeq ("$(ROLLNETWORK)", "ib")
   CONFIG_OPTS += --with-knem=$(PKGROOT) --includedir=$(PKGROOT)/include
 endif
 
-build:
-	tar zxvf $(SOURCE).tar.gz
-	tar zxvf patch-files/knem-1.1.0.tar.gz
+build: $(SRC_DIRS)
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
 	mkdir -p -m 755 $(PKGROOT)
 	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
-	mv knem-1.1.0 $(SOURCE)/
+	mv $(KNEM_SOURCE_DIR) $(SOURCE)/
 	( \
 	  $(COMPILERSETUP); \
 	  export CC=$(CCOMP); \
@@ -137,7 +136,7 @@ build:
 	  export FFLAGS="$(COMPILE_FLAGS)"; \
 	  export FC=$(F90COMP); \
 	  export FCFLAGS="$(COMPILE_FLAGS)"; \
-	  cd $(SOURCE)/knem-1.1.0; \
+	  cd $(SOURCE)/$(KNEM_SOURCE_DIR); \
 	  ./configure --prefix=$(PKGROOT); \
 	  make -j 16; \
 	  make  -j 16 install; \
