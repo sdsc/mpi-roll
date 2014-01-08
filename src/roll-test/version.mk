@@ -1,3 +1,4 @@
 NAME	= mpi-roll-test
 VERSION	= 1
-RELEASE	= 5
+RELEASE	= 0
+RPM.EXTRAS         = AutoReq:No

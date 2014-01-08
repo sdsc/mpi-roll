@@ -1,6 +1,7 @@
 NAME    = mvapich2_$(ROLLCOMPILER)_$(ROLLNETWORK)
 VERSION = 1.9
-RELEASE = 6
+RELEASE = 0
+RPM.EXTRAS         = AutoReq:No
 
 RPM.EXTRAS = "AutoReq: no"
 
