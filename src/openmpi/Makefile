@@ -119,6 +119,8 @@ ifeq ("$(ROLLNETWORK)", "mx")
   CONFIG_OPTS += --with-mx=$(MXHOME) --without-openib
 else ifeq ("$(ROLLNETWORK)", "ib")
   CONFIG_OPTS += --with-knem=$(PKGROOT) --includedir=$(PKGROOT)/include
+else
+  CONFIG_OPTS += --without-openib
 endif
 
 build: $(SRC_DIRS)
