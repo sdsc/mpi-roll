@@ -63,7 +63,7 @@ default:
 	@echo "copyright|rpm|pkg|clean"
 
 copyright rpm pkg clean::
-	for i in $(SRCDIRS) ; do \
+	for i in $(SRCDIRS); do \
 	  grep -q ROLLCOMPILER $$i/version.mk; \
 	  if test $$? -eq 0; then \
 	    nodot=`echo $$i | sed 's/^\.\///'`; \
@@ -73,11 +73,11 @@ copyright rpm pkg clean::
 	      for c in $(ROLLCOMPILER); do \
 	        for n in $(ROLLNETWORK); do \
 	          echo make $@ in $$i with ROLLCOMPILER=$$c ROLLNETWORK=$$n; \
-	          (cd $$i; $(MAKE) ROLLCOMPILER=$$c ROLLNETWORK=$$n $@); \
+	          (cd $$i && $(MAKE) ROLLCOMPILER=$$c ROLLNETWORK=$$n $@) || exit 2; \
 	        done; \
 	      done; \
 	    fi; \
 	  else \
-	    (cd $$i; $(MAKE) ROLLCOMPILER="$(ROLLCOMPILER)" ROLLNETWORK="$(ROLLNETWORK)" $@) ; \
+	    (cd $$i && $(MAKE) ROLLCOMPILER="$(ROLLCOMPILER)" ROLLNETWORK="$(ROLLNETWORK)" $@) || exit 2; \
 	  fi; \
 	done
