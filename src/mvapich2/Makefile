@@ -54,14 +54,7 @@
 #
 # @Copyright@
 
-ifndef ROLLCOMPILER
-  ROLLCOMPILER = gnu
-endif
-ifndef ROLLNETWORK
-  ROLLNETWORK = eth
-endif
-
-PKGROOT = /opt/mvapich2/$(ROLLCOMPILER)/$(ROLLNETWORK)
+PKGROOT = /opt/mvapich2/$(COMPILERNAME)/$(ROLLNETWORK)
 SOURCE = $(MVAPICH2_SOURCE_DIR)
 REDHAT.ROOT = $(PWD)/../../
 RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
@@ -72,6 +65,11 @@ include pull.mk
 COMPILERSETUP = \
   if test -e /etc/profile.d/modules.sh; then \
     . /etc/profile.d/modules.sh; \
+    module=`module avail 2>&1 | grep -m 1 -o "\<$(ROLLCOMPILER)\>"`; \
+    if test "$${module}" != "$(ROLLCOMPILER)"; then \
+      echo *** ERROR: Compiler $(ROLLCOMPILER) not found; \
+      exit 2; \
+    fi; \
     module load $(ROLLCOMPILER); \
   fi
 
@@ -80,13 +78,13 @@ CXX=g++
 F77=gfortran
 FC=gfortran
 COMPILE_FLAGS = -fPIC -O3
-ifeq ("$(ROLLCOMPILER)", "intel")
+ifeq ("$(COMPILERNAME)", "intel")
   CC=icc
   CXX=icpc
   F77=ifort
   FC=ifort
   COMPILE_FLAGS = -fPIC -O3
-else ifeq ("$(ROLLCOMPILER)", "pgi")
+else ifeq ("$(COMPILERNAME)", "pgi")
   CC=pgcc
   CXX=pgCC
   F77=pgf77
@@ -96,8 +94,7 @@ else ifneq ("$(ROLLOPTS)", "$(subst avx,,$(ROLLOPTS))")
   COMPILE_FLAGS += -mavx
 endif
 
-CONFIG_OPTS = \
-  --prefix=$(PKGROOT) --enable-shared --enable-sharedlibs=gcc --with-hwloc
+CONFIG_OPTS = --enable-shared --enable-sharedlibs=gcc --with-hwloc
 NETWORKSETUP = cat /dev/null
 ifeq ("$(ROLLNETWORK)", "eth")
   CONFIG_OPTS += --with-device=ch3:sock
@@ -110,7 +107,6 @@ else ifeq ("$(ROLLNETWORK)", "ib")
   CONFIG_OPTS += --enable-f77 --enable-fc --enable-hybrid \
                  --with-ib-include=/usr/include/infiniband \
                  --with-ib-libpath=/usr/lib64 \
-                 --with-limic2=$(PKGROOT) \
                  --enable-fast=O3
 endif
 
@@ -122,11 +118,6 @@ ifneq ("$(ROLLOPTS)", "$(subst torque,,$(ROLLOPTS))")
 endif
 
 build: $(SRC_DIRS)
-
-install::
-	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
-	-mkdir -p $(PKGROOT)
-	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
 	( \
 	  $(COMPILERSETUP); \
 	  $(NETWORKSETUP); \
@@ -138,21 +129,40 @@ install::
 	  export FCFLAGS="$(COMPILE_FLAGS)"; \
 	  export CFLAGS="$(COMPILE_FLAGS)"; \
 	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
-	  cd $(SOURCE)/limic2-0.5.6; \
-	  ./configure --prefix=$(PKGROOT) --enable-module; \
-	  make -j 16 ; \
-	  make  -j 16 install; \
-	  export LD_LIBRARY_PATH=$(PKGROOT)/lib:$${LD_LIBRARY_PATH}; \
-	  cd ..; \
-	  ./configure $(CONFIG_OPTS); \
-	  make -j 16 ; \
-	  make  -j 16 install \
+	  export LIMIC_OPTS=""; \
+	  cd $(SOURCE); \
+	  if test "$(ROLLNETWORK)" = "ib"; then \
+	    cd limic2-*; \
+	    ./configure --prefix=$(PKGROOT) --enable-module; \
+	    make -j 16; \
+	    mkdir -p -m 755 $(REDHAT.ROOT)/src/build-limic; \
+	    make prefix=$(REDHAT.ROOT)/src/build-limic -j 16 install; \
+	    export LIMIC_OPTS="--with-limic2=$(REDHAT.ROOT)/src/build-limic"; \
+	    export LD_LIBRARY_PATH=$(REDHAT.ROOT)/src/build-limic/lib:$${LD_LIBRARY_PATH}; \
+	    cd ..; \
+	  fi; \
+	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS) $${LIMIC_OPTS}; \
+	  make -j 16 \
+	)
+
+install::
+	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
+	-mkdir -p -m 755 $(PKGROOT)
+	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
+	( \
+	  cd $(SOURCE); \
+	  if test "$(ROLLNETWORK)" = "ib"; then \
+	    cd limic2-*; \
+	    make -j 16 install; \
+	    cd ..; \
+	  fi; \
+	  make -j 16 install \
 	)
 	umount $(PKGROOT)
 	-rmdir -p $(PKGROOT)
-	find . -name $(LIMIC_NAME) -exec cp {} $(ROOT)/$(PKGROOT)/lib/ \;
+	find . -name $(LIMIC_KO_NAME) -exec cp {} $(ROOT)/$(PKGROOT)/lib/ \;
 	mkdir -p $(REDHAT.ROOT)/src/build-mpi-modules
-	cat mvapich2.module | perl -pi -e "s!MODULEROOT!/opt/modulefiles/mpi/.$(ROLLCOMPILER)/mvapich2_$(ROLLNETWORK)!g;s!VERSION!$(VERSION)!g;s!ROLLCOMPILER!$(ROLLCOMPILER)!g;s!ROLLNETWORK!$(ROLLNETWORK)!g" \
+	cat mvapich2.module | perl -pi -e "s!MODULEROOT!/opt/modulefiles/mpi/.$(COMPILERNAME)/mvapich2_$(ROLLNETWORK)!g;s!VERSION!$(VERSION)!g;s!COMPILERNAME!$(COMPILERNAME)!g;s!ROLLNETWORK!$(ROLLNETWORK)!g" \
           > $(REDHAT.ROOT)/src/build-mpi-modules/$(NAME).module
 
 clean::
