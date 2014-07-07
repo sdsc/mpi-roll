@@ -48,15 +48,18 @@ my $modulesInstalled = -f '/etc/profile.d/modules.sh';
 foreach my $mpi (@MPIS) {
   foreach my $compiler (@COMPILERS) {
 
+    my $compilername = (split('/', $compiler))[0];
+
     SKIP: {
 
-      skip "$mpi/$compiler not installed", 5 if ! -d "/opt/$mpi/$compiler";
+      skip "$mpi/$compilername not installed", 5
+        if ! -d "/opt/$mpi/$compilername";
 
       foreach my $network (@NETWORKS) {
 
-        my $SUBMITERR = "$SUBMITDIR/$TESTFILE.$mpi.$compiler.$network.err";
-        my $SUBMITEXE = "$SUBMITDIR/$TESTFILE.$mpi.$compiler.$network.exe";
-        my $SUBMITOUT = "$SUBMITDIR/$TESTFILE.$mpi.$compiler.$network.out";
+        my $SUBMITERR = "$SUBMITDIR/$TESTFILE.$mpi.$compilername.$network.err";
+        my $SUBMITEXE = "$SUBMITDIR/$TESTFILE.$mpi.$compilername.$network.exe";
+        my $SUBMITOUT = "$SUBMITDIR/$TESTFILE.$mpi.$compilername.$network.out";
 
         my $setup = $modulesInstalled ?
           ". /etc/profile.d/modules.sh; module load $compiler ${mpi}_$network" :
@@ -75,7 +78,7 @@ foreach my $mpi (@MPIS) {
           skip 'No exe', 1 if ! -x $TESTFILE;
           chomp(my $hostName = `hostname`);
           $hostName =~ s/\..*//;
-          chomp(my $submitHosts = `qmgr -c 'list server submit_hosts'`);
+          chomp(my $submitHosts = `qmgr -c 'list server submit_hosts' 2>/dev/null`);
           skip 'Not submit machine', 1
             if $appliance ne 'Frontend' && $submitHosts !~ /$hostName/;
           `su -c "cp $TESTFILE $SUBMITEXE" $SUBMITUSER`;
@@ -115,13 +118,13 @@ END
 
         SKIP: {
           skip 'modules not installed', 3 if ! $modulesInstalled;
-          my $dir = "/opt/modulefiles/mpi/.$compiler/${mpi}_$network";
+          my $dir = "/opt/modulefiles/mpi/.$compilername/${mpi}_$network";
           `/bin/ls $dir/[0-9]* 2>&1`;
-          ok($? == 0, "$mpi/$compiler/$network module installed");
+          ok($? == 0, "$mpi/$compilername/$network module installed");
           `/bin/ls $dir/.version.[0-9]* 2>&1`;
-          ok($? == 0, "$mpi/$compiler/$network version module installed");
+          ok($? == 0, "$mpi/$compilername/$network version module installed");
           ok(-l "$dir/.version",
-             "$mpi/$compiler/$network version module link created");
+             "$mpi/$compilername/$network version module link created");
         }
 
       }
