@@ -150,6 +150,7 @@ install::
 	-mkdir -p -m 755 $(PKGROOT)
 	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
 	( \
+	  $(COMPILERSETUP); \
 	  cd $(SOURCE); \
 	  if test "$(ROLLNETWORK)" = "ib"; then \
 	    cd $(KNEM_SOURCE_DIR); \
