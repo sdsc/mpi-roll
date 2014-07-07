@@ -1,6 +1,15 @@
-NAME    = mpich2_$(ROLLCOMPILER)_$(ROLLNETWORK)
+ifndef ROLLNETWORK
+  ROLLNETWORK = eth
+endif
+ifndef ROLLCOMPILER
+  ROLLCOMPILER = gnu
+else
+  COMPILERNAME := $(firstword $(subst /, ,$(ROLLCOMPILER)))
+endif
+
+NAME    = mpich2_$(COMPILERNAME)_$(ROLLNETWORK)
 VERSION = 1.5
-RELEASE = 0
+RELEASE = 1
 RPM.EXTRAS         = AutoReq:No
 
 SRC_SUBDIR        = mpich2

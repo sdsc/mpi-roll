@@ -5,7 +5,7 @@ cat > ROOT_PKGROOTMODULEROOT/VERSION <<END
 #%Module1.0
 module-whatis "openmpi_ROLLNETWORK mpi stack"
 module-whatis "Version: VERSION"
-set mpiHome /opt/openmpi/ROLLCOMPILER/ROLLNETWORK
+set mpiHome /opt/openmpi/COMPILERNAME/ROLLNETWORK
 setenv MPIHOME \$mpiHome
 prepend-path PATH \$mpiHome/bin
 prepend-path LD_LIBRARY_PATH \$mpiHome/lib

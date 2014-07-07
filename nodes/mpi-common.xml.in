@@ -14,7 +14,7 @@ Copyright (c) 2000 - 2014 The Regents of the University of California.
 All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 </copyright>
 
-<package>ROLLMPI_ROLLCOMPILER_ROLLNETWORK</package>
+<package>ROLLMPI_COMPILERNAME_ROLLNETWORK</package>
 <package>mpi-modules</package>
 <package>mpi-roll-test</package>
 
@@ -25,7 +25,7 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 # This is a cheap/quick fix.
 if test -d /opt/openmpi; then
   /usr/bin/perl -pi -e 's#/opt/torque/lib\b#/opt/torque/lib64#g' \
-                       /opt/openmpi/ROLLCOMPILER/ROLLNETWORK/lib/*.la
+                       /opt/openmpi/COMPILERNAME/ROLLNETWORK/lib/*.la
 fi
 
 #

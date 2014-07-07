@@ -54,14 +54,7 @@
 #
 # @Copyright@
 
-ifndef ROLLCOMPILER
-  ROLLCOMPILER = gnu
-endif
-ifndef ROLLNETWORK
-  ROLLNETWORK = eth
-endif
-
-PKGROOT = /opt/openmpi/$(ROLLCOMPILER)/$(ROLLNETWORK)
+PKGROOT = /opt/openmpi/$(COMPILERNAME)/$(ROLLNETWORK)
 SOURCE = $(OPENMPI_SOURCE_DIR)
 REDHAT.ROOT = $(PWD)/../../
 RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
@@ -72,6 +65,11 @@ include pull.mk
 COMPILERSETUP = \
   if test -e /etc/profile.d/modules.sh; then \
     . /etc/profile.d/modules.sh; \
+    module=`module avail 2>&1 | grep -m 1 -o "\<$(ROLLCOMPILER)\>"`; \
+    if test "$${module}" != "$(ROLLCOMPILER)"; then \
+      echo *** ERROR: Compiler $(ROLLCOMPILER) not found; \
+      exit 2; \
+    fi; \
     module load $(ROLLCOMPILER); \
   fi
 
@@ -81,14 +79,14 @@ FCOMP = gfortran
 F90COMP = gfortran
 COMPILE_FLAGS = -O3 -mtune=core2 -march=core2 -mfpmath=sse -msse3 -fPIC -ffree-line-length-none
 WRAPPER_FLAGS = -O3
-ifeq ("$(ROLLCOMPILER)", "intel")
+ifeq ("$(COMPILERNAME)", "intel")
   CCOMP = icc
   CPPCOMP = icpc
   FCOMP = ifort
   F90COMP = ifort
   COMPILE_FLAGS = -O3   -fPIC
   WRAPPER_FLAGS = -O3
-else ifeq ("$(ROLLCOMPILER)", "pgi")
+else ifeq ("$(COMPILERNAME)", "pgi")
   CCOMP = pgcc
   CPPCOMP = pgCC
   FCOMP = pgf77
@@ -107,26 +105,20 @@ ifneq ("$(ROLLOPTS)", "$(subst torque,,$(ROLLOPTS))")
   LOADMGR += --with-tm=/opt/torque
 endif
 
-CONFIG_OPTS = --prefix=$(PKGROOT) --disable-dlopen --enable-mca-static \
+CONFIG_OPTS = --disable-dlopen --enable-mca-static \
               --enable-mpi-thread-multiple --enable-static --with-mpi-f90-size=medium \
               --with-platform=optimized $(LOADMGR) --with-wrapper-cflags='$(WRAPPER_FLAGS)' --with-wrapper-cxxflags='$(WRAPPER_FLAGS)' --with-wrapper-fflags='$(WRAPPER_FLAGS)' --with-wrapper-fcflags='$(WRAPPER_FLAGS)'
 
 CPPFLAGS=
-ifeq ("$(ROLLNETWORK)", "mx")
+ifeq ("$(ROLLNETWORK)", "eth")
+  CONFIG_OPTS += --without-openib
+else ifeq ("$(ROLLNETWORK)", "mx")
   MXHOME = /opt/mx
   COMPILE_FLAGS += -I$(MXHOME)/include
   CONFIG_OPTS += --with-mx=$(MXHOME) --without-openib
-else ifeq ("$(ROLLNETWORK)", "ib")
-  CONFIG_OPTS += --with-knem=$(PKGROOT) --includedir=$(PKGROOT)/include
-else
-  CONFIG_OPTS += --without-openib
 endif
 
 build: $(SRC_DIRS)
-	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
-	mkdir -p -m 755 $(PKGROOT)
-	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
-	mv $(KNEM_SOURCE_DIR) $(SOURCE)/
 	( \
 	  $(COMPILERSETUP); \
 	  export CC=$(CCOMP); \
@@ -137,32 +129,40 @@ build: $(SRC_DIRS)
 	  export FFLAGS="$(COMPILE_FLAGS)"; \
 	  export FC=$(F90COMP); \
 	  export FCFLAGS="$(COMPILE_FLAGS)"; \
-	  cd $(SOURCE)/$(KNEM_SOURCE_DIR); \
-	  ./configure --prefix=$(PKGROOT); \
-	  make -j 16; \
-	  make  -j 16 install; \
-          mkdir $(REDHAT.ROOT)/src/build-knem; \
-          cp -r $(PKGROOT)/* $(REDHAT.ROOT)/src/build-knem; \
-	  cd ..; \
-	  ./configure $(CONFIG_OPTS); \
+	  export KNEM_OPTS=""; \
+	  cd $(SOURCE); \
+	  if test "$(ROLLNETWORK)" = "ib"; then \
+	    mv ../$(KNEM_SOURCE_DIR) .; \
+	    cd $(KNEM_SOURCE_DIR); \
+	    ./configure --prefix=$(PKGROOT); \
+	    make -j 16; \
+	    mkdir -p -m 755 $(REDHAT.ROOT)/src/build-knem; \
+	    make prefix=$(REDHAT.ROOT)/src/build-knem -j 16 install; \
+	    export KNEM_OPTS=--with-knem=$(REDHAT.ROOT)/src/build-knem; \
+	    cd ..; \
+	  fi; \
+	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS) $${KNEM_OPTS}; \
 	  make -j 16 \
 	)
-	umount $(PKGROOT)
 
 install::
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
-	mkdir -p -m 755 $(PKGROOT)
+	-mkdir -p -m 755 $(PKGROOT)
 	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
-	mkdir -p $(REDHAT.ROOT)/src/build-mpi-modules
 	( \
-	  $(COMPILERSETUP); \
 	  cd $(SOURCE); \
-          cp -r $(REDHAT.ROOT)/src/build-knem/* $(PKGROOT); \
-	  make -j 16 prefix=$(PKGROOT) install; \
+	  if test "$(ROLLNETWORK)" = "ib"; then \
+	    cd $(KNEM_SOURCE_DIR); \
+	    make -j 16 install; \
+	    cd ..; \
+	  fi; \
+	  make -j 16 install \
 	)
-	find . -name knem.ko -exec cp {} $(PKGROOT)/lib/ \;
 	umount $(PKGROOT)
-	cat openmpi.module | perl -pi -e "s!MODULEROOT!/opt/modulefiles/mpi/.$(ROLLCOMPILER)/openmpi_$(ROLLNETWORK)!g;s!VERSION!$(VERSION)!g;s!ROLLCOMPILER!$(ROLLCOMPILER)!g;s!ROLLNETWORK!$(ROLLNETWORK)!g" \
+	-rmdir -p $(PKGROOT)
+	find . -name $(KNEM_KO_NAME) -exec cp {} $(ROOT)/$(PKGROOT)/lib/ \;
+	mkdir -p $(REDHAT.ROOT)/src/build-mpi-modules
+	cat openmpi.module | perl -pi -e "s!MODULEROOT!/opt/modulefiles/mpi/.$(COMPILERNAME)/openmpi_$(ROLLNETWORK)!g;s!VERSION!$(VERSION)!g;s!COMPILERNAME!$(COMPILERNAME)!g;s!ROLLNETWORK!$(ROLLNETWORK)!g" \
           > $(REDHAT.ROOT)/src/build-mpi-modules/$(NAME).module
 
 clean::
