@@ -59,24 +59,29 @@
 -include $(shell ${ROCKSROOT}/bin/arch).mk
 -include $(shell ${ROCKSROOT}/bin/os).mk
 
+MPI_FLAVORS = mpich2 mvapich2 openmpi
+
 default:
 	@echo "copyright|rpm|pkg|clean"
 
 copyright rpm pkg clean::
 	for i in $(SRCDIRS); do \
+	  i=`echo $$i | sed 's/^\.\///'`; \
+	  echo $(MPI_FLAVORS) | grep -q "\<$$i\>"; \
+	  if test $$? -eq 0; then \
+	    echo $(ROLLMPI) | grep -q "\<$$i\>"; \
+	    if test $$? -ne 0; then \
+	      continue; \
+	    fi; \
+	  fi; \
 	  grep -q ROLLCOMPILER $$i/version.mk; \
 	  if test $$? -eq 0; then \
-	    nodot=`echo $$i | sed 's/^\.\///'`; \
-	    echo echo $(ROLLMPI) pipe grep -q "\<$$nodot\>"; \
-	    echo $(ROLLMPI) | grep -q "\<$$nodot\>"; \
-	    if test $$? -eq 0; then \
-	      for c in $(ROLLCOMPILER); do \
-	        for n in $(ROLLNETWORK); do \
-	          echo make $@ in $$i with ROLLCOMPILER=$$c ROLLNETWORK=$$n; \
-	          (cd $$i && $(MAKE) ROLLCOMPILER=$$c ROLLNETWORK=$$n $@) || exit 2; \
-	        done; \
+	    for c in $(ROLLCOMPILER); do \
+	      for n in $(ROLLNETWORK); do \
+	        echo make $@ in $$i with ROLLCOMPILER=$$c ROLLNETWORK=$$n; \
+	        (cd $$i && $(MAKE) ROLLCOMPILER=$$c ROLLNETWORK=$$n $@) || exit 2; \
 	      done; \
-	    fi; \
+	    done; \
 	  else \
 	    (cd $$i && $(MAKE) ROLLCOMPILER="$(ROLLCOMPILER)" ROLLNETWORK="$(ROLLNETWORK)" $@) || exit 2; \
 	  fi; \
