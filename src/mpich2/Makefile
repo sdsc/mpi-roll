@@ -54,14 +54,7 @@
 #
 # @Copyright@
 
-ifndef ROLLCOMPILER
-  ROLLCOMPILER = gnu
-endif
-ifndef ROLLNETWORK
-  ROLLNETWORK = eth
-endif
-
-PKGROOT = /opt/mpich2/$(ROLLCOMPILER)/$(ROLLNETWORK)
+PKGROOT = /opt/mpich2/$(COMPILERNAME)/$(ROLLNETWORK)
 SOURCE = $(MPICH2_SOURCE_DIR)
 REDHAT.ROOT = $(PWD)/../../
 RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
@@ -72,6 +65,11 @@ include pull.mk
 COMPILERSETUP = \
   if test -e /etc/profile.d/modules.sh; then \
     . /etc/profile.d/modules.sh; \
+    module=`module avail 2>&1 | grep -m 1 -o "\<$(ROLLCOMPILER)\>"`; \
+    if test "$${module}" != "$(ROLLCOMPILER)"; then \
+      echo *** ERROR: Compiler $(ROLLCOMPILER) not found; \
+      exit 2; \
+    fi; \
     module load $(ROLLCOMPILER); \
   fi
 
@@ -80,13 +78,13 @@ CPPCOMP = g++
 FCOMP = gfortran
 F90COMP = gfortran
 COMPILE_FLAGS = -O3
-ifeq ("$(ROLLCOMPILER)", "intel")
+ifeq ("$(COMPILERNAME)", "intel")
   CCOMP = icc
   CPPCOMP = icpc
   FCOMP = ifort
   F90COMP = ifort
   COMPILE_FLAGS = -O3 -fPIC
-else ifeq ("$(ROLLCOMPILER)", "pgi")
+else ifeq ("$(COMPILERNAME)", "pgi")
   CCOMP = pgcc
   CPPCOMP = pgCC
   FCOMP = pgf90
@@ -96,7 +94,7 @@ else ifneq ("$(ROLLOPTS)", "$(subst avx,,$(ROLLOPTS))")
   COMPILE_FLAGS += -mavx
 endif
 
-CONFIG_OPTS = --prefix=$(PKGROOT) --enable-shared --enable-sharedlibs=gcc
+CONFIG_OPTS = --enable-shared --enable-sharedlibs=gcc
 NETWORKSETUP = cat /dev/null
 ifeq ("$(ROLLNETWORK)", "mx")
   MXHOME = /opt/mx
@@ -117,26 +115,25 @@ build: $(SRC_DIRS)
 	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
 	  export FC=$(FCOMP); \
 	  export FCFLAGS="$(COMPILE_FLAGS)"; \
-	  export PREFIX=$(PKGROOT); \
 	  cd $(SOURCE); \
-	  ./configure $(CONFIG_OPTS); \
+	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
 	  make -j 16 \
 	)
 
-# Clean immediately after install to free disk space
 install::
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
-	mkdir -p $(REDHAT.ROOT)/src/build-mpi-modules
-	if [ ! -d $(PKGROOT) ]; then mkdir -p $(PKGROOT); fi
+	-mkdir -p -m 755 $(PKGROOT)
 	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
 	( \
 	  $(COMPILERSETUP); \
 	  cd $(SOURCE); \
 	  make -j 16 install \
 	)
-	cat mpich2.module | perl -pi -e "s!MODULEROOT!/opt/modulefiles/mpi/.$(ROLLCOMPILER)/mpich2_$(ROLLNETWORK)!g;s!VERSION!$(VERSION)!g;s!ROLLCOMPILER!$(ROLLCOMPILER)!g;s!ROLLNETWORK!$(ROLLNETWORK)!g" \
-          > $(REDHAT.ROOT)/src/build-mpi-modules/$(NAME).module
 	umount $(PKGROOT)
+	-rmdir -p $(PKGROOT)
+	mkdir -p $(REDHAT.ROOT)/src/build-mpi-modules
+	cat mpich2.module | perl -pi -e "s!MODULEROOT!/opt/modulefiles/mpi/.$(COMPILERNAME)/mpich2_$(ROLLNETWORK)!g;s!VERSION!$(VERSION)!g;s!COMPILERNAME!$(COMPILERNAME)!g;s!ROLLNETWORK!$(ROLLNETWORK)!g" \
+          > $(REDHAT.ROOT)/src/build-mpi-modules/$(NAME).module
 
 clean::
 	rm -fr $(SOURCE)
