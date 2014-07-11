@@ -130,6 +130,7 @@ build: $(SRC_DIRS)
 	  export CFLAGS="$(COMPILE_FLAGS)"; \
 	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
 	  export LIMIC_OPTS=""; \
+          export LD_LIBRARY_PATH=/opt/torque/lib64:$${LD_LIBRARY_PATH}; \
 	  cd $(SOURCE); \
 	  if test "$(ROLLNETWORK)" = "ib"; then \
 	    cd limic2-*; \
