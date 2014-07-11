@@ -1,10 +1,8 @@
 #!/usr/bin/perl -w
 # mpi roll installation test.  Usage:
-# mpi.t [nodetype [submituser]]
+# mpi.t [nodetype]
 #   where nodetype is one of "Compute", "Dbnode", "Frontend" or "Login"
 #   if not specified, the test assumes either Compute or Frontend.
-#   submituser is the login id through which jobs will be submitted to the
-#   batch queue; defaults to diag.
 
 use Test::More qw(no_plan);
 
@@ -14,12 +12,8 @@ my $installedOnAppliancesPattern = '.';
 my $output;
 
 my $TESTFILE = 'tmpmpi';
-
 my $NODECOUNT = 4;
 my $LASTNODE = $NODECOUNT - 1;
-my $SUBMITUSER = $ARGV[1] || 'diag';
-my $SUBMITDIR = "/home/$SUBMITUSER/mpiroll";
-`su -c "mkdir $SUBMITDIR" $SUBMITUSER`;
 
 open(OUT, ">$TESTFILE.c");
 print OUT <<END;
@@ -57,64 +51,35 @@ foreach my $mpi (@MPIS) {
 
       foreach my $network (@NETWORKS) {
 
-        my $SUBMITERR = "$SUBMITDIR/$TESTFILE.$mpi.$compilername.$network.err";
-        my $SUBMITEXE = "$SUBMITDIR/$TESTFILE.$mpi.$compilername.$network.exe";
-        my $SUBMITOUT = "$SUBMITDIR/$TESTFILE.$mpi.$compilername.$network.out";
-
         my $setup = $modulesInstalled ?
           ". /etc/profile.d/modules.sh; module load $compiler ${mpi}_$network" :
           'echo > /dev/null'; # noop
 
-        my $command = "$setup; which mpicc; mpicc -o $TESTFILE $TESTFILE.c";
+        my $command = "$setup; which mpicc; mpicc -o $TESTFILE.exe $TESTFILE.c";
         $output = `$command`;
         $output =~ /(\S*mpicc)/;
         my $mpicc = $1 || 'mpicc';
         my $mpirun = $mpicc;
         $mpirun =~ s/mpicc/mpirun/;
-        ok(-x $TESTFILE, "Compile with $mpicc");
+        ok(-x "$TESTFILE.exe", "Compile with $mpicc");
 
         SKIP: {
 
-          skip 'No exe', 1 if ! -x $TESTFILE;
-          chomp(my $hostName = `hostname`);
-          $hostName =~ s/\..*//;
-          chomp(my $submitHosts = `qmgr -c 'list server submit_hosts' 2>/dev/null`);
-          skip 'Not submit machine', 1
-            if $appliance ne 'Frontend' && $submitHosts !~ /$hostName/;
-          `su -c "cp $TESTFILE $SUBMITEXE" $SUBMITUSER`;
+          skip 'No exe', 1 if ! -x "$TESTFILE.exe";
 
-          my $fileopt = $mpi =~ /^(openmpi|mpich)$/ ?
-                        "-machinefile \$PBS_NODEFILE" : "-f \$PBS_NODEFILE";
-          open(OUT, ">$TESTFILE.qsub");
+          open(OUT, ">$TESTFILE.sh");
           print OUT <<END;
-#!/bin/csh
-#PBS -l nodes=$NODECOUNT
-#PBS -l walltime=5:00
-#PBS -e $SUBMITERR
-#PBS -o $SUBMITOUT
-#PBS -V
-#PBS -m n
-cd $SUBMITDIR
+#!/bin/bash
 $setup
-$mpirun $fileopt -np $NODECOUNT $SUBMITEXE
+$mpirun -np $NODECOUNT ./$TESTFILE.exe
 END
           close(OUT);
-          $output = `su -c "/opt/torque/bin/qsub $TESTFILE.qsub" $SUBMITUSER`;
-          $output =~ /(\d+)/;
-          my $jobId = $1;
-          while(`/opt/torque/bin/qstat $jobId` =~ / (Q|R) /) {
-            sleep(1);
-          }
-          for(my $sec = 0; $sec < 60; $sec++) {
-            last if -f $SUBMITOUT;
-            sleep(1);
-          }
-          $output = `su -c "cat $SUBMITOUT" $SUBMITUSER`;
+          $output = `bash $TESTFILE.sh 2>&1`;
           like($output, qr/process $LASTNODE of $NODECOUNT/,"Run with $mpirun");
 
         }
 
-        `rm -f $TESTFILE`;
+        `rm -f $TESTFILE.exe`;
 
         SKIP: {
           skip 'modules not installed', 3 if ! $modulesInstalled;
@@ -144,4 +109,3 @@ SKIP: {
 }
 
 `rm -fr $TESTFILE*`;
-`su -c "rm -fr $SUBMITDIR" $SUBMITUSER`;
