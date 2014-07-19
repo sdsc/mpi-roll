@@ -20,14 +20,6 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 
 <post>
 
-# The openmpi build seems to have a bug in its libtool processing; it
-# references $(INSTALL)/lib in its lib/*.la files instead of $(INSTALL)/lib64.
-# This is a cheap/quick fix.
-if test -d /opt/openmpi; then
-  /usr/bin/perl -pi -e 's#/opt/torque/lib\b#/opt/torque/lib64#g' \
-                       /opt/openmpi/COMPILERNAME/ROLLNETWORK/lib/*.la
-fi
-
 #
 # Install the limic and knem kernel objects if they came w/the roll build.
 # For some reason, copying to /lib/modules once (outside the post- files)
@@ -56,7 +48,6 @@ if test -n "$kos"; then
   /bin/chmod 666 /dev/knem
 fi
 </file>
-
 
 </post>
 
