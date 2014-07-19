@@ -8,7 +8,7 @@ COMPILERNAME := $(firstword $(subst /, ,$(ROLLCOMPILER)))
 
 NAME    = openmpi_$(COMPILERNAME)_$(ROLLNETWORK)
 VERSION = 1.6.5
-RELEASE = 0
+RELEASE = 1
 RPM.EXTRAS         = AutoReq:No
 
 RPM.EXTRAS = "AutoReq: no"

@@ -8,7 +8,7 @@ COMPILERNAME := $(firstword $(subst /, ,$(ROLLCOMPILER)))
 
 NAME    = mvapich2_$(COMPILERNAME)_$(ROLLNETWORK)
 VERSION = 1.9
-RELEASE = 0
+RELEASE = 1
 RPM.EXTRAS         = AutoReq:No
 
 RPM.EXTRAS = "AutoReq: no"
