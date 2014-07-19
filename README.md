@@ -29,7 +29,7 @@ Rocks development machine.
 
 ## Dependencies
 
-Unknown at this time.
+autoconf >= 2.69 (mvapich2)
 
 
 ## Building
