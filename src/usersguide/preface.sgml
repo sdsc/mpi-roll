@@ -5,7 +5,7 @@
 <para>
 
 The mpi Roll provides MPICH2, MVAPICH2 and OpenMPI for a Rocks cluster.  It
-installs the software in /opt/mpich2, /opt/mvapich2, and /opt/openmpi on both
+installs the software in /opt/mvapich2 and /opt/openmpi on both
 client and server hosts.  Both static and shared MPI libraries are included
 with the MPICH2 and MVAPICH2 installations; for OpenMPI, only static libraries
 are provided.  Binaries and libraries produced with the GNU compilers are always

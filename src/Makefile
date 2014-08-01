@@ -59,7 +59,7 @@
 -include $(shell ${ROCKSROOT}/bin/arch).mk
 -include $(shell ${ROCKSROOT}/bin/os).mk
 
-MPI_FLAVORS = mpich2 mvapich2 openmpi
+MPI_FLAVORS = mvapich2 openmpi
 
 default:
 	@echo "copyright|rpm|pkg|clean"

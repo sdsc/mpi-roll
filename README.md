@@ -54,15 +54,15 @@ for openmpi ethernet.  To build for a different configuration, use the
 `ROLLCOMPILER`, `ROLLMPI` and `ROLLNETWORK` make variables, e.g.,
 
 ```shell
-make ROLLCOMPILER=intel ROLLMPI=mpich2 ROLLNETWORK=mx 
+make ROLLCOMPILER=intel ROLLMPI=mvapich2 ROLLNETWORK=mx 
 ```
 
 The build process currently supports one or more of the values "intel", "pgi",
 and "gnu" for the `ROLLCOMPILER` variable, defaulting to "gnu".  It supports
-`ROLLMPI` values "openmpi", "mpich2", and "mvapich2", defaulting to "openmpi".
+`ROLLMPI` values "openmpi" and "mvapich2", defaulting to "openmpi".
 It uses any `ROLLNETWORK` variable value(s) to load appropriate mpi modules,
 assuming that there are modules named `$(ROLLMPI)_$(ROLLNETWORK)` available
-(e.g., `openmpi_ib`, `mpich2_mx`, etc.).  The build process uses the
+(e.g., `openmpi_mx`, `mvapich2_ib`, etc.).  The build process uses the
 ROLLCOMPILER value to load an environment module, so you can also use it to
 specify a particular compiler version, e.g.,
 
