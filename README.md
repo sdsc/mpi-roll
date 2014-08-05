@@ -6,9 +6,6 @@ This roll bundles various flavors of the MPI library.
 
 For more information about the various packages included in the mpi roll please visit their official web pages:
 
-- <a href="http://www.mpich.org" target="_blank">MPICH2</a> is a high
-performance and widely portable implementation of the Message Passing Interface
-(MPI) standard.
 - <a href="http://mvapich.cse.ohio-state.edu/overview/mvapich2/"
 target="_blank">MVAPICH2</a> is an MPI-3 implementation.
 - <a href="http://www.open-mpi.org" target="_blank">Open MPI</a> is an open
