@@ -54,94 +54,94 @@
 #
 # @Copyright@
 
-PKGROOT = /opt/openmpi/$(COMPILERNAME)/$(ROLLNETWORK)
-SOURCE = $(OPENMPI_SOURCE_DIR)
 REDHAT.ROOT = $(PWD)/../../
 RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 
 -include $(ROCKSROOT)/etc/Rules.mk
 include pull.mk
 
-COMPILERSETUP = \
-  if test -e /etc/profile.d/modules.sh; then \
-    . /etc/profile.d/modules.sh; \
-    module=`module avail 2>&1 | grep -m 1 -o "\<$(ROLLCOMPILER)\>"`; \
-    if test "$${module}" != "$(ROLLCOMPILER)"; then \
-      echo *** ERROR: Compiler module $(ROLLCOMPILER) not found; \
-      exit 2; \
-    fi; \
-    module load $(ROLLCOMPILER); \
-  fi
-
-CCOMP = gcc
-CPPCOMP = g++
-FCOMP = gfortran
-F90COMP = gfortran
+CC = gcc
+CXX = g++
+F77 = gfortran
+FC = gfortran
 COMPILE_FLAGS = -O3 -mtune=core2 -march=core2 -mfpmath=sse -msse3 -fPIC -ffree-line-length-none
 WRAPPER_FLAGS = -O3
 ifeq ("$(COMPILERNAME)", "intel")
-  CCOMP = icc
-  CPPCOMP = icpc
-  FCOMP = ifort
-  F90COMP = ifort
-  COMPILE_FLAGS = -O3   -fPIC
-  WRAPPER_FLAGS = -O3
+  CC = icc
+  CXX = icpc
+  F77 = ifort
+  FC = ifort
+  COMPILE_FLAGS = -O3 -fPIC
 else ifeq ("$(COMPILERNAME)", "pgi")
-  CCOMP = pgcc
-  CPPCOMP = pgCC
-  FCOMP = pgf77
-  F90COMP = pgf90
+  CC = pgcc
+  CXX = pgCC
+  F77 = pgf77
+  FC = pgf90
   COMPILE_FLAGS = -fPIC -noswitcherror
-  WRAPPER_FLAGS = -O3
-else ifneq ("$(ROLLOPTS)", "$(subst avx,,$(ROLLOPTS))")
-  COMPILE_FLAGS += -mavx
-  WRAPPER_FLAGS = -mavx
-endif
-LOADMGR =
-ifneq ("$(ROLLOPTS)", "$(subst sge,,$(ROLLOPTS))")
-  LOADMGR += --with-sge
-endif
-ifneq ("$(ROLLOPTS)", "$(subst torque,,$(ROLLOPTS))")
-  LOADMGR += --with-tm=/opt/torque
 endif
 
-CONFIG_OPTS = --disable-dlopen --enable-mca-static \
-              --enable-mpi-thread-multiple --enable-static --with-mpi-f90-size=medium \
-              --with-platform=optimized $(LOADMGR) --with-wrapper-cflags='$(WRAPPER_FLAGS)' --with-wrapper-cxxflags='$(WRAPPER_FLAGS)' --with-wrapper-fflags='$(WRAPPER_FLAGS)' --with-wrapper-fcflags='$(WRAPPER_FLAGS)'
+ifneq ("$(ROLLOPTS)", "$(subst avx,,$(ROLLOPTS))")
+  ifneq ("$(COMPILERNAME)", "pgi")
+    COMPILE_FLAGS += -mavx
+  endif
+endif
 
-CPPFLAGS=
+COMPILERSETUP =  \
+  if test -e /etc/profile.d/modules.sh; then \
+    . /etc/profile.d/modules.sh; \
+    module load $(ROLLCOMPILER) || true; \
+  fi; \
+  echo === Compiler and version ===; \
+  $(CC) --version
+
+CONFIG_OPTS = \
+  --disable-dlopen --enable-static --enable-mca-static \
+  --enable-mpi-thread-multiple --with-mpi-f90-size=medium \
+  --with-platform=optimized --with-wrapper-cflags='$(WRAPPER_FLAGS)' \
+  --with-wrapper-cxxflags='$(WRAPPER_FLAGS)' \
+  --with-wrapper-fflags='$(WRAPPER_FLAGS)' \
+  --with-wrapper-fcflags='$(WRAPPER_FLAGS)'
+
 ifeq ("$(ROLLNETWORK)", "eth")
-  CONFIG_OPTS += --without-openib
+  CONFIG_OPTS += --without-openib --with-knem=$(KNEM_CACHE)
 else ifeq ("$(ROLLNETWORK)", "mx")
   MXHOME = /opt/mx
   COMPILE_FLAGS += -I$(MXHOME)/include
   CONFIG_OPTS += --with-mx=$(MXHOME) --without-openib
 endif
 
+ifneq ("$(ROLLOPTS)", "$(subst sge,,$(ROLLOPTS))")
+  CONFIG_OPTS += --with-sge
+endif
+
+ifneq ("$(ROLLOPTS)", "$(subst torque,,$(ROLLOPTS))")
+  CONFIG_OPTS += --with-tm=/opt/torque
+endif
+
+KNEM_CACHE = $(REDHAT.ROOT)/src/build-knem
+
 build: $(SRC_DIRS)
 	( \
 	  $(COMPILERSETUP); \
-	  export CC=$(CCOMP); \
+	  export CC=$(CC); \
 	  export CFLAGS="$(COMPILE_FLAGS)"; \
-	  export CXX=$(CPPCOMP); \
+	  export CXX=$(CXX); \
 	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
-	  export F77=$(FCOMP); \
+	  export F77=$(F77); \
 	  export FFLAGS="$(COMPILE_FLAGS)"; \
-	  export FC=$(F90COMP); \
+	  export FC=$(FC); \
 	  export FCFLAGS="$(COMPILE_FLAGS)"; \
-	  export KNEM_OPTS=""; \
-	  cd $(SOURCE); \
+	  cd $(SOURCE_DIR); \
 	  if test "$(ROLLNETWORK)" = "ib"; then \
-	    mv ../$(KNEM_SOURCE_DIR) .; \
-	    cd $(KNEM_SOURCE_DIR); \
+	    mv ../$(KNEM_DIR) .; \
+	    cd $(KNEM_DIR); \
 	    ./configure --prefix=$(PKGROOT); \
 	    make -j 16; \
-	    mkdir -p -m 755 $(REDHAT.ROOT)/src/build-knem; \
-	    make prefix=$(REDHAT.ROOT)/src/build-knem -j 16 install; \
-	    export KNEM_OPTS=--with-knem=$(REDHAT.ROOT)/src/build-knem; \
+	    mkdir -p -m 755 $(KNEM_CACHE); \
+	    make prefix=$(KNEM_CACHE) -j 16 install; \
 	    cd ..; \
 	  fi; \
-	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS) $${KNEM_OPTS}; \
+	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
 	  make -j 16 \
 	)
 
@@ -151,9 +151,9 @@ install::
 	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
 	( \
 	  $(COMPILERSETUP); \
-	  cd $(SOURCE); \
+	  cd $(SOURCE_DIR); \
 	  if test "$(ROLLNETWORK)" = "ib"; then \
-	    cd $(KNEM_SOURCE_DIR); \
+	    cd $(KNEM_DIR); \
 	    make -j 16 install; \
 	    cd ..; \
 	  fi; \
@@ -164,7 +164,7 @@ install::
 	find . -name $(KNEM_KO_NAME) -exec cp {} $(ROOT)/$(PKGROOT)/lib/ \;
 	mkdir -p $(REDHAT.ROOT)/src/build-mpi-modules
 	cat openmpi.module | perl -pi -e "s!MODULEROOT!/opt/modulefiles/mpi/.$(COMPILERNAME)/openmpi_$(ROLLNETWORK)!g;s!VERSION!$(VERSION)!g;s!COMPILERNAME!$(COMPILERNAME)!g;s!ROLLNETWORK!$(ROLLNETWORK)!g" \
-          > $(REDHAT.ROOT)/src/build-mpi-modules/$(NAME).module
+	  > $(REDHAT.ROOT)/src/build-mpi-modules/$(NAME).module
 
 clean::
-	rm -fr $(SOURCE)
+	rm -fr $(SOURCE_DIR)

@@ -54,24 +54,11 @@
 #
 # @Copyright@
 
-PKGROOT = /opt/mvapich2/$(COMPILERNAME)/$(ROLLNETWORK)
-SOURCE = $(MVAPICH2_SOURCE_DIR)
 REDHAT.ROOT = $(PWD)/../../
 RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 
 -include $(ROCKSROOT)/etc/Rules.mk
 include pull.mk
-
-COMPILERSETUP = \
-  if test -e /etc/profile.d/modules.sh; then \
-    . /etc/profile.d/modules.sh; \
-    module=`module avail 2>&1 | grep -m 1 -o "\<$(ROLLCOMPILER)\>"`; \
-    if test "$${module}" != "$(ROLLCOMPILER)"; then \
-      echo *** ERROR: Compiler module $(ROLLCOMPILER) not found; \
-      exit 2; \
-    fi; \
-    module load $(ROLLCOMPILER); \
-  fi
 
 CC=gcc
 CXX=g++
@@ -90,9 +77,15 @@ else ifeq ("$(COMPILERNAME)", "pgi")
   F77=pgf77
   FC=pgf90
   COMPILE_FLAGS = -fPIC -O3
-else ifneq ("$(ROLLOPTS)", "$(subst avx,,$(ROLLOPTS))")
-  COMPILE_FLAGS += -mavx
 endif
+
+COMPILERSETUP =  \
+  if test -e /etc/profile.d/modules.sh; then \
+    . /etc/profile.d/modules.sh; \
+    module load $(ROLLCOMPILER) || true; \
+  fi; \
+  echo === Compiler and version ===; \
+  $(CC) --version
 
 CONFIG_OPTS = --enable-shared --enable-sharedlibs=gcc --with-hwloc
 NETWORKSETUP = cat /dev/null
@@ -110,12 +103,21 @@ else ifeq ("$(ROLLNETWORK)", "ib")
                  --enable-fast=O3
 endif
 
+ifneq ("$(ROLLOPTS)", "$(subst avx,,$(ROLLOPTS))")
+  ifneq ("$(COMPILERNAME)", "pgi")
+    CONFIG_OPTS += --enable-avx
+  endif
+endif
+
 ifneq ("$(ROLLOPTS)", "$(subst torus,,$(ROLLOPTS))")
   CONFIG_OPTS += --enable-3dtorus-support
 endif
+
 ifneq ("$(ROLLOPTS)", "$(subst torque,,$(ROLLOPTS))")
   CONFIG_OPTS += --with-pbs=/opt/torque
 endif
+
+LIMIC_CACHE = $(REDHAT.ROOT)/src/build-limic
 
 build: $(SRC_DIRS)
 	( \
@@ -130,16 +132,16 @@ build: $(SRC_DIRS)
 	  export CFLAGS="$(COMPILE_FLAGS)"; \
 	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
 	  export LIMIC_OPTS=""; \
-          export LD_LIBRARY_PATH=/opt/torque/lib64:$${LD_LIBRARY_PATH}; \
-	  cd $(SOURCE); \
+	  export LD_LIBRARY_PATH=/opt/torque/lib64:$${LD_LIBRARY_PATH}; \
+	  cd $(SOURCE_DIR); \
 	  if test "$(ROLLNETWORK)" = "ib"; then \
 	    cd limic2-*; \
 	    ./configure --prefix=$(PKGROOT) --enable-module; \
 	    make -j 16; \
-	    mkdir -p -m 755 $(REDHAT.ROOT)/src/build-limic; \
-	    make prefix=$(REDHAT.ROOT)/src/build-limic -j 16 install; \
-	    export LIMIC_OPTS="--with-limic2=$(REDHAT.ROOT)/src/build-limic"; \
-	    export LD_LIBRARY_PATH=$(REDHAT.ROOT)/src/build-limic/lib:$${LD_LIBRARY_PATH}; \
+	    mkdir -p -m 755 $(LIMIC_CACHE); \
+	    make prefix=$(LIMIC_CACHE) -j 16 install; \
+	    export LIMIC_OPTS="--with-limic2=$(LIMIC_CACHE)"; \
+	    export LD_LIBRARY_PATH=$(LIMIC_CACHE)/lib:$${LD_LIBRARY_PATH}; \
 	    cd ..; \
 	  fi; \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS) $${LIMIC_OPTS}; \
@@ -152,7 +154,7 @@ install::
 	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
 	( \
 	  $(COMPILERSETUP); \
-	  cd $(SOURCE); \
+	  cd $(SOURCE_DIR); \
 	  if test "$(ROLLNETWORK)" = "ib"; then \
 	    cd limic2-*; \
 	    make -j 16 install; \
@@ -165,7 +167,7 @@ install::
 	find . -name $(LIMIC_KO_NAME) -exec cp {} $(ROOT)/$(PKGROOT)/lib/ \;
 	mkdir -p $(REDHAT.ROOT)/src/build-mpi-modules
 	cat mvapich2.module | perl -pi -e "s!MODULEROOT!/opt/modulefiles/mpi/.$(COMPILERNAME)/mvapich2_$(ROLLNETWORK)!g;s!VERSION!$(VERSION)!g;s!COMPILERNAME!$(COMPILERNAME)!g;s!ROLLNETWORK!$(ROLLNETWORK)!g" \
-          > $(REDHAT.ROOT)/src/build-mpi-modules/$(NAME).module
+	  > $(REDHAT.ROOT)/src/build-mpi-modules/$(NAME).module
 
 clean::
-	rm -fr $(SOURCE)
+	rm -fr $(SOURCE_DIR)
