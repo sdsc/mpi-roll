@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+# Install the limic and knem kernel objects if they came w/the roll build.
+# For some reason, copying to /lib/modules once (outside the post- files)
+# doesn't work; copying every time is a brute-force hack.
+#
+for kofile in `find /opt/mvapich2 -name limic.ko | head -1` \
+              `find /opt/openmpi -name knem.ko | head -1`; do
+  ko=`basename ${kofile} | sed 's/.ko$//'`
+  /bin/cp ${kofile} /lib/modules/`uname -r`/extra/
+  /sbin/depmod -a
+  /sbin/modprobe ${ko}
+  /bin/sleep 1
+  /bin/chmod 666 /dev/${ko}
+  # /bin/rm $0
+done

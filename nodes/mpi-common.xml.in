@@ -14,40 +14,8 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 </copyright>
 
 <package>ROLLMPI_COMPILERNAME_ROLLNETWORK</package>
+<package>mpi-kernel-objects</package>
 <package>mpi-modules</package>
 <package>mpi-roll-test</package>
-
-<post>
-
-#
-# Install the limic and knem kernel objects if they came w/the roll build.
-# For some reason, copying to /lib/modules once (outside the post- files)
-# doesn't work; copying every time is a brute-force hack.
-#
-<file name="/etc/rc.d/rocksconfig.d/post-97-limic" perms="0755">
-#!/bin/sh
-kos=`find /opt/mvapich2 -name limic.ko | head -1`
-if test -n "$kos"; then
-  /bin/cp $kos /lib/modules/`uname -r`/extra/
-  /sbin/depmod -a
-  /sbin/modprobe limic
-  /bin/sleep 1
-  /bin/chmod 666 /dev/limic
-fi
-</file> 
-
-<file name="/etc/rc.d/rocksconfig.d/post-97-knem" perms="0755">
-#!/bin/sh
-kos=`find /opt/openmpi -name knem.ko | head -1`
-if test -n "$kos"; then
-  /bin/cp $kos /lib/modules/`uname -r`/extra/
-  /sbin/depmod -a
-  /sbin/modprobe knem
-  /bin/sleep 1
-  /bin/chmod 666 /dev/knem
-fi
-</file>
-
-</post>
 
 </kickstart>
