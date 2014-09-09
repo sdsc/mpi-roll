@@ -81,7 +81,7 @@ else ifeq ("$(COMPILERNAME)", "pgi")
 endif
 
 ifneq ("$(ROLLOPTS)", "$(subst avx,,$(ROLLOPTS))")
-  ifneq ("$(COMPILERNAME)", "pgi")
+  ifneq ("$(COMPILERNAME)", "gnu")
     COMPILE_FLAGS += -mavx
   endif
 endif

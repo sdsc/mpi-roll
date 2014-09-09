@@ -104,7 +104,7 @@ else ifeq ("$(ROLLNETWORK)", "ib")
 endif
 
 ifneq ("$(ROLLOPTS)", "$(subst avx,,$(ROLLOPTS))")
-  ifneq ("$(COMPILERNAME)", "pgi")
+  ifneq ("$(COMPILERNAME)", "gnu")
     CONFIG_OPTS += --enable-avx
   endif
 endif
