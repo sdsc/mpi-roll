@@ -80,12 +80,14 @@ else ifeq ("$(COMPILERNAME)", "pgi")
 endif
 
 COMPILERSETUP =  \
-  if test -e /etc/profile.d/modules.sh; then \
-    . /etc/profile.d/modules.sh; \
-    module load $(ROLLCOMPILER) || true; \
-  fi; \
+  module load $(ROLLCOMPILER) || true; \
   echo === Compiler and version ===; \
   $(CC) --version
+
+AUTOCONFSETUP =  \
+  module load gnutools || true; \
+  echo === autoconf version ===; \
+  autoconf -V
 
 CONFIG_OPTS = --enable-shared --enable-sharedlibs=gcc --with-hwloc
 NETWORKSETUP = cat /dev/null
@@ -122,6 +124,7 @@ LIMIC_CACHE = $(REDHAT.ROOT)/src/build-limic
 build: $(SRC_DIRS)
 	( \
 	  $(COMPILERSETUP); \
+	  $(AUTOCONFSETUP); \
 	  $(NETWORKSETUP); \
 	  export CC=$(CC); \
 	  export CXX=$(CXX); \

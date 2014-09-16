@@ -36,8 +36,6 @@ my @COMPILERS = split(/\s+/, 'ROLLCOMPILER');
 my @NETWORKS = split(/\s+/, 'ROLLNETWORK');
 my @MPIS = split(/\s+/, 'ROLLMPI');
 
-my $modulesInstalled = -f '/etc/profile.d/modules.sh';
-
 # mpi-common.xml
 foreach my $mpi (@MPIS) {
   foreach my $compiler (@COMPILERS) {
@@ -51,11 +49,7 @@ foreach my $mpi (@MPIS) {
 
       foreach my $network (@NETWORKS) {
 
-        my $setup = $modulesInstalled ?
-          ". /etc/profile.d/modules.sh; module load $compiler ${mpi}_$network" :
-          'echo > /dev/null'; # noop
-
-        my $command = "$setup; which mpicc; mpicc -o $TESTFILE.exe $TESTFILE.c";
+        my $command = "module load $compiler ${mpi}_$network; which mpicc; mpicc -o $TESTFILE.exe $TESTFILE.c";
         $output = `$command`;
         $output =~ /(\S*mpicc)/;
         my $mpicc = $1 || 'mpicc';
@@ -70,7 +64,7 @@ foreach my $mpi (@MPIS) {
           open(OUT, ">$TESTFILE.sh");
           print OUT <<END;
 #!/bin/bash
-$setup
+module load $compiler ${mpi}_$network
 $mpirun -np $NODECOUNT ./$TESTFILE.exe
 END
           close(OUT);
@@ -82,7 +76,6 @@ END
         `rm -f $TESTFILE.exe`;
 
         SKIP: {
-          skip 'modules not installed', 3 if ! $modulesInstalled;
           my $dir = "/opt/modulefiles/mpi/.$compilername/${mpi}_$network";
           `/bin/ls $dir/[0-9]* 2>&1`;
           ok($? == 0, "$mpi/$compilername/$network module installed");
@@ -101,11 +94,5 @@ END
 
 `grep -s 'lib\>' /opt/openmpi/*/*/lib/*.la`;
 ok($? != 0, 'references to lib changed to lib64');
-
-# mpi-doc.xml
-SKIP: {
-  skip 'not server', 1 if $appliance ne 'Frontend';
-  ok(-d '/var/www/html/roll-documentation/mpi', 'doc installed');
-}
 
 `rm -fr $TESTFILE*`;
