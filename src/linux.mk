@@ -54,8 +54,5 @@
 # @Copyright@
 #
 
-SRCDIRS = `find . -maxdepth 1 -type d \
-	-not -name CVS \
-	-not -name build-\* \
-        -not -name mpi-modules \
-	-not -name .` mpi-modules
+SRCDIRS = `find . -maxdepth 1 -type d -not -name CVS -not -name . \
+	          -not -name build-*`

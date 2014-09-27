@@ -1,0 +1,7 @@
+#%Module1.0
+module-whatis "mvapich2_ROLLNETWORK mpi stack"
+module-whatis "Version: VERSION"
+set mpiHome /opt/mvapich2/COMPILERNAME/ROLLNETWORK
+setenv MPIHOME $mpiHome
+prepend-path PATH $mpiHome/bin
+prepend-path LD_LIBRARY_PATH $mpiHome/lib

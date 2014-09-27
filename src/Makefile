@@ -67,9 +67,10 @@ default:
 copyright rpm pkg clean::
 	for i in $(SRCDIRS); do \
 	  i=`echo $$i | sed 's/^\.\///'`; \
-	  echo $(MPI_FLAVORS) | grep -q "\<$$i\>"; \
+	  flavor=`echo $$i | sed 's/-modules//'`; \
+	  echo $(MPI_FLAVORS) | grep -q "\<$$flavor\>"; \
 	  if test $$? -eq 0; then \
-	    echo $(ROLLMPI) | grep -q "\<$$i\>"; \
+	    echo $(ROLLMPI) | grep -q "\<$$flavor\>"; \
 	    if test $$? -ne 0; then \
 	      continue; \
 	    fi; \

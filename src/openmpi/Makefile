@@ -159,9 +159,6 @@ install::
 	umount $(PKGROOT)
 	-rmdir -p $(PKGROOT)
 	find . -name $(KNEM_KO_NAME) -exec cp {} $(ROOT)/$(PKGROOT)/lib/ \;
-	mkdir -p $(REDHAT.ROOT)/src/build-mpi-modules
-	cat openmpi.module | perl -pi -e "s!MODULEROOT!/opt/modulefiles/mpi/.$(COMPILERNAME)/openmpi_$(ROLLNETWORK)!g;s!VERSION!$(VERSION)!g;s!COMPILERNAME!$(COMPILERNAME)!g;s!ROLLNETWORK!$(ROLLNETWORK)!g" \
-	  > $(REDHAT.ROOT)/src/build-mpi-modules/$(NAME).module
 
 clean::
 	rm -fr $(SOURCE_DIR)
