@@ -7,11 +7,14 @@ ifndef ROLLNETWORK
   ROLLNETWORK = eth
 endif
 
-NAME        = mvapich2-modules_$(COMPILERNAME)
-RELEASE     = 0
-PKGROOT     = /opt/modulefiles/mpi/.$(COMPILERNAME)/mvapich2_$(ROLLNETWORK)
+PACKAGE     = mvapich2
+CATEGORY    = mpi
 
-VERSION_SRC = $(REDHAT.ROOT)/src/mvapich2/version.mk
+NAME        = $(PACKAGE)-modules_$(COMPILERNAME)
+RELEASE     = 1
+PKGROOT     = /opt/modulefiles/$(CATEGORY)/.$(COMPILERNAME)/$(PACKAGE)_$(ROLLNETWORK)
+
+VERSION_SRC = $(REDHAT.ROOT)/src/$(PACKAGE)/version.mk
 VERSION_INC = version.inc
 include $(VERSION_INC)
 

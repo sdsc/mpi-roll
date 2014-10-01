@@ -7,11 +7,14 @@ ifndef ROLLNETWORK
   ROLLNETWORK = eth
 endif
 
-NAME        = openmpi-modules_$(COMPILERNAME)
-RELEASE     = 0
-PKGROOT     = /opt/modulefiles/mpi/.$(COMPILERNAME)/openmpi_$(ROLLNETWORK)
+PACKAGE     = openmpi
+CATEGORY    = mpi
 
-VERSION_SRC = $(REDHAT.ROOT)/src/openmpi/version.mk
+NAME        = $(PACKAGE)-modules_$(COMPILERNAME)
+RELEASE     = 1
+PKGROOT     = /opt/modulefiles/$(CATEGORY)/.$(COMPILERNAME)/$(PACKAGE)_$(ROLLNETWORK)
+
+VERSION_SRC = $(REDHAT.ROOT)/src/$(PACKAGE)/version.mk
 VERSION_INC = version.inc
 include $(VERSION_INC)
 
