@@ -9,7 +9,7 @@ endif
 
 NAME           = mvapich2_$(COMPILERNAME)_$(ROLLNETWORK)
 VERSION        = 1.9
-RELEASE        = 7
+RELEASE        = 8
 PKGROOT        = /opt/mvapich2/$(COMPILERNAME)/$(ROLLNETWORK)
 
 SRC_SUBDIR     = mvapich2

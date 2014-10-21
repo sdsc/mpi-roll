@@ -9,7 +9,7 @@ endif
 
 NAME           = openmpi_$(COMPILERNAME)_$(ROLLNETWORK)
 VERSION        = 1.6.5
-RELEASE        = 6
+RELEASE        = 8
 PKGROOT        = /opt/openmpi/$(COMPILERNAME)/$(ROLLNETWORK)
 
 SRC_SUBDIR     = openmpi
