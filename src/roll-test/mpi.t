@@ -49,27 +49,23 @@ foreach my $mpi (@MPIS) {
 
       foreach my $network (@NETWORKS) {
 
-        my $command = "module load $compiler ${mpi}_$network; which mpicc; mpicc -o $TESTFILE.exe $TESTFILE.c";
-        $output = `$command`;
-        $output =~ /(\S*mpicc)/;
-        my $mpicc = $1 || 'mpicc';
-        my $mpirun = $mpicc;
-        $mpirun =~ s/mpicc/mpirun/;
-        ok(-x "$TESTFILE.exe", "Compile with $mpicc");
+        my $command = "module load $compiler ${mpi}_$network; mpicc -o $TESTFILE.exe $TESTFILE.c";
+        $output = `$command 2>&1`;
+        ok(-x "$TESTFILE.exe", "Compile with $mpi/$compilername/$network");
 
         SKIP: {
 
           skip 'No exe', 1 if ! -x "$TESTFILE.exe";
 
-          open(OUT, ">$TESTFILE.sh");
-          print OUT <<END;
-#!/bin/bash
-module load $compiler ${mpi}_$network
-$mpirun -np $NODECOUNT ./$TESTFILE.exe
-END
-          close(OUT);
-          $output = `bash $TESTFILE.sh 2>&1`;
-          like($output, qr/process $LASTNODE of $NODECOUNT/,"Run with $mpirun");
+          $command = "module load $compiler ${mpi}_$network; mpirun -np $NODECOUNT ./$TESTFILE.exe";
+          $output = `$command 2>&1`;
+          # Later versions of openmpi require a special option for root runs
+          if($output =~ "allow-run-as-root") {
+            $command =~ s/mpirun/mpirun --allow-run-as-root/;
+            $output = `$command 2>&1`;
+          }
+          like($output, qr/process $LASTNODE of $NODECOUNT/,
+               "Run with $mpi/$compilername/$network");
 
         }
 

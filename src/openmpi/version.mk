@@ -8,8 +8,8 @@ ifndef ROLLNETWORK
 endif
 
 NAME           = openmpi_$(COMPILERNAME)_$(ROLLNETWORK)
-VERSION        = 1.6.5
-RELEASE        = 6
+VERSION        = 1.8.3
+RELEASE        = 0
 PKGROOT        = /opt/openmpi/$(COMPILERNAME)/$(ROLLNETWORK)
 
 SRC_SUBDIR     = openmpi
