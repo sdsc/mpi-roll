@@ -31,56 +31,61 @@ autoconf >= 2.69 (mvapich2)
 
 ## Building
 
-To build the mpi-roll, execute these instructions on a Rocks development
+To build the mpi-roll, execute this on a Rocks development
 machine (e.g., a frontend or development appliance):
 
 ```shell
-% make default 2>&1 | tee build.log
-% grep "RPM build error" build.log
+% make 2>&1 | tee build.log
 ```
 
-If nothing is returned from the grep command then the roll should have been
-created as... `mpi-*.iso`. If you built the roll on a Rocks frontend then
-proceed to the installation step. If you built the roll on a Rocks development
-appliance you need to copy the roll to your Rocks frontend before continuing
-with installation.
+A successful build will create the file `mpi-*.disk1.iso`.  If you built the
+roll on a Rocks frontend, proceed to the installation step. If you built the
+roll on a Rocks development appliance, you need to copy the roll to your Rocks
+frontend before continuing with installation.
 
-This roll source supports building with different compilers and for different
-network fabrics and mpi flavors.  By default, it builds using the gnu compilers
-for openmpi ethernet.  To build for a different configuration, use the
-`ROLLCOMPILER`, `ROLLMPI` and `ROLLNETWORK` make variables, e.g.,
+This roll source supports building with different compilers.  The
+`ROLLCOMPILER` make variable can be used to specify the names of compiler
+modulefiles to use for building the software, e.g., 
 
 ```shell
-make ROLLCOMPILER=intel ROLLMPI=mvapich2 ROLLNETWORK=mx 
+% make ROLLCOMPILER='gnu intel' 2>&1 | tee build.log
 ```
 
-The build process currently supports one or more of the values "intel", "pgi",
-and "gnu" for the `ROLLCOMPILER` variable, defaulting to "gnu".  It supports
-`ROLLMPI` values "openmpi" and "mvapich2", defaulting to "openmpi".
-It uses any `ROLLNETWORK` variable value(s) to load appropriate mpi modules,
-assuming that there are modules named `$(ROLLMPI)_$(ROLLNETWORK)` available
-(e.g., `openmpi_mx`, `mvapich2_ib`, etc.).  The build process uses the
-ROLLCOMPILER value to load an environment module, so you can also use it to
-specify a particular compiler version, e.g.,
+The build processes recognizes the values `gnu`, `intel` and `pgi` for the
+ROLLCOMPILER value, defaulting to `gnu`.
+
+By default, the roll builds both openmpi and mvapich2 rpms.  You can limit the
+build to one or the other using the ROLLMPI make variable, e.g.,
 
 ```shell
-% make ROLLCOMPILER=gnu/4.8.1
+% make ROLLMPI='mvapich2' 2>&1 | tee build.log
 ```
 
-If the `ROLLCOMPILER`, `ROLLNETWORK` and/or `ROLLMPI` variables are specified,
-their values are incorporated into the names of the produced rpms, e.g.,
+By default, the roll builds for ethernet network fabric.  You can expand this
+by specifying one or more of the values 'ib' and 'mx' in the ROLLNETWORK make
+varible, e.g.,
+
 
 ```shell
-make ROLLCOMPILER=intel ROLLMPI=mvapich2 ROLLNETWORK=ib
+% make ROLLNETWORK='ib' 2>&1 | tee build.log
 ```
-produces an rpm that begins "`mvapich2_intel_ib`".
+
+The values of the `ROLLCOMPILER` and `ROLLNETWORK` variables are incorporated
+into the names of the produced rpms.  For example,
+
+```shell
+% make ROLLCOMPILER=intel ROLLNETWORK=ib 2>&1 | tee build.log
+```
+
+produces a roll containing an rpm with a name that begins
+`mvapich2_intel_ib`.
 
 For gnu compilers, the roll also supports a `ROLLOPTS` make variable value of
 'avx', indicating that the target architecture supports AVX instructions.
-
 If `ROLLOPTS` contains one or both of 'torque' and 'sge', then openmpi is built
 to integrate with the specified scheduler(s).  If `ROLLOPTS` contains 'torus',
 then mvapich2 is compiled with 3d torus support.
+
 
 ## Installation
 
@@ -105,7 +110,7 @@ module files in:
 ## Testing
 
 The mpi-roll includes a test script which can be run to verify proper
-installation of the mpi-roll documentation, binaries and module files. To
+installation of the roll documentation, binaries and module files. To
 run the test scripts execute the following command(s):
 
 ```shell
