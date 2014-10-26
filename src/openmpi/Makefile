@@ -91,9 +91,11 @@ COMPILERSETUP =  \
   echo === Compiler and version ===; \
   $(CC) --version
 
+# Removed --enable-mpi-thread-multiple, which can cause hanging processes
+# See http://comments.gmane.org/gmane.comp.clustering.open-mpi.user/20338
 CONFIG_OPTS = \
   --disable-dlopen --enable-static --enable-mca-static \
-  --enable-mpi-thread-multiple --with-mpi-f90-size=medium \
+  --with-mpi-f90-size=medium \
   --with-platform=optimized --with-wrapper-cflags='$(WRAPPER_FLAGS)' \
   --with-wrapper-cxxflags='$(WRAPPER_FLAGS)' \
   --with-wrapper-fflags='$(WRAPPER_FLAGS)' \
