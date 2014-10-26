@@ -99,14 +99,17 @@ CONFIG_OPTS = \
   --with-platform=optimized --with-wrapper-cflags='$(WRAPPER_FLAGS)' \
   --with-wrapper-cxxflags='$(WRAPPER_FLAGS)' \
   --with-wrapper-fflags='$(WRAPPER_FLAGS)' \
-  --with-wrapper-fcflags='$(WRAPPER_FLAGS)'
+  --with-wrapper-fcflags='$(WRAPPER_FLAGS)' \
+  --with-knem=$(KNEM_CACHE)
 
-ifeq ("$(ROLLNETWORK)", "eth")
-  CONFIG_OPTS += --without-openib --with-knem=$(KNEM_CACHE)
-else ifeq ("$(ROLLNETWORK)", "mx")
+ifneq ("$(ROLLNETWORK)", "ib")
+  CONFIG_OPTS += --without-openib
+endif
+
+ifeq ("$(ROLLNETWORK)", "mx")
   MXHOME = /opt/mx
   COMPILE_FLAGS += -I$(MXHOME)/include
-  CONFIG_OPTS += --with-mx=$(MXHOME) --without-openib
+  CONFIG_OPTS += --with-mx=$(MXHOME)
 endif
 
 ifneq ("$(ROLLOPTS)", "$(subst sge,,$(ROLLOPTS))")
@@ -120,6 +123,9 @@ endif
 KNEM_CACHE = $(REDHAT.ROOT)/src/build-knem
 
 build: $(SRC_DIRS)
+	if test -d $(KNEM_CACHE); then \
+	  rm -fr $(KNEM_DIR); \
+	fi
 	( \
 	  $(COMPILERSETUP); \
 	  export CC=$(CC); \
@@ -130,16 +136,15 @@ build: $(SRC_DIRS)
 	  export FFLAGS="$(COMPILE_FLAGS)"; \
 	  export FC=$(FC); \
 	  export FCFLAGS="$(COMPILE_FLAGS)"; \
-	  cd $(SOURCE_DIR); \
-	  if test "$(ROLLNETWORK)" = "ib"; then \
-	    mv ../$(KNEM_DIR) .; \
+	  if test -d $(KNEM_DIR); then \
 	    cd $(KNEM_DIR); \
 	    ./configure --prefix=$(PKGROOT); \
 	    make -j 16; \
 	    mkdir -p -m 755 $(KNEM_CACHE); \
-	    make prefix=$(KNEM_CACHE) -j 16 install; \
+	    make prefix=$(KNEM_CACHE) install; \
 	    cd ..; \
 	  fi; \
+	  cd $(SOURCE_DIR); \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
 	  make -j 16 \
 	)
@@ -150,17 +155,17 @@ install::
 	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
 	( \
 	  $(COMPILERSETUP); \
-	  cd $(SOURCE_DIR); \
-	  if test "$(ROLLNETWORK)" = "ib"; then \
+	  if test -d $(KNEM_DIR); then \
 	    cd $(KNEM_DIR); \
-	    make -j 16 install; \
+	    make prefix=$(PKGROOT) install; \
+	    cp `find . -name $(KNEM_KO_NAME)` $(ROOT)/$(PKGROOT)/lib/; \
 	    cd ..; \
 	  fi; \
+	  cd $(SOURCE_DIR); \
 	  make -j 16 install \
 	)
 	umount $(PKGROOT)
 	-rmdir -p $(PKGROOT)
-	find . -name $(KNEM_KO_NAME) -exec cp {} $(ROOT)/$(PKGROOT)/lib/ \;
 
 clean::
-	rm -fr $(SOURCE_DIR)
+	rm -fr $(SOURCE_DIR) $(KNEM_DIR)
