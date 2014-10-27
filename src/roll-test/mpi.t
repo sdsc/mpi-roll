@@ -88,7 +88,4 @@ foreach my $mpi (@MPIS) {
   }
 }
 
-`grep -s 'lib\>' /opt/openmpi/*/*/lib/*.la`;
-ok($? != 0, 'references to lib changed to lib64');
-
 `rm -fr $TESTFILE*`;
