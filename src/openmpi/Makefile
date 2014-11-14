@@ -58,25 +58,14 @@ REDHAT.ROOT = $(PWD)/../../
 RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 
 -include $(ROCKSROOT)/etc/Rules.mk
-include pull.mk
+include $(SDSCDEVEL)/Pull.mk
+include $(SDSCDEVEL)/Rules.mk
 
-CC = gcc
-CXX = g++
-F77 = gfortran
-FC = gfortran
 COMPILE_FLAGS = -O3 -mtune=core2 -march=core2 -mfpmath=sse -msse3 -fPIC -ffree-line-length-none
 WRAPPER_FLAGS = -O3
 ifeq ("$(COMPILERNAME)", "intel")
-  CC = icc
-  CXX = icpc
-  F77 = ifort
-  FC = ifort
   COMPILE_FLAGS = -O3 -fPIC
 else ifeq ("$(COMPILERNAME)", "pgi")
-  CC = pgcc
-  CXX = pgCC
-  F77 = pgf77
-  FC = pgf90
   COMPILE_FLAGS = -fPIC -noswitcherror
 endif
 
@@ -85,11 +74,6 @@ ifneq ("$(ROLLOPTS)", "$(subst avx,,$(ROLLOPTS))")
     COMPILE_FLAGS += -mavx
   endif
 endif
-
-COMPILERSETUP =  \
-  module load $(ROLLCOMPILER) || true; \
-  echo === Compiler and version ===; \
-  $(CC) --version
 
 # Removed --enable-mpi-thread-multiple, which can cause hanging processes
 # See http://comments.gmane.org/gmane.comp.clustering.open-mpi.user/20338
@@ -120,14 +104,29 @@ ifneq ("$(ROLLOPTS)", "$(subst torque,,$(ROLLOPTS))")
   CONFIG_OPTS += --with-tm=/opt/torque
 endif
 
-KNEM_CACHE = $(REDHAT.ROOT)/src/build-knem
+KNEM_CACHE = $(REDHAT.ROOT)/cache/build-knem
+
+LICENSE_FILES = $(SOURCE_DIR)/LICENSE
+
+$(NAME).spec: DESCRIPTION LICENSE
+
+DESCRIPTION:
+	( \
+	  $(DESCRIBE_PKG) \
+	) > $@
+
+LICENSE: $(SRC_DIRS)
+	if ! grep -q "Open MPI core" $(LICENSE_FILES); then \
+	  exit 2; \
+	fi
+	echo BSD > $@
 
 build: $(SRC_DIRS)
 	if test -d $(KNEM_CACHE); then \
 	  rm -fr $(KNEM_DIR); \
 	fi
 	( \
-	  $(COMPILERSETUP); \
+	  $(MODULE_LOAD_CC); \
 	  export CC=$(CC); \
 	  export CFLAGS="$(COMPILE_FLAGS)"; \
 	  export CXX=$(CXX); \
@@ -151,10 +150,9 @@ build: $(SRC_DIRS)
 
 install::
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
-	-mkdir -p -m 755 $(PKGROOT)
-	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
+	$(PKGROOT_BIND_MOUNT)
 	( \
-	  $(COMPILERSETUP); \
+	  $(MODULE_LOAD_CC); \
 	  if test -d $(KNEM_DIR); then \
 	    cd $(KNEM_DIR); \
 	    make prefix=$(PKGROOT) install; \
@@ -164,8 +162,8 @@ install::
 	  cd $(SOURCE_DIR); \
 	  make -j 16 install \
 	)
-	umount $(PKGROOT)
-	-rmdir -p $(PKGROOT)
+	$(PKGROOT_BIND_UMOUNT)
+	$(INSTALL_LICENSE_FILES)
 
 clean::
-	rm -fr $(SOURCE_DIR) $(KNEM_DIR)
+	rm -fr $(SOURCE_DIR) $(KNEM_DIR) DESCRIPTION LICENSE

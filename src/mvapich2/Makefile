@@ -58,36 +58,15 @@ REDHAT.ROOT = $(PWD)/../../
 RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 
 -include $(ROCKSROOT)/etc/Rules.mk
-include pull.mk
+include $(SDSCDEVEL)/Pull.mk
+include $(SDSCDEVEL)/Rules.mk
 
-CC=gcc
-CXX=g++
-F77=gfortran
-FC=gfortran
 COMPILE_FLAGS = -fPIC -O3
 ifeq ("$(COMPILERNAME)", "intel")
-  CC=icc
-  CXX=icpc
-  F77=ifort
-  FC=ifort
   COMPILE_FLAGS = -fPIC -O3
 else ifeq ("$(COMPILERNAME)", "pgi")
-  CC=pgcc
-  CXX=pgCC
-  F77=pgf77
-  FC=pgf90
   COMPILE_FLAGS = -fPIC -O3
 endif
-
-COMPILERSETUP =  \
-  module load $(ROLLCOMPILER) || true; \
-  echo === Compiler and version ===; \
-  $(CC) --version
-
-AUTOCONFSETUP =  \
-  module load gnutools || true; \
-  echo === autoconf version ===; \
-  autoconf -V
 
 CONFIG_OPTS = --enable-shared --enable-sharedlibs=gcc --with-hwloc
 NETWORKSETUP = cat /dev/null
@@ -119,12 +98,29 @@ ifneq ("$(ROLLOPTS)", "$(subst torque,,$(ROLLOPTS))")
   CONFIG_OPTS += --with-pbs=/opt/torque
 endif
 
-LIMIC_CACHE = $(REDHAT.ROOT)/src/build-limic
+MODULE_LOAD_AUTOCONF = $(call MODULE_LOAD_COMPILER, gnutools, autoconf)
+
+LIMIC_CACHE = $(REDHAT.ROOT)/cache/build-limic
+
+LICENSE_FILES = $(SOURCE_DIR)/COPYRIGHT
+
+$(NAME).spec: DESCRIPTION LICENSE
+
+DESCRIPTION:
+	( \
+	  $(DESCRIBE_PKG) \
+	) > $@
+
+LICENSE: $(SRC_DIRS)
+	if ! grep -qF "under BSD licensing" $(LICENSE_FILES); then \
+	  exit 2; \
+	fi
+	echo BSD > $@
 
 build: $(SRC_DIRS)
 	( \
-	  $(COMPILERSETUP); \
-	  $(AUTOCONFSETUP); \
+	  $(MODULE_LOAD_CC); \
+	  $(MODULE_LOAD_AUTOCONF); \
 	  $(NETWORKSETUP); \
 	  export CC=$(CC); \
 	  export CXX=$(CXX); \
@@ -153,10 +149,9 @@ build: $(SRC_DIRS)
 
 install::
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
-	-mkdir -p -m 755 $(PKGROOT)
-	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
+	$(PKGROOT_BIND_MOUNT)
 	( \
-	  $(COMPILERSETUP); \
+	  $(MODULE_LOAD_CC); \
 	  cd $(SOURCE_DIR); \
 	  if test "$(ROLLNETWORK)" = "ib"; then \
 	    cd limic2-*; \
@@ -165,9 +160,9 @@ install::
 	  fi; \
 	  make -j 16 install \
 	)
-	umount $(PKGROOT)
-	-rmdir -p $(PKGROOT)
+	$(PKGROOT_BIND_UMOUNT)
+	$(INSTALL_LICENSE_FILES)
 	find . -name $(LIMIC_KO_NAME) -exec cp {} $(ROOT)/$(PKGROOT)/lib/ \;
 
 clean::
-	rm -fr $(SOURCE_DIR)
+	rm -fr $(SOURCE_DIR) DESCRIPTION LICENSE

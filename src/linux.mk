@@ -54,5 +54,4 @@
 # @Copyright@
 #
 
-SRCDIRS = `find . -maxdepth 1 -type d -not -name CVS -not -name . \
-	          -not -name build-*`
+SRCDIRS = `find . -maxdepth 1 -type d -not -name CVS -not -name .`

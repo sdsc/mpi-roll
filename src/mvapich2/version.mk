@@ -7,9 +7,9 @@ ifndef ROLLNETWORK
   ROLLNETWORK = eth
 endif
 
-NAME           = mvapich2_$(COMPILERNAME)_$(ROLLNETWORK)
+NAME           = sdsc-mvapich2_$(COMPILERNAME)_$(ROLLNETWORK)
 VERSION        = 2.1a
-RELEASE        = 0
+RELEASE        = 1
 PKGROOT        = /opt/mvapich2/$(COMPILERNAME)/$(ROLLNETWORK)
 
 SRC_SUBDIR     = mvapich2

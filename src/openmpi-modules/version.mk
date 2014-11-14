@@ -10,8 +10,8 @@ endif
 PACKAGE     = openmpi
 CATEGORY    = mpi
 
-NAME        = $(PACKAGE)-modules_$(COMPILERNAME)_$(ROLLNETWORK)
-RELEASE     = 2
+NAME        = sdsc-$(PACKAGE)-modules_$(COMPILERNAME)_$(ROLLNETWORK)
+RELEASE     = 3
 PKGROOT     = /opt/modulefiles/$(CATEGORY)/.$(COMPILERNAME)/$(PACKAGE)_$(ROLLNETWORK)
 
 VERSION_SRC = $(REDHAT.ROOT)/src/$(PACKAGE)/version.mk
