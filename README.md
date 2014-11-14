@@ -70,16 +70,6 @@ varible, e.g.,
 % make ROLLNETWORK='ib' 2>&1 | tee build.log
 ```
 
-The values of the `ROLLCOMPILER` and `ROLLNETWORK` variables are incorporated
-into the names of the produced rpms.  For example,
-
-```shell
-% make ROLLCOMPILER=intel ROLLNETWORK=ib 2>&1 | tee build.log
-```
-
-produces a roll containing an rpm with a name that begins
-`mvapich2_intel_ib`.
-
 For gnu compilers, the roll also supports a `ROLLOPTS` make variable value of
 'avx', indicating that the target architecture supports AVX instructions.
 If `ROLLOPTS` contains one or both of 'torque' and 'sge', then openmpi is built
