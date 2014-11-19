@@ -122,9 +122,6 @@ LICENSE: $(SRC_DIRS)
 	echo BSD > $@
 
 build: $(SRC_DIRS)
-	if test -d $(KNEM_CACHE); then \
-	  rm -fr $(KNEM_DIR); \
-	fi
 	( \
 	  $(MODULE_LOAD_CC); \
 	  export CC=$(CC); \
@@ -135,14 +132,13 @@ build: $(SRC_DIRS)
 	  export FFLAGS="$(COMPILE_FLAGS)"; \
 	  export FC=$(FC); \
 	  export FCFLAGS="$(COMPILE_FLAGS)"; \
-	  if test -d $(KNEM_DIR); then \
-	    cd $(KNEM_DIR); \
-	    ./configure --prefix=$(PKGROOT); \
-	    make -j 16; \
-	    mkdir -p -m 755 $(KNEM_CACHE); \
-	    make prefix=$(KNEM_CACHE) install; \
-	    cd ..; \
-	  fi; \
+	  cd $(KNEM_DIR); \
+	  ./configure --prefix=$(PKGROOT); \
+	  make -j 16; \
+	  rm -fr $(KNEM_CACHE); \
+	  mkdir -p -m 755 $(KNEM_CACHE); \
+	  make prefix=$(KNEM_CACHE) install; \
+	  cd ..; \
 	  cd $(SOURCE_DIR); \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
 	  make -j 16 \
@@ -153,12 +149,10 @@ install::
 	$(PKGROOT_BIND_MOUNT)
 	( \
 	  $(MODULE_LOAD_CC); \
-	  if test -d $(KNEM_DIR); then \
-	    cd $(KNEM_DIR); \
-	    make prefix=$(PKGROOT) install; \
-	    cp `find . -name $(KNEM_KO_NAME)` $(ROOT)/$(PKGROOT)/lib/; \
-	    cd ..; \
-	  fi; \
+	  cd $(KNEM_DIR); \
+	  make prefix=$(PKGROOT) install; \
+	  cp `find . -name $(KNEM_KO_NAME)` $(ROOT)/$(PKGROOT)/lib/; \
+	  cd ..; \
 	  cd $(SOURCE_DIR); \
 	  make -j 16 install \
 	)
