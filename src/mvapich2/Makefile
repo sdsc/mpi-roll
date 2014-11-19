@@ -137,6 +137,7 @@ build: $(SRC_DIRS)
 	    cd limic2-*; \
 	    ./configure --prefix=$(PKGROOT) --enable-module; \
 	    make -j 16; \
+	    rm -fr $(LIMIC_CACHE); \
 	    mkdir -p -m 755 $(LIMIC_CACHE); \
 	    make prefix=$(LIMIC_CACHE) -j 16 install; \
 	    export LIMIC_OPTS="--with-limic2=$(LIMIC_CACHE)"; \
