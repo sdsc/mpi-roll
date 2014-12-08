@@ -61,12 +61,15 @@ RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 include $(SDSCDEVEL)/Pull.mk
 include $(SDSCDEVEL)/Rules.mk
 
-COMPILE_FLAGS = -O3 -mtune=core2 -march=core2 -mfpmath=sse -msse3 -fPIC -ffree-line-length-none
+COMPILE_FLAGS = -O3 -mtune=core2 -march=core2 -mfpmath=sse -msse3 -fPIC
+COMPILE_FFLAGS = -ffree-line-length-none
 WRAPPER_FLAGS = -O3
 ifeq ("$(COMPILERNAME)", "intel")
   COMPILE_FLAGS = -O3 -fPIC
+  COMPILE_FFLAGS = 
 else ifeq ("$(COMPILERNAME)", "pgi")
   COMPILE_FLAGS = -fPIC -noswitcherror
+  COMPILE_FFLAGS = 
 endif
 
 ifneq ("$(ROLLOPTS)", "$(subst avx,,$(ROLLOPTS))")
@@ -129,9 +132,9 @@ build: $(SRC_DIRS)
 	  export CXX=$(CXX); \
 	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
 	  export F77=$(F77); \
-	  export FFLAGS="$(COMPILE_FLAGS)"; \
+	  export FFLAGS="$(COMPILE_FLAGS) $(COMPILE_FFLAGS)"; \
 	  export FC=$(FC); \
-	  export FCFLAGS="$(COMPILE_FLAGS)"; \
+	  export FCFLAGS="$(COMPILE_FLAGS) $(COMPILE_FFLAGS)"; \
 	  cd $(KNEM_DIR); \
 	  ./configure --prefix=$(PKGROOT); \
 	  make -j 16; \
