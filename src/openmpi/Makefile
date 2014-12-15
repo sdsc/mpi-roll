@@ -108,8 +108,7 @@ ifneq ("$(ROLLOPTS)", "$(subst torque,,$(ROLLOPTS))")
 endif
 
 KNEM_CACHE = $(REDHAT.ROOT)/cache/build-knem
-
-LICENSE_FILES = $(SOURCE_DIR)/LICENSE
+KNEM_LICENSE_FILES = knem.spec
 
 $(NAME).spec: DESCRIPTION LICENSE
 
@@ -119,9 +118,10 @@ DESCRIPTION:
 	) > $@
 
 LICENSE: $(SRC_DIRS)
-	if ! grep -q "Open MPI core" $(LICENSE_FILES); then \
-	  exit 2; \
-	fi
+	for F in $(KNEM_LICENSE_FILES); do \
+	  cp knem*/$$F $(SOURCE_DIR)/knem-$$F; \
+	done
+	$(CHECK_LICENSE_FILES)
 	echo BSD > $@
 
 build: $(SRC_DIRS)

@@ -102,8 +102,6 @@ MODULE_LOAD_AUTOCONF = $(call MODULE_LOAD_COMPILER, gnutools, autoconf)
 
 LIMIC_CACHE = $(REDHAT.ROOT)/cache/build-limic
 
-LICENSE_FILES = $(SOURCE_DIR)/COPYRIGHT
-
 $(NAME).spec: DESCRIPTION LICENSE
 
 DESCRIPTION:
@@ -112,9 +110,7 @@ DESCRIPTION:
 	) > $@
 
 LICENSE: $(SRC_DIRS)
-	if ! grep -qF "under BSD licensing" $(LICENSE_FILES); then \
-	  exit 2; \
-	fi
+	$(CHECK_LICENSE_FILES)
 	echo BSD > $@
 
 build: $(SRC_DIRS)
