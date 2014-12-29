@@ -80,9 +80,13 @@ endif
 
 # Removed --enable-mpi-thread-multiple, which can cause hanging processes
 # See http://comments.gmane.org/gmane.comp.clustering.open-mpi.user/20338
+#
+# Added --disable-mpi-interface-warning; as of late 2014, the Intel compilers
+# reject as an error mpi.h's use of the __deprecated__ macro, although the gnu
+# and pgi compilers accept it.
 CONFIG_OPTS = \
   --disable-dlopen --enable-static --enable-mca-static \
-  --with-mpi-f90-size=medium \
+  --with-mpi-f90-size=medium --disable-mpi-interface-warning \
   --with-platform=optimized --with-wrapper-cflags='$(WRAPPER_FLAGS)' \
   --with-wrapper-cxxflags='$(WRAPPER_FLAGS)' \
   --with-wrapper-fflags='$(WRAPPER_FLAGS)' \
