@@ -8,8 +8,8 @@ ifndef ROLLNETWORK
 endif
 
 NAME           = sdsc-openmpi_$(COMPILERNAME)_$(ROLLNETWORK)
-VERSION        = 1.8.3
-RELEASE        = 1
+VERSION        = 1.8.4
+RELEASE        = 0
 PKGROOT        = /opt/openmpi/$(COMPILERNAME)/$(ROLLNETWORK)
 
 SRC_SUBDIR     = openmpi
@@ -22,7 +22,7 @@ SOURCE_DIR     = $(SOURCE_PKG:%.$(SOURCE_SUFFIX)=%)
 
 KNEM_NAME      = knem
 KNEM_SUFFIX    = tar.gz
-KNEM_VERSION   = 1.1.0
+KNEM_VERSION   = 1.1.1
 KNEM_PKG       = $(KNEM_NAME)-$(KNEM_VERSION).$(KNEM_SUFFIX)
 KNEM_DIR       = $(KNEM_PKG:%.$(KNEM_SUFFIX)=%)
 
