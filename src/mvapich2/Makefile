@@ -98,6 +98,10 @@ ifneq ("$(ROLLOPTS)", "$(subst torque,,$(ROLLOPTS))")
   CONFIG_OPTS += --with-pbs=/opt/torque
 endif
 
+ifneq ("$(ROLLOPTS)", "$(subst slurm,,$(ROLLOPTS))")
+  CONFIG_OPTS += --with-slurm=/usr/lib64/slurm
+endif
+
 MODULE_LOAD_AUTOCONF = $(call MODULE_LOAD_COMPILER, gnutools, autoconf)
 
 LIMIC_CACHE = $(REDHAT.ROOT)/cache/build-limic
