@@ -27,9 +27,9 @@
 
 Summary: KNEM: High-Performance Intra-Node MPI Communication
 Name: knem
-Version: 1.1.1
+Version: 1.1.2
 Release: 0
-License: BSD
+License: BSD and GPLv2
 Group: System Environment/Libraries
 Packager: Brice Goglin
 Source: knem-%{version}.tar.gz
@@ -37,7 +37,7 @@ BuildRoot: /var/tmp/%{name}-%{version}-build
 
 %description
 KNEM is a Linux kernel module enabling high-performance intra-node MPI communication for large messages. KNEM offers support for asynchronous and vectorial data transfers as well as offloading memory copies on to Intel I/OAT hardware.
-See http://runtime.bordeaux.inria.fr/knem/ for details.
+See http://knem.gforge.inria.fr for details.
 
 %prep
 %setup -n knem-%{version}
