@@ -8,7 +8,7 @@ ifndef ROLLNETWORK
 endif
 
 NAME           = sdsc-mvapich2_$(COMPILERNAME)_$(ROLLNETWORK)
-VERSION        = 2.1rc1
+VERSION        = 2.1rc2
 RELEASE        = 1
 PKGROOT        = /opt/mvapich2/$(COMPILERNAME)/$(ROLLNETWORK)
 
