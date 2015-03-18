@@ -102,6 +102,10 @@ ifneq ("$(ROLLOPTS)", "$(subst slurm,,$(ROLLOPTS))")
   CONFIG_OPTS += --with-slurm=/usr/lib64/slurm
 endif
 
+ifneq ("$(ROLLOPTS)", "$(subst lustre,,$(ROLLOPTS))")
+  CONFIG_OPTS += --with-file-system=lustre
+endif
+
 MODULE_LOAD_AUTOCONF = $(call MODULE_LOAD_COMPILER, gnutools, autoconf)
 
 LIMIC_CACHE = $(REDHAT.ROOT)/cache/build-limic
@@ -118,6 +122,8 @@ LICENSE: $(SRC_DIRS)
 	echo BSD > $@
 
 build: $(SRC_DIRS)
+	patch $(SOURCE_DIR)/src/mpid/ch3/channels/common/src/affinity/hwloc_bind.c patch-files/hwloc_bind.c.patch
+	patch $(SOURCE_DIR)/src/mpid/ch3/channels/mrail/src/rdma/ch3_init.c patch-files/ch3_init.c.patch
 	( \
 	  $(MODULE_LOAD_CC); \
 	  $(MODULE_LOAD_AUTOCONF); \
