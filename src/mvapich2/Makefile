@@ -162,7 +162,7 @@ install::
 	$(PKGROOT_BIND_MOUNT)
 	( \
           if test $(COMPILERNAME) = "pgi"; then \
-	      $(PKGROOT_BIND_UMOUNT); \
+	      rm -rf $(ROOT)/$(PKGROOT)/*; \
               exit; \
           fi; \
 	  $(MODULE_LOAD_CC); \
@@ -176,9 +176,7 @@ install::
 	)
 	$(PKGROOT_BIND_UMOUNT)
 	( \
-           if test $(COMPILERNAME) = "pgi"; then \
-	      rm -rf $(ROOT)/$(PKGROOT)/*; \
-           else \
+           if test $(COMPILERNAME) != "pgi"; then \
               $(INSTALL_LICENSE_FILES); \
               find . -name $(LIMIC_KO_NAME) -exec cp {} $(ROOT)/$(PKGROOT)/lib/ ; \
            fi \
