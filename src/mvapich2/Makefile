@@ -178,7 +178,7 @@ install::
 	( \
            if test $(COMPILERNAME) != "pgi"; then \
               $(INSTALL_LICENSE_FILES); \
-              find . -name $(LIMIC_KO_NAME) -exec cp {} $(ROOT)/$(PKGROOT)/lib/ ; \
+              find . -name $(LIMIC_KO_NAME) -exec cp {} $(ROOT)/$(PKGROOT)/lib/ \; ; \
            fi \
         )
 
