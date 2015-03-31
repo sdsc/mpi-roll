@@ -139,6 +139,9 @@ build: $(SRC_DIRS)
 	  export LIMIC_OPTS=""; \
 	  export LD_LIBRARY_PATH=/opt/torque/lib64:$${LD_LIBRARY_PATH}; \
 	  cd $(SOURCE_DIR); \
+          if test $(COMPILERNAME) = "pgi"; then \
+              exit; \
+          fi; \
 	  if test "$(ROLLNETWORK)" = "ib"; then \
 	    cd limic2-*; \
 	    ./configure --prefix=$(PKGROOT) --enable-module; \
@@ -158,6 +161,10 @@ install::
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
 	$(PKGROOT_BIND_MOUNT)
 	( \
+          if test $(COMPILERNAME) = "pgi"; then \
+	      $(PKGROOT_BIND_UMOUNT); \
+              exit; \
+          fi; \
 	  $(MODULE_LOAD_CC); \
 	  cd $(SOURCE_DIR); \
 	  if test "$(ROLLNETWORK)" = "ib"; then \
@@ -168,8 +175,15 @@ install::
 	  make -j 16 install \
 	)
 	$(PKGROOT_BIND_UMOUNT)
-	$(INSTALL_LICENSE_FILES)
-	find . -name $(LIMIC_KO_NAME) -exec cp {} $(ROOT)/$(PKGROOT)/lib/ \;
+	( \
+           if test $(COMPILERNAME) = "pgi"; then \
+	      rm -rf $(ROOT)/$(PKGROOT)/*; \
+           else \
+              $(INSTALL_LICENSE_FILES); \
+              find . -name $(LIMIC_KO_NAME) -exec cp {} $(ROOT)/$(PKGROOT)/lib/ ; \
+           fi \
+        )
 
 clean::
 	rm -fr $(SOURCE_DIR) DESCRIPTION LICENSE
+
