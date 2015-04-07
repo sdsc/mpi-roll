@@ -139,13 +139,21 @@ build: $(SRC_DIRS)
 	  export FFLAGS="$(COMPILE_FLAGS) $(COMPILE_FFLAGS)"; \
 	  export FC=$(FC); \
 	  export FCFLAGS="$(COMPILE_FLAGS) $(COMPILE_FFLAGS)"; \
-	  cd $(KNEM_DIR); \
-	  ./configure --prefix=$(PKGROOT); \
-	  make -j 16; \
-	  rm -fr $(KNEM_CACHE); \
-	  mkdir -p -m 755 $(KNEM_CACHE); \
-	  make prefix=$(KNEM_CACHE) install; \
-	  cd ..; \
+          module unload gnu; \
+          module unload gnutools; \
+          if test $(COMPILERNAME) = "gnu"; then
+             module unload gnu; \
+             module unload gnutools; \
+	     cd $(KNEM_DIR); \
+	     ./configure --prefix=$(PKGROOT); \
+	     make -j 16; \
+	     rm -fr $(KNEM_CACHE); \
+	     mkdir -p -m 755 $(KNEM_CACHE); \
+	     make prefix=$(KNEM_CACHE) install; \
+	     cd ..; \
+             module load gnutools; \
+             module load gnu; \
+          fi; \
 	  cd $(SOURCE_DIR); \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
 	  make -j 16 \
