@@ -139,9 +139,7 @@ build: $(SRC_DIRS)
 	  export FFLAGS="$(COMPILE_FLAGS) $(COMPILE_FFLAGS)"; \
 	  export FC=$(FC); \
 	  export FCFLAGS="$(COMPILE_FLAGS) $(COMPILE_FFLAGS)"; \
-          module unload gnu; \
-          module unload gnutools; \
-          if test $(COMPILERNAME) = "gnu"; then
+          if test $(COMPILERNAME) = "gnu"; then \
              module unload gnu; \
              module unload gnutools; \
 	     cd $(KNEM_DIR); \
