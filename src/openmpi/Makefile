@@ -163,10 +163,14 @@ install::
 	( \
 	  $(MODULE_LOAD_CC); \
           if test $(COMPILERNAME) = "gnu"; then \
+             module unload gnu; \
+             module unload gnutools; \
 	     cd $(KNEM_DIR); \
 	     make prefix=$(PKGROOT) install; \
 	     cp `find . -name $(KNEM_KO_NAME)` $(ROOT)/$(PKGROOT)/lib/; \
 	     cd ..; \
+             module load gnutools; \
+             module load gnu; \
           fi; \
 	  cd $(SOURCE_DIR); \
 	  make -j 16 install \
