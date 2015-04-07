@@ -162,10 +162,12 @@ install::
 	$(PKGROOT_BIND_MOUNT)
 	( \
 	  $(MODULE_LOAD_CC); \
-	  cd $(KNEM_DIR); \
-	  make prefix=$(PKGROOT) install; \
-	  cp `find . -name $(KNEM_KO_NAME)` $(ROOT)/$(PKGROOT)/lib/; \
-	  cd ..; \
+          if test $(COMPILERNAME) = "gnu"; then \
+	     cd $(KNEM_DIR); \
+	     make prefix=$(PKGROOT) install; \
+	     cp `find . -name $(KNEM_KO_NAME)` $(ROOT)/$(PKGROOT)/lib/; \
+	     cd ..; \
+          fi; \
 	  cd $(SOURCE_DIR); \
 	  make -j 16 install \
 	)
