@@ -8,15 +8,15 @@ ifndef ROLLNETWORK
 endif
 
 NAME           = sdsc-mvapich2_$(COMPILERNAME)_$(ROLLNETWORK)
-VERSION        = 2.1rc2
-RELEASE        = 2
+VERSION        = 2.1x
+RELEASE        = 0
 PKGROOT        = /opt/mvapich2/$(COMPILERNAME)/$(ROLLNETWORK)
 
 SRC_SUBDIR     = mvapich2
 
 SOURCE_NAME    = mvapich2
 SOURCE_SUFFIX  = tar.gz
-SOURCE_VERSION = $(VERSION)
+SOURCE_VERSION = 2.1
 SOURCE_PKG     = $(SOURCE_NAME)-$(SOURCE_VERSION).$(SOURCE_SUFFIX)
 SOURCE_DIR     = $(SOURCE_PKG:%.$(SOURCE_SUFFIX)=%)
 
