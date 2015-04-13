@@ -136,6 +136,9 @@ build: $(SRC_DIRS)
 	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
 	  export LIMIC_OPTS=""; \
 	  export LD_LIBRARY_PATH=/opt/torque/lib64:$${LD_LIBRARY_PATH}; \
+          if test $(COMPILERNAME) = "pgi"; then \
+              exit; \
+          fi; \
 	  cd $(SOURCE_DIR); \
 	  if test "$(ROLLNETWORK)" = "ib" -a $(COMPILERNAME) = "gnu"; then \
             module unload gnu; \
@@ -160,6 +163,10 @@ install::
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
 	$(PKGROOT_BIND_MOUNT)
 	( \
+          if test $(COMPILERNAME) = "pgi"; then \
+             rm -rf $(ROOT)/$(PKGROOT)/*; \
+              exit; \
+          fi; \
 	  $(MODULE_LOAD_CC); \
 	  cd $(SOURCE_DIR); \
 	  if test "$(ROLLNETWORK)" = "ib"; then \

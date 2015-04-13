@@ -85,7 +85,7 @@ endif
 # reject as an error mpi.h's use of the __deprecated__ macro, although the gnu
 # and pgi compilers accept it.
 CONFIG_OPTS = \
-  --disable-dlopen --enable-static --enable-mca-static \
+  --enable-static --enable-mca-static \
   --with-mpi-f90-size=medium --disable-mpi-interface-warning \
   --with-platform=optimized --with-wrapper-cflags='$(WRAPPER_FLAGS)' \
   --with-wrapper-cxxflags='$(WRAPPER_FLAGS)' \
@@ -158,10 +158,6 @@ build: $(SRC_DIRS)
              module load gnu; \
           fi; \
 	  cd $(SOURCE_DIR); \
-	  export CFLAGS="$(COMPILE_FLAGS) $(OMPI_FLAGS)"; \
-	  export CXXFLAGS="$(COMPILE_FLAGS) $(OMPI_FLAGS)"; \
-	  export FFLAGS="$(COMPILE_FLAGS) $(COMPILE_FFLAGS) $(OMPI_FLAGS)"; \
-	  export FCFLAGS="$(COMPILE_FLAGS) $(COMPILE_FFLAGS) $(OMPI_FLAGS)"; \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
 	  make -j 16 \
 	)
