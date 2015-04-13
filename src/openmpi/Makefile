@@ -91,7 +91,8 @@ CONFIG_OPTS = \
   --with-wrapper-cxxflags='$(WRAPPER_FLAGS)' \
   --with-wrapper-fflags='$(WRAPPER_FLAGS)' \
   --with-wrapper-fcflags='$(WRAPPER_FLAGS)' \
-  --with-knem=$(KNEM_CACHE)
+  --with-knem=$(KNEM_CACHE) \
+  --enable-mpi-ext=affinity
 
 ifneq ("$(ROLLNETWORK)", "ib")
   CONFIG_OPTS += --without-openib
@@ -109,6 +110,10 @@ endif
 
 ifneq ("$(ROLLOPTS)", "$(subst torque,,$(ROLLOPTS))")
   CONFIG_OPTS += --with-tm=/opt/torque
+endif
+
+ifneq ("$(ROLLOPTS)", "$(subst cuda,,$(ROLLOPTS))")
+  CONFIG_OPTS += --with-cuda=/usr/local/cuda/include
 endif
 
 KNEM_CACHE = $(REDHAT.ROOT)/cache/build-knem
@@ -153,6 +158,10 @@ build: $(SRC_DIRS)
              module load gnu; \
           fi; \
 	  cd $(SOURCE_DIR); \
+	  export CFLAGS="$(COMPILE_FLAGS) $(OMPI_FLAGS)"; \
+	  export CXXFLAGS="$(COMPILE_FLAGS) $(OMPI_FLAGS)"; \
+	  export FFLAGS="$(COMPILE_FLAGS) $(COMPILE_FFLAGS) $(OMPI_FLAGS)"; \
+	  export FCFLAGS="$(COMPILE_FLAGS) $(COMPILE_FFLAGS) $(OMPI_FLAGS)"; \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
 	  make -j 16 \
 	)
@@ -173,7 +182,7 @@ install::
              module load gnu; \
           fi; \
 	  cd $(SOURCE_DIR); \
-	  make -j 16 install \
+	  make -j 16 install; \
 	)
 	$(PKGROOT_BIND_UMOUNT)
 	$(INSTALL_LICENSE_FILES)
