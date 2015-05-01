@@ -69,7 +69,7 @@ ifeq ("$(COMPILERNAME)", "intel")
   COMPILE_FLAGS = -fPIC -O3
 else ifeq ("$(COMPILERNAME)", "pgi")
   COMPILE_FLAGS = -fPIC -O3 --noswitcherror
-  CONFIG_OPTS += --disable-rpath --disable-static --disable-rdma-cm --disable-mcast --without-hydra=ckpointlib 
+  CONFIG_OPTS += --disable-rpath --disable-static --disable-rdma-cm --disable-mcast --without-hydra-ckpointlib 
 endif
 
 NETWORKSETUP = cat /dev/null
