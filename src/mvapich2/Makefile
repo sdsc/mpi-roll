@@ -62,13 +62,16 @@ include $(SDSCDEVEL)/Pull.mk
 include $(SDSCDEVEL)/Rules.mk
 
 COMPILE_FLAGS = -fPIC -O3
+
+CONFIG_OPTS = --enable-shared --enable-sharedlibs=gcc --with-hwloc
+
 ifeq ("$(COMPILERNAME)", "intel")
   COMPILE_FLAGS = -fPIC -O3
 else ifeq ("$(COMPILERNAME)", "pgi")
-  COMPILE_FLAGS = -fPIC -O3
+  COMPILE_FLAGS = -fPIC -O3 --noswitcherror
+  CONFIG_OPTS += --disable-rpath --disable-static --disable-rdma-cm --disable-mcast --without-hydra=ckpointlib 
 endif
 
-CONFIG_OPTS = --enable-shared --enable-sharedlibs=gcc --with-hwloc
 NETWORKSETUP = cat /dev/null
 ifeq ("$(ROLLNETWORK)", "eth")
   CONFIG_OPTS += --with-device=ch3:sock
@@ -122,6 +125,8 @@ LICENSE: $(SRC_DIRS)
 	echo BSD > $@
 
 build: $(SRC_DIRS)
+	patch $(SOURCE_DIR)/src/mpid/ch3/channels/common/src/affinity/hwloc_bind.c patch-files/hwloc_bind.c.patch
+	patch $(SOURCE_DIR)/src/mpid/ch3/channels/mrail/src/rdma/ch3_init.c patch-files/ch3_init.c.patch
 	( \
 	  $(MODULE_LOAD_CC); \
 	  $(MODULE_LOAD_AUTOCONF); \
@@ -136,13 +141,8 @@ build: $(SRC_DIRS)
 	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
 	  export LIMIC_OPTS=""; \
 	  export LD_LIBRARY_PATH=/opt/torque/lib64:$${LD_LIBRARY_PATH}; \
-          if test $(COMPILERNAME) = "pgi"; then \
-              exit; \
-          fi; \
 	  cd $(SOURCE_DIR); \
-	  if test "$(ROLLNETWORK)" = "ib" -a $(COMPILERNAME) = "gnu"; then \
-            module unload gnu; \
-            module unload gnutools; \
+	  if test "$(ROLLNETWORK)" = "ib"; then \
 	    cd limic2-*; \
 	    ./configure --prefix=$(PKGROOT) --enable-module; \
 	    make -j 16; \
@@ -152,8 +152,6 @@ build: $(SRC_DIRS)
 	    export LIMIC_OPTS="--with-limic2=$(LIMIC_CACHE)"; \
 	    export LD_LIBRARY_PATH=$(LIMIC_CACHE)/lib:$${LD_LIBRARY_PATH}; \
 	    cd ..; \
-            module load gnutools; \
-            module load gnu; \
 	  fi; \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS) $${LIMIC_OPTS}; \
 	  make -j 16 \
@@ -163,10 +161,6 @@ install::
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
 	$(PKGROOT_BIND_MOUNT)
 	( \
-          if test $(COMPILERNAME) = "pgi"; then \
-             rm -rf $(ROOT)/$(PKGROOT)/*; \
-              exit; \
-          fi; \
 	  $(MODULE_LOAD_CC); \
 	  cd $(SOURCE_DIR); \
 	  if test "$(ROLLNETWORK)" = "ib"; then \
@@ -179,7 +173,7 @@ install::
 	$(PKGROOT_BIND_UMOUNT)
 	( \
               $(INSTALL_LICENSE_FILES); \
-              find . -name $(LIMIC_KO_NAME) -exec cp {} $(ROOT)/$(PKGROOT)/lib/ \; ; \
+              find . -name $(LIMIC_KO_NAME) -exec cp {} $(ROOT)/$(PKGROOT)/lib/ \; \
         )
 
 clean::
