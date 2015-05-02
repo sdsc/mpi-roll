@@ -68,7 +68,7 @@ CONFIG_OPTS = --enable-shared --enable-sharedlibs=gcc --with-hwloc
 ifeq ("$(COMPILERNAME)", "intel")
   COMPILE_FLAGS = -fPIC -O3
 else ifeq ("$(COMPILERNAME)", "pgi")
-  COMPILE_FLAGS = -fPIC -O3 --noswitcherror
+  COMPILE_FLAGS = -fPIC -O3 -noswitcherror
   CONFIG_OPTS += --disable-rpath --disable-static --disable-rdma-cm --disable-mcast --without-hydra-ckpointlib 
 endif
 
