@@ -142,7 +142,9 @@ build: $(SRC_DIRS)
 	  export LIMIC_OPTS=""; \
 	  export LD_LIBRARY_PATH=/opt/torque/lib64:$${LD_LIBRARY_PATH}; \
 	  cd $(SOURCE_DIR); \
-	  if test "$(ROLLNETWORK)" = "ib"; then \
+	  if test "$(ROLLNETWORK)" = "ib" -a $(COMPILERNAME) = "gnu"; then \
+            module unload gnu; \
+            module unload gnutools; \
 	    cd limic2-*; \
 	    ./configure --prefix=$(PKGROOT) --enable-module; \
 	    make -j 16; \
@@ -152,6 +154,8 @@ build: $(SRC_DIRS)
 	    export LIMIC_OPTS="--with-limic2=$(LIMIC_CACHE)"; \
 	    export LD_LIBRARY_PATH=$(LIMIC_CACHE)/lib:$${LD_LIBRARY_PATH}; \
 	    cd ..; \
+            module load gnutools; \
+            module load gnu; \
 	  fi; \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS) $${LIMIC_OPTS}; \
 	  make -j 16 \

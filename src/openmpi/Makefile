@@ -116,6 +116,10 @@ ifneq ("$(ROLLOPTS)", "$(subst cuda,,$(ROLLOPTS))")
   CONFIG_OPTS += --with-cuda=/usr/local/cuda/include
 endif
 
+ifneq ("$(ROLLOPTS)", "$(subst slurm,,$(ROLLOPTS))")
+  CONFIG_OPTS += --with-pmi=/usr/include/slurm
+endif
+
 KNEM_CACHE = $(REDHAT.ROOT)/cache/build-knem
 KNEM_LICENSE_FILES = knem.spec
 
