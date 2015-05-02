@@ -117,7 +117,7 @@ ifneq ("$(ROLLOPTS)", "$(subst cuda,,$(ROLLOPTS))")
 endif
 
 ifneq ("$(ROLLOPTS)", "$(subst slurm,,$(ROLLOPTS))")
-  CONFIG_OPTS += --with-pmi=/usr/include/slurm
+  CONFIG_OPTS += --with-pmi=/usr
 endif
 
 KNEM_CACHE = $(REDHAT.ROOT)/cache/build-knem
