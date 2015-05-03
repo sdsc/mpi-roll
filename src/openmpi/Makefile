@@ -148,6 +148,13 @@ build: $(SRC_DIRS)
 	  export FFLAGS="$(COMPILE_FLAGS) $(COMPILE_FFLAGS)"; \
 	  export FC=$(FC); \
 	  export FCFLAGS="$(COMPILE_FLAGS) $(COMPILE_FFLAGS)"; \
+          if test $(COMPILERNAME) = "pgi"; then \
+              patch $(SOURCE_DIR)/ompi/mpi/fortran/base/gen-mpi-sizeof.pl patch-files/gen-mpi-sizeof.pl.patch; \
+	      export CC="$(CC) -noswitcherror"; \
+	      export CXX="$(CXX) -noswitcherror"; \
+	      export F77="$(F77) -noswitcherror"; \
+	      export FC="$(FC) -noswitcherror"; \
+          fi; \
           if test $(COMPILERNAME) = "gnu"; then \
              module unload gnu; \
              module unload gnutools; \
