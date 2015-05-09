@@ -153,7 +153,8 @@ build: $(SRC_DIRS)
 	    cd ..; \
             module load gnutools; \
             module load gnu; \
-            find . -name $(LIMIC_KO_NAME) -exec insmod {} \; ; \
+	  elif test "$(ROLLNETWORK)" = "ib"; then \
+	    export LD_LIBRARY_PATH=$(LIMIC_CACHE)/lib:$${LD_LIBRARY_PATH}; \
 	  fi; \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS) $${LIMIC_OPTS}; \
 	  make -j 16 \
