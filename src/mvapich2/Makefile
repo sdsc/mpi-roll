@@ -84,7 +84,7 @@ else ifeq ("$(ROLLNETWORK)", "ib")
   CONFIG_OPTS += --enable-f77 --enable-fc --enable-hybrid \
                  --with-ib-include=/usr/include/infiniband \
                  --with-ib-libpath=/usr/lib64 \
-                 --enable-fast=O3
+                 --enable-fast=O3 --with-limic2=$(LIMIC_CACHE)
 endif
 
 ifneq ("$(ROLLOPTS)", "$(subst avx,,$(ROLLOPTS))")
@@ -149,7 +149,6 @@ build: $(SRC_DIRS)
 	    rm -fr $(LIMIC_CACHE); \
 	    mkdir -p -m 755 $(LIMIC_CACHE); \
 	    make prefix=$(LIMIC_CACHE) -j 16 install; \
-	    export LIMIC_OPTS="--with-limic2=$(LIMIC_CACHE)"; \
 	    export LD_LIBRARY_PATH=$(LIMIC_CACHE)/lib:$${LD_LIBRARY_PATH}; \
 	    cd ..; \
             module load gnutools; \
