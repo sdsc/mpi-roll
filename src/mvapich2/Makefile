@@ -153,7 +153,7 @@ build: $(SRC_DIRS)
 	    cd ..; \
             module load gnutools; \
             module load gnu; \
-            find . -name $(LIMIC_KO_NAME) -exec insmod {} \;
+            find . -name $(LIMIC_KO_NAME) -exec insmod {} \; ; \
 	  fi; \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS) $${LIMIC_OPTS}; \
 	  make -j 16 \
