@@ -167,6 +167,7 @@ build: $(SRC_DIRS)
 	     cd ..; \
              module load gnutools; \
              module load gnu; \
+	     `find . -name $(KNEM_KO_NAME) -exec insmod {}`; \ 
           fi; \
 	  cd $(SOURCE_DIR); \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
