@@ -1,0 +1,10 @@
+#!/bin/sh
+/sbin/depmod -a
+for ko in knem limic; do
+  if find /lib/modules -name ${ko}.ko; then
+    /sbin/modprobe ${ko}
+    /bin/sleep 1
+    /bin/chmod 666 /dev/${ko}
+  fi
+done
+# /bin/rm $0

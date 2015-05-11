@@ -3,7 +3,7 @@ KERNEL         := $(shell uname -r)
 NAME           = sdsc-mpi-kernel-objects
 VERSION        = $(firstword $(subst -, ,$(KERNEL)))
 RELEASE        = $(lastword $(subst -, ,$(KERNEL)))
-PKGROOT        = /lib/modules/$(KERNEL)/extra/
+PKGROOT        = /
 
 SRC_SUBDIR     = mpi-kernel-objects
 
