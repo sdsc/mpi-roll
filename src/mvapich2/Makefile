@@ -170,7 +170,7 @@ install::
 	    cd limic2-*; \
 	    make -j 16 install; \
 	    cd ..; \
-          else; \
+          else \
             cp $(LIMIC_CACHE)/lib/* $(ROOT)/$(PKGROOT)/lib; \
 	  fi; \
 	  make -j 16 install \
