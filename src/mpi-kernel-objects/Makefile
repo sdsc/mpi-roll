@@ -57,13 +57,58 @@
 REDHAT.ROOT = $(CURDIR)/../../
 
 -include $(ROCKSROOT)/etc/Rules.mk
-include Rules.mk
+include $(SDSCDEVEL)/Pull.mk
 include $(SDSCDEVEL)/Rules.mk
 
-build:
+KNEM_CACHE = $(REDHAT.ROOT)/cache/build-knem
+LIMIC_CACHE = $(REDHAT.ROOT)/cache/build-limic
+
+KNEM_LICENSE_FILES = knem.spec
+
+$(NAME).spec: DESCRIPTION LICENSE
+
+DESCRIPTION:
+	( \
+	  $(DESCRIBE_PKG); \
+	  $(DESCRIBE_CC) \
+	) > $@
+
+LICENSE: $(SRC_DIRS)
+	for F in $(KNEM_LICENSE_FILES); do \
+	  cp knem*/$$F $(SOURCE_DIR)/knem-$$F; \
+	done
+	$(CHECK_LICENSE_FILES)
+	echo BSD and GPLv2 > $@
+
+build: $(SRC_DIRS)
+	if test "$(ROLLNETWORK)" = "ib"; then \
+	  cd $(SOURCE_DIR)/limic2-*; \
+	  ./configure --prefix=$(PKGROOT) --enable-module; \
+	  make -j 16; \
+	fi
+	( \
+	  cd $(KNEM_DIR); \
+	  ./configure --prefix=$(PKGROOT); \
+	  make -j 16; \
+	)
 
 install::
 	mkdir -p $(ROOT)/$(PKGROOT)
-	cp post* $(ROOT)/$(PKGROOT)/
+	if test "$(ROLLNETWORK)" = "ib"; then \
+	  cd $(SOURCE_DIR)/limic2-*; \
+	  cp `find . -name \*.ko` $(ROOT)/$(PKGROOT); \
+	  rm -fr $(LIMIC_CACHE); \
+	  mkdir -p -m 755 $(LIMIC_CACHE); \
+	  make prefix=$(LIMIC_CACHE) -j 16 install; \
+	fi
+	( \
+	  cd $(KNEM_DIR); \
+	  mkdir -p -m 755 $(KNEM_CACHE); \
+	  cp `find . -name \*.ko` $(ROOT)/$(PKGROOT); \
+	  rm -fr $(KNEM_CACHE); \
+	  make prefix=$(KNEM_CACHE) install \
+	)
 
 clean::
+	rm -fr $(SOURCE_DIR) DESCRIPTION LICENSE
+

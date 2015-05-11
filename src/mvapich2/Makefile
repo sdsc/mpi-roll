@@ -116,8 +116,10 @@ LIMIC_CACHE = $(REDHAT.ROOT)/cache/build-limic
 $(NAME).spec: DESCRIPTION LICENSE
 
 DESCRIPTION:
+	$(MODULE_LOAD_CC); \
 	( \
-	  $(DESCRIBE_PKG) \
+	  $(DESCRIBE_PKG); \
+	  $(DESCRIBE_CC) \
 	) > $@
 
 LICENSE: $(SRC_DIRS)
@@ -137,26 +139,9 @@ build: $(SRC_DIRS)
 	  export FCFLAGS="$(COMPILE_FLAGS)"; \
 	  export CFLAGS="$(COMPILE_FLAGS)"; \
 	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
-	  export LIMIC_OPTS=""; \
-	  export LD_LIBRARY_PATH=/opt/torque/lib64:$${LD_LIBRARY_PATH}; \
+	  export LD_LIBRARY_PATH=/opt/torque/lib64:$(LIMIC_CACHE)/lib:$${LD_LIBRARY_PATH}; \
 	  cd $(SOURCE_DIR); \
-	  if test "$(ROLLNETWORK)" = "ib" -a $(COMPILERNAME) = "gnu"; then \
-            module unload gnu; \
-            module unload gnutools; \
-	    cd limic2-*; \
-	    ./configure --prefix=$(PKGROOT) --enable-module; \
-	    make -j 16; \
-	    rm -fr $(LIMIC_CACHE); \
-	    mkdir -p -m 755 $(LIMIC_CACHE); \
-	    make prefix=$(LIMIC_CACHE) -j 16 install; \
-	    export LD_LIBRARY_PATH=$(LIMIC_CACHE)/lib:$${LD_LIBRARY_PATH}; \
-	    cd ..; \
-            module load gnutools; \
-            module load gnu; \
-	  elif test "$(ROLLNETWORK)" = "ib"; then \
-	    export LD_LIBRARY_PATH=$(LIMIC_CACHE)/lib:$${LD_LIBRARY_PATH}; \
-	  fi; \
-	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS) $${LIMIC_OPTS}; \
+	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
 	  make -j 16 \
 	)
 
@@ -166,18 +151,10 @@ install::
 	( \
 	  $(MODULE_LOAD_CC); \
 	  cd $(SOURCE_DIR); \
-	  if test "$(ROLLNETWORK)" = "ib"; then \
-	    cd limic2-*; \
-	    make -j 16 install; \
-	    cd ..; \
-	  fi; \
 	  make -j 16 install \
 	)
 	$(PKGROOT_BIND_UMOUNT)
-	( \
-              $(INSTALL_LICENSE_FILES); \
-              find . -name $(LIMIC_KO_NAME) -exec cp {} $(ROOT)/$(PKGROOT)/lib/ \; \
-        )
+	$(INSTALL_LICENSE_FILES)
 
 clean::
 	rm -fr $(SOURCE_DIR) DESCRIPTION LICENSE

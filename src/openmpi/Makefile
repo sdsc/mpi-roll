@@ -121,19 +121,17 @@ ifneq ("$(ROLLOPTS)", "$(subst slurm,,$(ROLLOPTS))")
 endif
 
 KNEM_CACHE = $(REDHAT.ROOT)/cache/build-knem
-KNEM_LICENSE_FILES = knem.spec
 
 $(NAME).spec: DESCRIPTION LICENSE
 
 DESCRIPTION:
+	$(MODULE_LOAD_CC); \
 	( \
-	  $(DESCRIBE_PKG) \
+	  $(DESCRIBE_PKG); \
+	  $(DESCRIBE_CC) \
 	) > $@
 
 LICENSE: $(SRC_DIRS)
-	for F in $(KNEM_LICENSE_FILES); do \
-	  cp knem*/$$F $(SOURCE_DIR)/knem-$$F; \
-	done
 	$(CHECK_LICENSE_FILES)
 	echo BSD > $@
 
@@ -155,19 +153,6 @@ build: $(SRC_DIRS)
 	      export F77="$(F77) -noswitcherror"; \
 	      export FC="$(FC) -noswitcherror"; \
           fi; \
-          if test $(COMPILERNAME) = "gnu"; then \
-             module unload gnu; \
-             module unload gnutools; \
-	     cd $(KNEM_DIR); \
-	     ./configure --prefix=$(PKGROOT); \
-	     make -j 16; \
-	     rm -fr $(KNEM_CACHE); \
-	     mkdir -p -m 755 $(KNEM_CACHE); \
-	     make prefix=$(KNEM_CACHE) install; \
-	     cd ..; \
-             module load gnutools; \
-             module load gnu; \
-          fi; \
 	  cd $(SOURCE_DIR); \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
 	  make -j 16 \
@@ -178,16 +163,6 @@ install::
 	$(PKGROOT_BIND_MOUNT)
 	( \
 	  $(MODULE_LOAD_CC); \
-          if test $(COMPILERNAME) = "gnu"; then \
-             module unload gnu; \
-             module unload gnutools; \
-	     cd $(KNEM_DIR); \
-	     make prefix=$(PKGROOT) install; \
-	     cp `find . -name $(KNEM_KO_NAME)` $(ROOT)/$(PKGROOT)/lib/; \
-	     cd ..; \
-             module load gnutools; \
-             module load gnu; \
-          fi; \
 	  cd $(SOURCE_DIR); \
 	  make -j 16 install; \
 	)
@@ -195,4 +170,4 @@ install::
 	$(INSTALL_LICENSE_FILES)
 
 clean::
-	rm -fr $(SOURCE_DIR) $(KNEM_DIR) DESCRIPTION LICENSE
+	rm -fr $(SOURCE_DIR) DESCRIPTION LICENSE

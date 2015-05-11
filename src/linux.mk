@@ -54,4 +54,11 @@
 # @Copyright@
 #
 
-SRCDIRS = `find . -maxdepth 1 -type d -not -name CVS -not -name .`
+# mvapich2 and openmpi dependent on mpi-kernel-objects
+SRCDIRS = \
+  mpi-kernel-objects \
+ `find . -maxdepth 1 \
+         -type d \
+         -not -name CVS \
+         -not -name . \
+         -not -name mpi-kernel-objects`
