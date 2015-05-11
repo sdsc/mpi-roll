@@ -166,10 +166,12 @@ install::
 	( \
 	  $(MODULE_LOAD_CC); \
 	  cd $(SOURCE_DIR); \
-	  if test "$(ROLLNETWORK)" = "ib"; then \
+	  if test "$(ROLLNETWORK)" = "ib" -a $(COMPILERNAME) = "gnu"; then \
 	    cd limic2-*; \
 	    make -j 16 install; \
 	    cd ..; \
+          else; \
+            cp $(LIMIC_CACHE)/lib/* $(ROOT)/$(PKGROOT)/lib; \
 	  fi; \
 	  make -j 16 install \
 	)
