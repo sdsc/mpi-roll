@@ -44,7 +44,7 @@ foreach my $mpi (@MPIS) {
 
     SKIP: {
 
-      skip "$mpi/$compilername not installed", 5
+      skip "$mpi/$compilername not installed", 6
         if ! -d "/opt/$mpi/$compilername";
 
       foreach my $network (@NETWORKS) {
@@ -71,15 +71,22 @@ foreach my $mpi (@MPIS) {
 
         `rm -f $TESTFILE.exe`;
 
-        SKIP: {
-          my $dir = "/opt/modulefiles/mpi/.$compilername/${mpi}_$network";
-          `/bin/ls $dir/[0-9]* 2>&1`;
-          ok($? == 0, "$mpi/$compilername/$network module installed");
-          `/bin/ls $dir/.version.[0-9]* 2>&1`;
-          ok($? == 0, "$mpi/$compilername/$network version module installed");
-          ok(-l "$dir/.version",
-             "$mpi/$compilername/$network version module link created");
+        if($mpi eq 'mvapich2' && $network eq 'ib') {
+          ok(-f "/opt/$mpi/$compilername/$network/include/limic.h" &&
+             -f "/opt/$mpi/$compilername/$network/lib/liblimic2.so",
+             "limic built for $mpi/$compilername/$network");
+        } elsif($mpi eq 'openmpi') {
+          ok(-f "/opt/$mpi/$compilername/$network/include/knem_io.h",
+             "knem built for $mpi/$compilername/$network");
         }
+
+        my $dir = "/opt/modulefiles/mpi/.$compilername/${mpi}_$network";
+        `/bin/ls $dir/[0-9]* 2>&1`;
+        ok($? == 0, "$mpi/$compilername/$network module installed");
+        `/bin/ls $dir/.version.[0-9]* 2>&1`;
+        ok($? == 0, "$mpi/$compilername/$network version module installed");
+        ok(-l "$dir/.version",
+           "$mpi/$compilername/$network version module link created");
 
       }
 

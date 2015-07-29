@@ -9,7 +9,7 @@ endif
 
 NAME           = sdsc-mvapich2_$(COMPILERNAME)_$(ROLLNETWORK)
 VERSION        = 2.1
-RELEASE        = 0
+RELEASE        = 1
 PKGROOT        = /opt/mvapich2/$(COMPILERNAME)/$(ROLLNETWORK)
 
 SRC_SUBDIR     = mvapich2
