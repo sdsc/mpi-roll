@@ -155,6 +155,9 @@ build: $(SRC_DIRS)
           fi; \
 	  cd $(SOURCE_DIR); \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
+	  make -j 16; \
+	  cd ../$(KNEM_DIR); \
+	  ./configure --prefix=$(PKGROOT); \
 	  make -j 16 \
 	)
 
@@ -165,6 +168,8 @@ install::
 	  $(MODULE_LOAD_CC); \
 	  cd $(SOURCE_DIR); \
 	  make -j 16 install; \
+	  cd ../$(KNEM_DIR); \
+	  make install \
 	)
 	$(PKGROOT_BIND_UMOUNT)
 	$(INSTALL_LICENSE_FILES)
