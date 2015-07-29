@@ -169,7 +169,7 @@ install::
 	  cd $(SOURCE_DIR); \
 	  make -j 16 install; \
 	  cd ../$(KNEM_DIR); \
-	  make prefix=$(PKGROOT) install \
+	  make install \
 	)
 	$(PKGROOT_BIND_UMOUNT)
 	$(INSTALL_LICENSE_FILES)
