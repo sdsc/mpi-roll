@@ -141,13 +141,17 @@ build: $(SRC_DIRS)
 	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
 	  export LD_LIBRARY_PATH=/opt/torque/lib64:$(LIMIC_CACHE)/lib:$${LD_LIBRARY_PATH}; \
 	  cd $(SOURCE_DIR); \
-	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
-	  make -j 16; \
 	  if test "$(ROLLNETWORK)" = "ib"; then \
 	    cd limic2-*; \
 	    ./configure --prefix=$(PKGROOT); \
 	    make -j 16; \
-	  fi \
+	    /bin/rm -fr $(LIMIC_CACHE); \
+	    mkdir -p -m 755 $(LIMIC_CACHE); \
+	    make prefix=$(LIMIC_CACHE) install; \
+	    cd ..; \
+	  fi; \
+	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
+	  make -j 16 \
 	)
 
 install::
