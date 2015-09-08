@@ -112,8 +112,10 @@ ifneq ("$(ROLLOPTS)", "$(subst torque,,$(ROLLOPTS))")
   CONFIG_OPTS += --with-tm=/opt/torque
 endif
 
+USE_CUDA_MODULE = false
 ifneq ("$(ROLLOPTS)", "$(subst cuda,,$(ROLLOPTS))")
-  CONFIG_OPTS += --with-cuda=/usr/local/cuda/include
+  USE_CUDA_MODULE = true
+  CONFIG_OPTS += --with-cuda=$${CUDAHOME}/include
 endif
 
 ifneq ("$(ROLLOPTS)", "$(subst slurm,,$(ROLLOPTS))")
@@ -130,6 +132,9 @@ DESCRIPTION:
 	  $(DESCRIBE_PKG); \
 	  $(DESCRIBE_CC) \
 	) > $@
+	if test "$(USE_CUDA_MODULE)" = "true"; then \
+	  $(DESCRIBE_CUDA) >> $@; \
+	fi
 
 LICENSE: $(SRC_DIRS)
 	$(CHECK_LICENSE_FILES)
@@ -138,6 +143,9 @@ LICENSE: $(SRC_DIRS)
 build: $(SRC_DIRS)
 	( \
 	  $(MODULE_LOAD_CC); \
+	  if test "$(USE_CUDA_MODULE)" = "true"; then \
+	    $(MODULE_LOAD_CUDA); \
+	  fi; \
 	  export CC=$(CC); \
 	  export CFLAGS="$(COMPILE_FLAGS)"; \
 	  export CXX=$(CXX); \
