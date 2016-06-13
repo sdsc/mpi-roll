@@ -79,9 +79,13 @@ varible, e.g.,
 
 For gnu compilers, the roll also supports a `ROLLOPTS` make variable value of
 'avx', indicating that the target architecture supports AVX instructions.
-If `ROLLOPTS` contains one or both of 'torque' and 'sge', then openmpi is built
-to integrate with the specified scheduler(s).  If `ROLLOPTS` contains 'torus',
-then mvapich2 is compiled with 3d torus support.
+If `ROLLOPTS` contains one or more of 'torque','slurm'  and 'sge', then
+openmpi is built to integrate with the specified scheduler(s). 
+mvapich2  uses the slurm and torque options as well, but does not have
+an sge option
+If `ROLLOPTS` contains 'cuda', then openmpi is compiled with gpu support. 
+If 'ROLLOPTS' contains 'lustre' then mvapich2 is compiled with i/o support for
+lustre file systems.
 
 
 ## Installation
