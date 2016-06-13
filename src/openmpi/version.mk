@@ -9,7 +9,7 @@ endif
 
 NAME           = sdsc-openmpi_$(COMPILERNAME)_$(ROLLNETWORK)
 VERSION        = 1.8.4
-RELEASE        = 3
+RELEASE        = 4
 PKGROOT        = /opt/openmpi/$(COMPILERNAME)/$(ROLLNETWORK)
 
 SRC_SUBDIR     = openmpi
