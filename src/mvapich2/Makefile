@@ -62,6 +62,11 @@ include $(SDSCDEVEL)/Pull.mk
 include $(SDSCDEVEL)/Rules.mk
 
 COMPILE_FLAGS = -fPIC -O3
+# Parallel make breaks build with 2016 Intel compiler
+MAKE_OPTS =
+ifneq ("$(COMPILERNAME)", "intel")
+  MAKE_OPTS += -j 16
+endif
 
 CONFIG_OPTS = --enable-shared --enable-sharedlibs=gcc --with-hwloc
 
@@ -144,14 +149,14 @@ build: $(SRC_DIRS)
 	  if test "$(ROLLNETWORK)" = "ib"; then \
 	    cd limic2-*; \
 	    ./configure --prefix=$(PKGROOT); \
-	    make -j 16; \
+	    make $(MAKE_OPTS); \
 	    /bin/rm -fr $(LIMIC_CACHE); \
 	    mkdir -p -m 755 $(LIMIC_CACHE); \
 	    make prefix=$(LIMIC_CACHE) install; \
 	    cd ..; \
 	  fi; \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
-	  make -j 16 \
+	  make $(MAKE_OPTS) \
 	)
 
 install::
@@ -160,7 +165,7 @@ install::
 	( \
 	  $(MODULE_LOAD_CC); \
 	  cd $(SOURCE_DIR); \
-	  make -j 16 install; \
+	  make $(MAKE_OPTS) install; \
 	  if test "$(ROLLNETWORK)" = "ib"; then \
 	    cd limic2-*; \
 	    make install; \
