@@ -58,7 +58,7 @@ modulefiles to use for building the software, e.g.,
 % make ROLLCOMPILER='gnu intel' 2>&1 | tee build.log
 ```
 
-The build processes recognizes the values`gnu,`intel and`pgi`for the
+The build processes recognizes the values `gnu`, `intel` and `pgi` for the
 ROLLCOMPILER value, defaulting to gnu.
 
 By default, the roll builds openmpi, openmpi2, and mvapich2 rpms.  You can
