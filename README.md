@@ -58,11 +58,11 @@ modulefiles to use for building the software, e.g.,
 % make ROLLCOMPILER='gnu intel' 2>&1 | tee build.log
 ```
 
-The build processes recognizes the values `gnu`, `intel` and `pgi` for the
-ROLLCOMPILER value, defaulting to `gnu`.
+The build processes recognizes the values`gnu,`intel and`pgi`for the
+ROLLCOMPILER value, defaulting to gnu.
 
-By default, the roll builds both openmpi and mvapich2 rpms.  You can limit the
-build to one or the other using the ROLLMPI make variable, e.g.,
+By default, the roll builds openmpi, openmpi2, and mvapich2 rpms.  You can
+limit the build to a subset of these using the ROLLMPI make variable, e.g.,
 
 ```shell
 % make ROLLMPI='mvapich2' 2>&1 | tee build.log
