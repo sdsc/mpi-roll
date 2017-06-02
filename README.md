@@ -59,10 +59,10 @@ modulefiles to use for building the software, e.g.,
 ```
 
 The build processes recognizes the values `gnu`, `intel` and `pgi` for the
-ROLLCOMPILER value, defaulting to `gnu`.
+ROLLCOMPILER value, defaulting to gnu.
 
-By default, the roll builds both openmpi and mvapich2 rpms.  You can limit the
-build to one or the other using the ROLLMPI make variable, e.g.,
+By default, the roll builds openmpi, openmpi2, and mvapich2 rpms.  You can
+limit the build to a subset of these using the ROLLMPI make variable, e.g.,
 
 ```shell
 % make ROLLMPI='mvapich2' 2>&1 | tee build.log
@@ -79,10 +79,10 @@ varible, e.g.,
 
 For gnu compilers, the roll also supports a `ROLLOPTS` make variable value of
 'avx', indicating that the target architecture supports AVX instructions.
-If `ROLLOPTS` contains one or more of 'torque','slurm'  and 'sge', then
+If `ROLLOPTS` contains one or more of 'torque', 'slurm', and 'sge', then
 openmpi is built to integrate with the specified scheduler(s). 
-mvapich2  uses the slurm and torque options as well, but does not have
-an sge option
+mvapich2 uses the slurm and torque options as well, but does not have
+an sge option.
 If `ROLLOPTS` contains 'cuda', then openmpi is compiled with gpu support. 
 If 'ROLLOPTS' contains 'lustre' then mvapich2 is compiled with i/o support for
 lustre file systems.
