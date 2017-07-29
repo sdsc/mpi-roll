@@ -161,13 +161,7 @@ build: $(SRC_DIRS)
 	      export F77="$(F77) -noswitcherror"; \
 	      export FC="$(FC) -noswitcherror"; \
           fi; \
-	  cd $(KNEM_DIR); \
-	  ./configure --prefix=$(PKGROOT); \
-	  make -j 16; \
-	  /bin/rm -fr $(KNEM_CACHE); \
-	  mkdir -p -m 755 $(KNEM_CACHE); \
-	  make prefix=$(KNEM_CACHE) install; \
-	  cd ../$(SOURCE_DIR); \
+	  cd $(SOURCE_DIR); \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
 	  make -j 16 \
 	)
@@ -175,13 +169,10 @@ build: $(SRC_DIRS)
 install::
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
 	$(PKGROOT_BIND_MOUNT)
-	( \
-	  $(MODULE_LOAD_CC); \
-	  cd $(SOURCE_DIR); \
-	  make -j 16 install; \
-	  cd ../$(KNEM_DIR); \
-	  make install \
-	)
+	$(MODULE_LOAD_CC); \
+	cd $(SOURCE_DIR); \
+	make -j 16 install
+	/bin/cp -r $(KNEM_CACHE)/* $(ROOT)/$(PKGROOT)
 	$(PKGROOT_BIND_UMOUNT)
 	$(INSTALL_LICENSE_FILES)
 

@@ -74,10 +74,10 @@ foreach my $mpi (@MPIS) {
         if($mpi eq 'mvapich2' && $network eq 'ib') {
           ok(-f "/opt/$mpi/$compilername/$network/include/limic.h" &&
              -f "/opt/$mpi/$compilername/$network/lib/liblimic2.so",
-             "limic built for $mpi/$compilername/$network");
+             "limic available for $mpi/$compilername/$network");
         } elsif($mpi eq 'openmpi') {
           ok(-f "/opt/$mpi/$compilername/$network/include/knem_io.h",
-             "knem built for $mpi/$compilername/$network");
+             "knem available for $mpi/$compilername/$network");
         }
 
         my $dir = "/opt/modulefiles/mpi/.$compilername/${mpi}_$network";
