@@ -146,15 +146,6 @@ build: $(SRC_DIRS)
 	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
 	  export LD_LIBRARY_PATH=/opt/torque/lib64:$(LIMIC_CACHE)/lib:$${LD_LIBRARY_PATH}; \
 	  cd $(SOURCE_DIR); \
-	  if test "$(ROLLNETWORK)" = "ib"; then \
-	    cd limic2-*; \
-	    ./configure --prefix=$(PKGROOT); \
-	    make $(MAKE_OPTS); \
-	    /bin/rm -fr $(LIMIC_CACHE); \
-	    mkdir -p -m 755 $(LIMIC_CACHE); \
-	    make prefix=$(LIMIC_CACHE) install; \
-	    cd ..; \
-	  fi; \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
 	  make $(MAKE_OPTS) \
 	)
@@ -162,15 +153,12 @@ build: $(SRC_DIRS)
 install::
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
 	$(PKGROOT_BIND_MOUNT)
-	( \
-	  $(MODULE_LOAD_CC); \
-	  cd $(SOURCE_DIR); \
-	  make $(MAKE_OPTS) install; \
-	  if test "$(ROLLNETWORK)" = "ib"; then \
-	    cd limic2-*; \
-	    make install; \
-	  fi \
-	)
+	$(MODULE_LOAD_CC); \
+	cd $(SOURCE_DIR); \
+	make $(MAKE_OPTS) install
+	if test "$(ROLLNETWORK)" = "ib"; then \
+	  /bin/cp -r $(LIMIC_CACHE)/* $(ROOT)/$(PKGROOT)/; \
+	fi
 	$(PKGROOT_BIND_UMOUNT)
 	$(INSTALL_LICENSE_FILES)
 
