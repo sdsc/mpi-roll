@@ -80,19 +80,23 @@ foreach my $mpi (@MPIS) {
              "knem available for $mpi/$compilername/$network");
         }
 
-        my $dir = "/opt/modulefiles/mpi/.$compilername/${mpi}_$network";
-        `/bin/ls $dir/[0-9]* 2>&1`;
-        ok($? == 0, "$mpi/$compilername/$network module installed");
-        `/bin/ls $dir/.version.[0-9]* 2>&1`;
-        ok($? == 0, "$mpi/$compilername/$network version module installed");
-        ok(-l "$dir/.version",
-           "$mpi/$compilername/$network version module link created");
-
       }
 
     }
 
   }
 }
+
+foreach my $mpi (@MPIS) {
+  foreach my $network (@NETWORKS) {
+    `/bin/ls /opt/modulefiles/mpi/${mpi}_$network/[0-9]* 2>&1`;
+    ok($? == 0, "$mpi/$network module installed");
+    `/bin/ls /opt/modulefiles/mpi/${mpi}_$network/.version.[0-9]* 2>&1`;
+    ok($? == 0, "$mpi/$network version module installed");
+    ok(-l "/opt/modulefiles/mpi/${mpi}_$network/.version",
+       "$mpi/$network version module link created");
+  }
+}
+
 
 `rm -fr $TESTFILE*`;

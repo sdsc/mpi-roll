@@ -15,7 +15,7 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 
 <package>sdsc-ROLLMPI_COMPILERNAME_ROLLNETWORK</package>
 <package>sdsc-mpi-kernel-objects</package>
-<package>sdsc-ROLLMPI-modules_COMPILERNAME_ROLLNETWORK</package>
+<package>sdsc-ROLLMPI-modules_ROLLNETWORK</package>
 <package>sdsc-mpi-roll-test</package>
 
 </kickstart>
