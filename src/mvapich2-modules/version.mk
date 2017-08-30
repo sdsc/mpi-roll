@@ -1,8 +1,3 @@
-ifndef ROLLCOMPILER
-  ROLLCOMPILER = gnu
-endif
-COMPILERNAME := $(firstword $(subst /, ,$(ROLLCOMPILER)))
-
 ifndef ROLLNETWORK
   ROLLNETWORK = eth
 endif
@@ -10,12 +5,12 @@ endif
 PACKAGE     = mvapich2
 CATEGORY    = mpi
 
-NAME        = sdsc-$(PACKAGE)-modules_$(COMPILERNAME)_$(ROLLNETWORK)
-RELEASE     = 3
-PKGROOT     = /opt/modulefiles/$(CATEGORY)/.$(COMPILERNAME)/$(PACKAGE)_$(ROLLNETWORK)
+NAME        = sdsc-$(PACKAGE)-modules_$(ROLLNETWORK)
+RELEASE     = 4
+PKGROOT     = /opt/modulefiles/$(CATEGORY)/$(PACKAGE)_$(ROLLNETWORK)
 
 VERSION_SRC = $(REDHAT.ROOT)/src/$(PACKAGE)/version.mk
 VERSION_INC = version.inc
 include $(VERSION_INC)
 
-RPM.EXTRAS  = AutoReq:No
+RPM.EXTRAS  = AutoReq:No\nObsoletes:sdsc-mvapich2-modules_gnu_ib,sdsc-mvapich2-modules_intel_ib,sdsc-mvapich2-modules_pgi_ib
