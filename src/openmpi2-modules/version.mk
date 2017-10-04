@@ -6,7 +6,7 @@ PACKAGE     = openmpi2
 CATEGORY    = mpi
 
 NAME        = sdsc-$(PACKAGE)-modules_$(ROLLNETWORK)
-RELEASE     = 1
+RELEASE     = 2
 PKGROOT     = /opt/modulefiles/$(CATEGORY)/$(PACKAGE)_$(ROLLNETWORK)
 
 VERSION_SRC = $(REDHAT.ROOT)/src/$(PACKAGE)/version.mk
