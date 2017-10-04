@@ -14,3 +14,4 @@ VERSION_INC = version.inc
 include $(VERSION_INC)
 
 RPM.EXTRAS  = AutoReq:No\nObsoletes:sdsc-mvapich2-modules_gnu_ib,sdsc-mvapich2-modules_intel_ib,sdsc-mvapich2-modules_pgi_ib
+RPM.PREFIX  = $(PKGROOT)
