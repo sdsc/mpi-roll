@@ -22,3 +22,4 @@ KNEM_DIR       = $(KNEM_PKG:%.$(KNEM_SUFFIX)=%)
 TAR_GZ_PKGS    = $(SOURCE_PKG) $(KNEM_PKG)
 
 RPM.EXTRAS     = AutoReq:No
+RPM.FILES      = /lib/modules/$(KERNEL)/extra/knem.ko\n/lib/modules/$(KERNEL)/extra/limic.ko\n/etc/rc.d/rocksconfig.d/post-97-mpiko

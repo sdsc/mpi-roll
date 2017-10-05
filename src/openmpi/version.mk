@@ -9,7 +9,7 @@ endif
 
 NAME           = sdsc-openmpi_$(COMPILERNAME)_$(ROLLNETWORK)
 VERSION        = 1.8.4
-RELEASE        = 4
+RELEASE        = 5
 PKGROOT        = /opt/openmpi/$(COMPILERNAME)/$(ROLLNETWORK)
 
 SRC_SUBDIR     = openmpi
@@ -23,3 +23,4 @@ SOURCE_DIR     = $(SOURCE_PKG:%.$(SOURCE_SUFFIX)=%)
 TAR_GZ_PKGS    = $(SOURCE_PKG)
 
 RPM.EXTRAS     = AutoReq:No
+RPM.PREFIX     = $(PKGROOT)

@@ -3,11 +3,11 @@
 #
 # @Copyright@
 #
-# 				Rocks(tm)
+# 				Rocks(r)
 # 		         www.rocksclusters.org
-# 		        version 4.3 (Mars Hill)
+# 		         version 7.0 (Manzinita)
 #
-# Copyright (c) 2000 - 2011 The Regents of the University of California.
+# Copyright (c) 2000 - 2017 The Regents of the University of California.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -25,7 +25,7 @@
 # 3. All advertising and press materials, printed or electronic, mentioning
 # features or use of this software must display the following acknowledgement:
 #
-# 	"This product includes software developed by the Rocks(tm)
+# 	"This product includes software developed by the Rocks(r)
 # 	Cluster Group at the San Diego Supercomputer Center at the
 # 	University of California, San Diego and its contributors."
 #
@@ -61,7 +61,7 @@ RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 include $(SDSCDEVEL)/Pull.mk
 include $(SDSCDEVEL)/Rules.mk
 
-COMPILE_FLAGS = -fPIC -O3
+COMPILE_FLAGS = -fPIC -O3 -std=gnu90
 # Parallel make breaks build with 2016 Intel compiler
 MAKE_OPTS =
 ifneq ("$(COMPILERNAME)", "intel")
