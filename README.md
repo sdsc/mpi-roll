@@ -94,17 +94,28 @@ To install, execute these instructions on a Rocks frontend:
 
 ```shell
 % rocks add roll *.iso
-% rocks enable roll mpi
+% rocks enable roll chemistry
 % cd /export/rocks/install
 % rocks create distro
-% rocks run roll mpi | bash
 ```
 
-In addition to the software itself, the roll installs mpi environment
+Subsequent installs of compute and login nodes will then include the contents
+of the chemistry-roll.  To avoid cluttering the cluster frontend with unused
+software, the chemistry-roll is configured to install only on compute and
+login nodes. To force installation on your frontend, run this command after
+adding the chemistry-roll to your distro
+
+```shell
+% rocks run roll chemistry host=NAME | bash
+```
+
+where NAME is the DNS name of a compute or login node in your cluster.
+
+In addition to the software itself, the roll installs package environment
 module files in:
 
 ```shell
-/opt/modulefiles/mpi/.(compiler)
+/opt/modulefiles/applications/{apbs,cp2k,gromacs,lammps,namd}
 ```
 
 
