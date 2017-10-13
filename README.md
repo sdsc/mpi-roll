@@ -112,10 +112,10 @@ adding the mpi-roll to your distro
 where NAME is the DNS name of a compute or login node in your cluster.
 
 In addition to the software itself, the roll installs package environment
-module files in:
+module files in (for example with an ib network):
 
 ```shell
-/opt/modulefiles/applications/{apbs,cp2k,gromacs,lammps,namd}
+/opt/modulefiles/mpi/{mvapich2_ib,openmpi_ib,openmpi2_ib}
 ```
 
 
