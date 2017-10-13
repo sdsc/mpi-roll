@@ -97,14 +97,25 @@ To install, execute these instructions on a Rocks frontend:
 % rocks enable roll mpi
 % cd /export/rocks/install
 % rocks create distro
-% rocks run roll mpi | bash
 ```
 
-In addition to the software itself, the roll installs mpi environment
-module files in:
+Subsequent installs of compute and login nodes will then include the contents
+of the mpi-roll.  To avoid cluttering the cluster frontend with unused
+software, the mpi-roll is configured to install only on compute and
+login nodes. To force installation on your frontend, run this command after
+adding the mpi-roll to your distro
 
 ```shell
-/opt/modulefiles/mpi/.(compiler)
+% rocks run roll mpi host=NAME | bash
+```
+
+where NAME is the DNS name of a compute or login node in your cluster.
+
+In addition to the software itself, the roll installs package environment
+module files in (for example with an ib network):
+
+```shell
+/opt/modulefiles/mpi/{mvapich2_ib,openmpi_ib,openmpi2_ib}
 ```
 
 
