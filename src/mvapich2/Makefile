@@ -145,6 +145,12 @@ build: $(SRC_DIRS)
 	  export CFLAGS="$(COMPILE_FLAGS)"; \
 	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
 	  export LD_LIBRARY_PATH=/opt/torque/lib64:$(LIMIC_CACHE)/lib:$${LD_LIBRARY_PATH}; \
+          if test "$(COMPILERNAME)" = "gnu"; then \
+              export MPICHLIB_CFLAGS='-std=gnu90'; \
+              export MPICHLIB_CXXFLAGS='-std=gnu90'; \
+              export MPICHLIB_FFLAGS='-std=gnu90'; \
+              export MPICHLIB_FCFLAGS='-std=gnu90'; \
+          fi; \
 	  cd $(SOURCE_DIR); \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
 	  make $(MAKE_OPTS) \
