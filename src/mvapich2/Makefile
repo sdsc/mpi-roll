@@ -61,7 +61,7 @@ RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 include $(SDSCDEVEL)/Pull.mk
 include $(SDSCDEVEL)/Rules.mk
 
-COMPILE_FLAGS = -fPIC -O3 -std=gnu90
+COMPILE_FLAGS = -fPIC -O3
 # Parallel make breaks build with 2016 Intel compiler
 MAKE_OPTS =
 ifneq ("$(COMPILERNAME)", "intel")
