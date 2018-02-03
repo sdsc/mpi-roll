@@ -157,6 +157,7 @@ install::
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
 	$(PKGROOT_BIND_MOUNT)
 	$(MODULE_LOAD_CC); \
+	$(MODULE_LOAD_AUTOCONF); \
 	cd $(SOURCE_DIR); \
 	make $(MAKE_OPTS) install
 	if test "$(ROLLNETWORK)" = "ib"; then \
