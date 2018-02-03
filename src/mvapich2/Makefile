@@ -61,7 +61,7 @@ RPM.EXTRAS=%define __os_install_post /usr/lib/rpm/brp-compress
 include $(SDSCDEVEL)/Pull.mk
 include $(SDSCDEVEL)/Rules.mk
 
-COMPILE_FLAGS = -fPIC -O3 -std=gnu90
+COMPILE_FLAGS = -fPIC -O3
 # Parallel make breaks build with 2016 Intel compiler
 MAKE_OPTS =
 ifneq ("$(COMPILERNAME)", "intel")
@@ -145,6 +145,9 @@ build: $(SRC_DIRS)
 	  export CFLAGS="$(COMPILE_FLAGS)"; \
 	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
 	  export LD_LIBRARY_PATH=/opt/torque/lib64:$(LIMIC_CACHE)/lib:$${LD_LIBRARY_PATH}; \
+	  if test "$(COMPILERNAME)" = "gnu"; then \
+	    export MPICHLIB_CFLAGS='-std=gnu90'; \
+	  fi; \
 	  cd $(SOURCE_DIR); \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
 	  make $(MAKE_OPTS) \
@@ -154,6 +157,7 @@ install::
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
 	$(PKGROOT_BIND_MOUNT)
 	$(MODULE_LOAD_CC); \
+	$(MODULE_LOAD_AUTOCONF); \
 	cd $(SOURCE_DIR); \
 	make $(MAKE_OPTS) install
 	if test "$(ROLLNETWORK)" = "ib"; then \
