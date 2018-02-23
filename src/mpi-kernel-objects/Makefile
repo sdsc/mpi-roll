@@ -113,6 +113,7 @@ install::
 	  rm -fr $(KNEM_CACHE); \
 	  make prefix=$(KNEM_CACHE) install \
 	)
+	cp post* $(ROOT)/$(RC_PKGROOT)/
 
 clean::
 	rm -fr $(SOURCE_DIR) DESCRIPTION LICENSE
