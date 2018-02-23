@@ -104,7 +104,7 @@ install::
 	  rm -fr $(LIMIC_CACHE); \
 	  mkdir -p -m 755 $(LIMIC_CACHE); \
 	  make prefix=$(LIMIC_CACHE) -j 16 install; \
-          cp $(LIMIC_CACHE)/lib/liblimic2.la $(ROOT)/$(KO_PKGROOT)/lib \
+          cp $(LIMIC_CACHE)/lib/liblimic2.la $(ROOT)/$(KO_PKGROOT)/lib; \
 	fi
 	( \
 	  cd $(KNEM_DIR); \
