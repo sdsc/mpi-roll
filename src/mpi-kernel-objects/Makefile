@@ -97,12 +97,14 @@ build: $(SRC_DIRS)
 
 install::
 	mkdir -p -m 755 $(ROOT)/$(KO_PKGROOT) $(ROOT)/$(RC_PKGROOT)
+	mkdir -p -m 755 $(ROOT)/$(KO_PKGROOT)/lib
 	if test "$(ROLLNETWORK)" = "ib"; then \
 	  cd $(SOURCE_DIR)/limic2-*; \
 	  cp `find . -name \*.ko` $(ROOT)/$(KO_PKGROOT)/; \
 	  rm -fr $(LIMIC_CACHE); \
 	  mkdir -p -m 755 $(LIMIC_CACHE); \
 	  make prefix=$(LIMIC_CACHE) -j 16 install; \
+          cp $(LIMIC_CACHE)/lib/liblimic2.la $(ROOT)/$(KO_PKGROOT)/lib \
 	fi
 	( \
 	  cd $(KNEM_DIR); \
@@ -111,7 +113,6 @@ install::
 	  rm -fr $(KNEM_CACHE); \
 	  make prefix=$(KNEM_CACHE) install \
 	)
-	cp post* $(ROOT)/$(RC_PKGROOT)/
 
 clean::
 	rm -fr $(SOURCE_DIR) DESCRIPTION LICENSE
