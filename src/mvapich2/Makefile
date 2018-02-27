@@ -62,6 +62,9 @@ include $(SDSCDEVEL)/Pull.mk
 include $(SDSCDEVEL)/Rules.mk
 
 COMPILE_FLAGS = -fPIC -O3
+
+LIMIC_CACHE = $(REDHAT.ROOT)/cache/build-limic
+
 # Parallel make breaks build with 2016 Intel compiler
 MAKE_OPTS =
 ifneq ("$(COMPILERNAME)", "intel")
@@ -156,13 +159,16 @@ build: $(SRC_DIRS)
 install::
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
 	$(PKGROOT_BIND_MOUNT)
-	$(MODULE_LOAD_CC); \
-	$(MODULE_LOAD_AUTOCONF); \
-	cd $(SOURCE_DIR); \
-	make $(MAKE_OPTS) install
-	if test "$(ROLLNETWORK)" = "ib"; then \
-	  /bin/cp -r $(LIMIC_CACHE)/* $(ROOT)/$(PKGROOT)/; \
-	fi
+	( \
+	   $(MODULE_LOAD_CC); \
+ 	   $(MODULE_LOAD_AUTOCONF); \
+	   cd $(SOURCE_DIR); \
+	   make $(MAKE_OPTS) install; \
+	   if test "$(ROLLNETWORK)" = "ib"; then \
+	     /bin/cp -r $(LIMIC_CACHE)/* $(ROOT)/$(PKGROOT)/; \
+             perl -pi -e "s!^libdir=.*!libdir=$(PKGROOT)/lib!"  $(ROOT)/$(PKGROOT)/lib/liblimic2.la; \
+	   fi \
+        )
 	$(PKGROOT_BIND_UMOUNT)
 	$(INSTALL_LICENSE_FILES)
 
