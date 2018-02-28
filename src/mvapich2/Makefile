@@ -148,6 +148,10 @@ build: $(SRC_DIRS)
 	  export CFLAGS="$(COMPILE_FLAGS)"; \
 	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
 	  export LD_LIBRARY_PATH=/opt/torque/lib64:$(LIMIC_CACHE)/lib:$${LD_LIBRARY_PATH}; \
+	  if test "$(ROLLNETWORK)" = "ib"; then \
+             /bin/cp $(LIMIC_CACHE)/lib/liblimic2.la.in $(LIMIC_CACHE)/lib/lib/liblimic2.la; \
+             perl -pi -e "s!COMPILERNAME!$(COMPILERNAME)!" $(LIMIC_CACHE)/lib/liblimic2.la; \
+          fi; \
 	  if test "$(COMPILERNAME)" = "gnu"; then \
 	    export MPICHLIB_CFLAGS='-std=gnu90'; \
 	  fi; \
@@ -160,13 +164,15 @@ install::
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
 	$(PKGROOT_BIND_MOUNT)
 	( \
+           echo $(LIMIC_CACHE_VIA_KERNEL_PACKAGE); \
+           exit; \
 	   $(MODULE_LOAD_CC); \
  	   $(MODULE_LOAD_AUTOCONF); \
 	   cd $(SOURCE_DIR); \
 	   make $(MAKE_OPTS) install; \
 	   if test "$(ROLLNETWORK)" = "ib"; then \
 	     /bin/cp -r $(LIMIC_CACHE)/* $(ROOT)/$(PKGROOT)/; \
-             perl -pi -e "s!^libdir=.*!libdir=$(PKGROOT)/lib!"  $(ROOT)/$(PKGROOT)/lib/liblimic2.la; \
+             rm -f $(ROOT)/$(PKGROOT)/lib/liblimic2.la.in; \
 	   fi \
         )
 	$(PKGROOT_BIND_UMOUNT)
