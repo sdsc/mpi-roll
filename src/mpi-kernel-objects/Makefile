@@ -124,5 +124,5 @@ install::
 	cp post* $(ROOT)/$(RC_PKGROOT)/
 
 clean::
-	rm -fr $(SOURCE_DIR) DESCRIPTION LICENSE
+	rm -fr $(SOURCE_DIR) DESCRIPTION LICENSE $(MVAPICH2_PKGROOT_INC)
 
