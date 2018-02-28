@@ -13,6 +13,7 @@ RELEASE        = 7
 PKGROOT        = /opt/mvapich2/$(COMPILERNAME)/$(ROLLNETWORK)
 
 MVAPICH2_PKGROOT = /opt/mvapich2/COMPILERNAME/$(ROLLNETWORK)
+MVAPICH2_ROOT    = /opt/mvapich2
 
 SRC_SUBDIR     = mvapich2
 
