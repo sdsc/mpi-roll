@@ -149,7 +149,7 @@ build: $(SRC_DIRS)
 	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
 	  export LD_LIBRARY_PATH=/opt/torque/lib64:$(LIMIC_CACHE)/lib:$${LD_LIBRARY_PATH}; \
 	  if test "$(ROLLNETWORK)" = "ib"; then \
-             /bin/cp $(LIMIC_CACHE)/lib/liblimic2.la.in $(LIMIC_CACHE)/lib/lib/liblimic2.la; \
+             /bin/cp $(LIMIC_CACHE)/lib/liblimic2.la.in $(LIMIC_CACHE)/lib/liblimic2.la; \
              perl -pi -e "s!COMPILERNAME!$(COMPILERNAME)!" $(LIMIC_CACHE)/lib/liblimic2.la; \
           fi; \
 	  if test "$(COMPILERNAME)" = "gnu"; then \
