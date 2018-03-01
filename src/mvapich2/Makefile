@@ -164,8 +164,6 @@ install::
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
 	$(PKGROOT_BIND_MOUNT)
 	( \
-           echo $(LIMIC_CACHE_VIA_KERNEL_PACKAGE); \
-           exit; \
 	   $(MODULE_LOAD_CC); \
  	   $(MODULE_LOAD_AUTOCONF); \
 	   cd $(SOURCE_DIR); \
