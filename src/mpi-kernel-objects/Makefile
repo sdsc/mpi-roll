@@ -83,10 +83,15 @@ LICENSE: $(SRC_DIRS)
 	$(CHECK_LICENSE_FILES)
 	echo BSD and GPLv2 > $@
 
-build: $(SRC_DIRS)
+$(MVAPICH2_PKGROOT_INC): $(MVAPICH2_PKGROOT_SRC)
+	/bin/grep 'MVAPICH2_PKGROOT.*=' $(MVAPICH2_PKGROOT_SRC) > $@
+	/bin/grep 'MVAPICH2_ROOT.*=' $(MVAPICH2_PKGROOT_SRC) >> $@
+
+build: $(SRC_DIRS) $(MVAPICH2_PKGROOT_INC)
+	echo $(MVAPICH2_PKGROOT) >o
 	if test "$(ROLLNETWORK)" = "ib"; then \
 	  cd $(SOURCE_DIR)/limic2-*; \
-	  ./configure --prefix=$(KO_PKGROOT) --enable-module; \
+	  ./configure --prefix=$(MVAPICH2_PKGROOT) --enable-module; \
 	  make -j 16; \
 	fi
 	( \
@@ -97,13 +102,18 @@ build: $(SRC_DIRS)
 
 install::
 	mkdir -p -m 755 $(ROOT)/$(KO_PKGROOT) $(ROOT)/$(RC_PKGROOT)
+	mkdir -p -m 755 $(ROOT)/$(KO_PKGROOT)/lib
 	if test "$(ROLLNETWORK)" = "ib"; then \
-	  cd $(SOURCE_DIR)/limic2-*; \
-	  cp `find . -name \*.ko` $(ROOT)/$(KO_PKGROOT)/; \
-	  rm -fr $(LIMIC_CACHE); \
-	  mkdir -p -m 755 $(LIMIC_CACHE); \
-	  make prefix=$(LIMIC_CACHE) -j 16 install; \
-	fi
+          cd $(SOURCE_DIR)/limic2-*; \
+          cp `find . -name \*.ko` $(ROOT)/$(KO_PKGROOT)/; \
+          rm -fr $(LIMIC_CACHE); \
+          mkdir -p -m 755 $(LIMIC_CACHE); \
+          make -j 16 install; \
+          cp -r $(MVAPICH2_PKGROOT)/* $(LIMIC_CACHE); \
+          rm -rf $(MVAPICH2_PKGROOT); \
+          cp -r $(LIMIC_CACHE)/lib/liblimic2.la $(LIMIC_CACHE)/lib/liblimic2.la.in; \
+          rm -rf $(MVAPICH2_ROOT); \
+        fi
 	( \
 	  cd $(KNEM_DIR); \
 	  mkdir -p -m 755 $(KNEM_CACHE); \
@@ -114,5 +124,5 @@ install::
 	cp post* $(ROOT)/$(RC_PKGROOT)/
 
 clean::
-	rm -fr $(SOURCE_DIR) DESCRIPTION LICENSE
+	rm -fr $(SOURCE_DIR) DESCRIPTION LICENSE $(MVAPICH2_PKGROOT_INC)
 

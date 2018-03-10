@@ -5,6 +5,11 @@ VERSION        = $(firstword $(subst -, ,$(KERNEL)))
 RELEASE        = $(lastword $(subst -, ,$(KERNEL)))
 PKGROOT        = /
 
+MVAPICH2_PKGROOT_SRC = $(REDHAT.ROOT)/src/mvapich2/version.mk
+MVAPICH2_PKGROOT_INC = mvapich2_pkgroot.inc
+include $(MVAPICH2_PKGROOT_INC)
+
+
 SRC_SUBDIR     = mpi-kernel-objects
 
 SOURCE_NAME    = mvapich2
