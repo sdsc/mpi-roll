@@ -77,7 +77,7 @@ ifeq ("$(COMPILERNAME)", "intel")
   COMPILE_FLAGS = -fPIC -O3
 else ifeq ("$(COMPILERNAME)", "pgi")
   COMPILE_FLAGS = -fPIC -O3 -noswitcherror
-  CONFIG_OPTS += --disable-rpath --disable-static --disable-rdma-cm --without-hydra-ckpointlib
+  CONFIG_OPTS += --disable-rpath --disable-static --disable-rdma-cm --without-hydra-ckpointlib --enable-f77 --enable-fc --enable-hybrid
 endif
 
 NETWORKSETUP = cat /dev/null
@@ -89,8 +89,7 @@ else ifeq ("$(ROLLNETWORK)", "mx")
   CONFIG_OPTS += --with-device=ch3:nemesis:mx --with-mx=$(MXHOME)
   NETWORKSETUP = export LD_LIBRARY_PATH=$(MXHOME)/lib:$$LD_LIBRARY_PATH
 else ifeq ("$(ROLLNETWORK)", "ib")
-  CONFIG_OPTS += --enable-f77 --enable-fc --enable-hybrid \
-                 --with-ib-include=/usr/include/infiniband \
+  CONFIG_OPTS += --with-ib-include=/usr/include/infiniband \
                  --with-ib-libpath=/usr/lib64 \
                  --enable-fast=O3 --with-limic2=$(LIMIC_CACHE)
 endif
@@ -121,13 +120,30 @@ MODULE_LOAD_AUTOCONF = $(call MODULE_LOAD_COMPILER, gnutools, autoconf)
 
 LIMIC_CACHE = $(REDHAT.ROOT)/cache/build-limic
 
+CUDABUILD=no
+ifneq ("$(ROLLOPTS)", "$(subst cuda,,$(ROLLOPTS))")
+  CUDABUILD=yes
+  CONFIG_OPTS += --enable-cuda --with-cuda=$${CUDAHOME}
+  ifneq (,$(wildcard /usr/lib64/nvidia))
+     export LDFLAGS=-L/usr/lib64/nvidia
+     export LIBS=-lnvidia-fatbinaryloader
+     export LD_LIBRARY_PATH=/usr/lib64/nvidia:$${LD_LIBRARY_PATH}
+  endif
+endif
+
+MODULE_LOAD_MVAPICH2_CUDA = $(call MODULE_LOAD_PACKAGE, $(CUDAVERSION), CUDAHOME)
+DESCRIBE_MVAPICH2_CUDA = echo built with cuda $(call GET_MODULE_VERSION, $(CUDAVERSION))
+
 $(NAME).spec: DESCRIPTION LICENSE
 
 DESCRIPTION:
 	$(MODULE_LOAD_CC); \
 	( \
 	  $(DESCRIBE_PKG); \
-	  $(DESCRIBE_CC) \
+	  $(DESCRIBE_CC); \
+          if test "$(CUDABUILD)" = "yes"; then \
+             $(DESCRIBE_MVAPICH2_CUDA); \
+          fi; \
 	) > $@
 
 LICENSE: $(SRC_DIRS)
@@ -135,10 +151,14 @@ LICENSE: $(SRC_DIRS)
 	echo BSD > $@
 
 build: $(SRC_DIRS)
+	patch $(SOURCE_DIR)/contrib/hwloc/config/hwloc.m4 patch-files/hwloc.m4.patch
 	( \
 	  $(MODULE_LOAD_CC); \
 	  $(MODULE_LOAD_AUTOCONF); \
 	  $(NETWORKSETUP); \
+          if test "$(CUDABUILD)" = "yes"; then \
+             $(MODULE_LOAD_MVAPICH2_CUDA); \
+          fi; \
 	  export CC=$(CC); \
 	  export CXX=$(CXX); \
 	  export F77=$(F77); \
@@ -155,7 +175,9 @@ build: $(SRC_DIRS)
 	  if test "$(COMPILERNAME)" = "gnu"; then \
 	    export MPICHLIB_CFLAGS='-std=gnu90'; \
 	  fi; \
-	  cd $(SOURCE_DIR); \
+	  cd $(SOURCE_DIR)/contrib/hwloc; \
+          bash autogen.sh; \
+          cd ../..; \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
 	  make $(MAKE_OPTS) \
 	)
