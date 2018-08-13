@@ -7,11 +7,6 @@ ifndef ROLLNETWORK
   ROLLNETWORK = eth
 endif
 
-CUDAVERSION=cuda
-ifneq ("$(ROLLOPTS)", "$(subst cuda=,,$(ROLLOPTS))")
-  CUDAVERSION = $(subst cuda=,,$(filter cuda=%,$(ROLLOPTS)))
-endif
-
 NAME           = sdsc-mvapich2_$(COMPILERNAME)_$(ROLLNETWORK)
 VERSION        = 2.3
 RELEASE        = 0

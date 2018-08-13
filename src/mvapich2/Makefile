@@ -73,6 +73,7 @@ endif
 
 CONFIG_OPTS = --enable-shared --enable-sharedlibs=gcc --with-hwloc
 
+CPPFLAGS=
 ifeq ("$(COMPILERNAME)", "intel")
   COMPILE_FLAGS = -fPIC -O3
 else ifeq ("$(COMPILERNAME)", "pgi")
@@ -120,20 +121,6 @@ MODULE_LOAD_AUTOCONF = $(call MODULE_LOAD_COMPILER, gnutools, autoconf)
 
 LIMIC_CACHE = $(REDHAT.ROOT)/cache/build-limic
 
-CUDABUILD=no
-ifneq ("$(ROLLOPTS)", "$(subst cuda,,$(ROLLOPTS))")
-  CUDABUILD=yes
-  CONFIG_OPTS += --enable-cuda --with-cuda=$${CUDAHOME}
-  ifneq (,$(wildcard /usr/lib64/nvidia))
-     export LDFLAGS=-L/usr/lib64/nvidia
-     export LIBS=-lnvidia-fatbinaryloader
-     export LD_LIBRARY_PATH=/usr/lib64/nvidia:$${LD_LIBRARY_PATH}
-  endif
-endif
-
-MODULE_LOAD_MVAPICH2_CUDA = $(call MODULE_LOAD_PACKAGE, $(CUDAVERSION), CUDAHOME)
-DESCRIBE_MVAPICH2_CUDA = echo built with cuda $(call GET_MODULE_VERSION, $(CUDAVERSION))
-
 $(NAME).spec: DESCRIPTION LICENSE
 
 DESCRIPTION:
@@ -141,9 +128,6 @@ DESCRIPTION:
 	( \
 	  $(DESCRIBE_PKG); \
 	  $(DESCRIBE_CC); \
-          if test "$(CUDABUILD)" = "yes"; then \
-             $(DESCRIBE_MVAPICH2_CUDA); \
-          fi; \
 	) > $@
 
 LICENSE: $(SRC_DIRS)
@@ -151,22 +135,19 @@ LICENSE: $(SRC_DIRS)
 	echo BSD > $@
 
 build: $(SRC_DIRS)
-	patch $(SOURCE_DIR)/contrib/hwloc/config/hwloc.m4 patch-files/hwloc.m4.patch
 	( \
 	  $(MODULE_LOAD_CC); \
 	  $(MODULE_LOAD_AUTOCONF); \
 	  $(NETWORKSETUP); \
-          if test "$(CUDABUILD)" = "yes"; then \
-             $(MODULE_LOAD_MVAPICH2_CUDA); \
-          fi; \
 	  export CC=$(CC); \
 	  export CXX=$(CXX); \
-	  export F77=$(F77); \
+	  export F77=$(FC); \
 	  export FC=$(FC); \
 	  export FFLAGS="$(COMPILE_FLAGS)"; \
 	  export FCFLAGS="$(COMPILE_FLAGS)"; \
 	  export CFLAGS="$(COMPILE_FLAGS)"; \
 	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
+          export CPPFLAGS="$(CPPFLAGS)"; \
 	  export LD_LIBRARY_PATH=/opt/torque/lib64:$(LIMIC_CACHE)/lib:$${LD_LIBRARY_PATH}; \
 	  if test "$(ROLLNETWORK)" = "ib"; then \
              /bin/cp $(LIMIC_CACHE)/lib/liblimic2.la.in $(LIMIC_CACHE)/lib/liblimic2.la; \
@@ -179,7 +160,7 @@ build: $(SRC_DIRS)
           bash autogen.sh; \
           cd ../..; \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
-	  make $(MAKE_OPTS) \
+	  make -j 16 $(MAKE_OPTS) \
 	)
 
 install::
@@ -189,7 +170,7 @@ install::
 	   $(MODULE_LOAD_CC); \
  	   $(MODULE_LOAD_AUTOCONF); \
 	   cd $(SOURCE_DIR); \
-	   make $(MAKE_OPTS) install; \
+	   make -j 16 $(MAKE_OPTS) install; \
 	   if test "$(ROLLNETWORK)" = "ib"; then \
 	     /bin/cp -r $(LIMIC_CACHE)/* $(ROOT)/$(PKGROOT)/; \
              rm -f $(ROOT)/$(PKGROOT)/lib/liblimic2.la.in; \
