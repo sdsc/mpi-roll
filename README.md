@@ -85,7 +85,7 @@ mvapich2 uses the slurm and torque options as well, but does not have
 an sge option.
 If `ROLLOPTS` contains 'cuda', then openmpi is compiled with gpu support. 
 If 'ROLLOPTS' contains 'lustre' then mvapich2 is compiled with i/o support for
-lustre file systems.
+If 'ROLLOPTS' contains 'slurm' then mvapich2 is compiled with support for the sllurm job scheduling system.
 
 
 ## Installation

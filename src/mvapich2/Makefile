@@ -73,11 +73,12 @@ endif
 
 CONFIG_OPTS = --enable-shared --enable-sharedlibs=gcc --with-hwloc
 
+CPPFLAGS=
 ifeq ("$(COMPILERNAME)", "intel")
   COMPILE_FLAGS = -fPIC -O3
 else ifeq ("$(COMPILERNAME)", "pgi")
   COMPILE_FLAGS = -fPIC -O3 -noswitcherror
-  CONFIG_OPTS += --disable-rpath --disable-static --disable-rdma-cm --without-hydra-ckpointlib
+  CONFIG_OPTS += --disable-rpath --disable-static --disable-rdma-cm --without-hydra-ckpointlib --enable-f77 --enable-fc --enable-hybrid
 endif
 
 NETWORKSETUP = cat /dev/null
@@ -89,8 +90,7 @@ else ifeq ("$(ROLLNETWORK)", "mx")
   CONFIG_OPTS += --with-device=ch3:nemesis:mx --with-mx=$(MXHOME)
   NETWORKSETUP = export LD_LIBRARY_PATH=$(MXHOME)/lib:$$LD_LIBRARY_PATH
 else ifeq ("$(ROLLNETWORK)", "ib")
-  CONFIG_OPTS += --enable-f77 --enable-fc --enable-hybrid \
-                 --with-ib-include=/usr/include/infiniband \
+  CONFIG_OPTS += --with-ib-include=/usr/include/infiniband \
                  --with-ib-libpath=/usr/lib64 \
                  --enable-fast=O3 --with-limic2=$(LIMIC_CACHE)
 endif
@@ -127,7 +127,7 @@ DESCRIPTION:
 	$(MODULE_LOAD_CC); \
 	( \
 	  $(DESCRIBE_PKG); \
-	  $(DESCRIBE_CC) \
+	  $(DESCRIBE_CC); \
 	) > $@
 
 LICENSE: $(SRC_DIRS)
@@ -141,12 +141,13 @@ build: $(SRC_DIRS)
 	  $(NETWORKSETUP); \
 	  export CC=$(CC); \
 	  export CXX=$(CXX); \
-	  export F77=$(F77); \
+	  export F77=$(FC); \
 	  export FC=$(FC); \
 	  export FFLAGS="$(COMPILE_FLAGS)"; \
 	  export FCFLAGS="$(COMPILE_FLAGS)"; \
 	  export CFLAGS="$(COMPILE_FLAGS)"; \
 	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
+          export CPPFLAGS="$(CPPFLAGS)"; \
 	  export LD_LIBRARY_PATH=/opt/torque/lib64:$(LIMIC_CACHE)/lib:$${LD_LIBRARY_PATH}; \
 	  if test "$(ROLLNETWORK)" = "ib"; then \
              /bin/cp $(LIMIC_CACHE)/lib/liblimic2.la.in $(LIMIC_CACHE)/lib/liblimic2.la; \
@@ -155,9 +156,11 @@ build: $(SRC_DIRS)
 	  if test "$(COMPILERNAME)" = "gnu"; then \
 	    export MPICHLIB_CFLAGS='-std=gnu90'; \
 	  fi; \
-	  cd $(SOURCE_DIR); \
+	  cd $(SOURCE_DIR)/contrib/hwloc; \
+          bash autogen.sh; \
+          cd ../..; \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
-	  make $(MAKE_OPTS) \
+	  make -j 16 $(MAKE_OPTS) \
 	)
 
 install::
@@ -167,7 +170,7 @@ install::
 	   $(MODULE_LOAD_CC); \
  	   $(MODULE_LOAD_AUTOCONF); \
 	   cd $(SOURCE_DIR); \
-	   make $(MAKE_OPTS) install; \
+	   make -j 16 $(MAKE_OPTS) install; \
 	   if test "$(ROLLNETWORK)" = "ib"; then \
 	     /bin/cp -r $(LIMIC_CACHE)/* $(ROOT)/$(PKGROOT)/; \
              rm -f $(ROOT)/$(PKGROOT)/lib/liblimic2.la.in; \
