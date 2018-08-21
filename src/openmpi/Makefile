@@ -158,10 +158,12 @@ build: $(SRC_DIRS)
 	      export CXX="$(CXX) -noswitcherror"; \
 	      export F77="$(F77) -noswitcherror"; \
 	      export FC="$(FC) -noswitcherror"; \
+              patch  $(SOURCE_DIR)/ompi/mca/fs/lustre/fs_lustre.c patch-files/fs_lustre.c.patch; \
+              patch  $(SOURCE_DIR)/ompi/mca/fs/lustre/fs_lustre.h patch-files/fs_lustre.h.patch; \
           fi; \
 	  cd $(SOURCE_DIR); \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
-	  make -j 16 \
+	  make -j 16  \
 	)
 
 install::
