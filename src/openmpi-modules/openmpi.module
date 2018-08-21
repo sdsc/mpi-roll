@@ -32,3 +32,6 @@ set mpiHome /opt/openmpi/$compiler/ROLLNETWORK
 setenv MPIHOME $mpiHome
 prepend-path PATH $mpiHome/bin
 prepend-path LD_LIBRARY_PATH $mpiHome/lib
+if { [ catch  { exec /usr/bin/nvidia-smi >& /dev/null } msg ] } {
+    setenv OMPI_MCA_mpi_cuda_support 0
+}
