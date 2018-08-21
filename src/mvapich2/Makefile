@@ -66,10 +66,6 @@ COMPILE_FLAGS = -fPIC -O3
 LIMIC_CACHE = $(REDHAT.ROOT)/cache/build-limic
 
 # Parallel make breaks build with 2016 Intel compiler
-MAKE_OPTS =
-ifneq ("$(COMPILERNAME)", "intel")
-  MAKE_OPTS += -j 16
-endif
 
 CONFIG_OPTS = --enable-shared --enable-sharedlibs=gcc --with-hwloc
 
@@ -160,7 +156,7 @@ build: $(SRC_DIRS)
           bash autogen.sh; \
           cd ../..; \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
-	  make -j 16 $(MAKE_OPTS) \
+	  make -j 16 \
 	)
 
 install::
