@@ -60,7 +60,7 @@ ifndef ROLLCOMPILER
 endif
 
 ifndef ROLLMPI
-  ROLLMPI = mvapich2 openmpi openmpi2
+  ROLLMPI = mvapich2 openmpi
 endif
 
 ifndef ROLLNETWORK
