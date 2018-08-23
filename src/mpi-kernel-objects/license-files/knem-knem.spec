@@ -27,7 +27,7 @@
 
 Summary: KNEM: High-Performance Intra-Node MPI Communication
 Name: knem
-Version: 1.1.2
+Version: 1.1.3
 Release: 0
 License: BSD and GPLv2
 Group: System Environment/Libraries

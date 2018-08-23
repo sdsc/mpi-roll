@@ -1,0 +1,11 @@
+--- openmpi-3.1.1/ompi/mca/fs/lustre/fs_lustre.c	2018-06-29 09:08:13.000000000 -0700
++++ patch-files/fs_lustre.c	2018-08-21 12:21:09.497270583 -0700
+@@ -88,7 +88,7 @@
+     tmp = strchr (fh->f_filename, ':');
+     if (!tmp) {
+         if (OMPIO_ROOT == fh->f_rank) {
+-            fh->f_fstype = mca_fs_base_get_fstype ( fh->f_filename );
++            fh->f_fstype = mca_fs_base_get_fstype ( (char *) fh->f_filename );
+         }
+ 	fh->f_comm->c_coll->coll_bcast (&(fh->f_fstype),
+ 				       1,

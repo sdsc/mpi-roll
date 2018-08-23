@@ -14,6 +14,7 @@ my $output;
 my $TESTFILE = 'tmpmpi';
 my $NODECOUNT = 4;
 my $LASTNODE = $NODECOUNT - 1;
+my $KO_PKGROOT = '/lib/modules/KERNEL/extra';
 
 open(OUT, ">$TESTFILE.c");
 print OUT <<END;
@@ -72,11 +73,11 @@ foreach my $mpi (@MPIS) {
         `rm -f $TESTFILE.exe`;
 
         if($mpi eq 'mvapich2' && $network eq 'ib') {
-          ok(-f "/opt/$mpi/$compilername/$network/include/limic.h" &&
+          ok(-f "$KO_PKGROOT/limic.ko" &&
              -f "/opt/$mpi/$compilername/$network/lib/liblimic2.so",
              "limic available for $mpi/$compilername/$network");
         } elsif($mpi eq 'openmpi') {
-          ok(-f "/opt/$mpi/$compilername/$network/include/knem_io.h",
+          ok(-f "$KO_PKGROOT/knem.ko",
              "knem available for $mpi/$compilername/$network");
         }
 

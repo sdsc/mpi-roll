@@ -86,13 +86,12 @@ endif
 # and pgi compilers accept it.
 CONFIG_OPTS = \
   --enable-static --enable-mca-static \
-  --with-mpi-f90-size=medium --disable-mpi-interface-warning \
-  --with-platform=optimized --with-wrapper-cflags='$(WRAPPER_FLAGS)' \
+  --disable-mpi-interface-warning --with-platform=optimized \
+  --with-wrapper-cflags='$(WRAPPER_FLAGS)' \
   --with-wrapper-cxxflags='$(WRAPPER_FLAGS)' \
-  --with-wrapper-fflags='$(WRAPPER_FLAGS)' \
   --with-wrapper-fcflags='$(WRAPPER_FLAGS)' \
-  --with-knem=$(KNEM_CACHE) \
-  --enable-mpi-ext=affinity
+  --enable-mpi-ext=affinity \
+  --enable-show-load-errors-by-default=no
 
 ifneq ("$(ROLLNETWORK)", "ib")
   CONFIG_OPTS += --without-openib
@@ -122,7 +121,9 @@ ifneq ("$(ROLLOPTS)", "$(subst slurm,,$(ROLLOPTS))")
   CONFIG_OPTS += --with-pmi=/usr
 endif
 
-KNEM_CACHE = $(REDHAT.ROOT)/cache/build-knem
+ifneq ("$(ROLLOPTS)", "$(subst lustre,,$(ROLLOPTS))")
+  CONFIG_OPTS += --with-lustre=/usr
+endif
 
 $(NAME).spec: DESCRIPTION LICENSE
 
@@ -150,29 +151,29 @@ build: $(SRC_DIRS)
 	  export CFLAGS="$(COMPILE_FLAGS)"; \
 	  export CXX=$(CXX); \
 	  export CXXFLAGS="$(COMPILE_FLAGS)"; \
-	  export F77=$(F77); \
-	  export FFLAGS="$(COMPILE_FLAGS) $(COMPILE_FFLAGS)"; \
 	  export FC=$(FC); \
 	  export FCFLAGS="$(COMPILE_FLAGS) $(COMPILE_FFLAGS)"; \
           if test $(COMPILERNAME) = "pgi"; then \
-              patch $(SOURCE_DIR)/ompi/mpi/fortran/base/gen-mpi-sizeof.pl patch-files/gen-mpi-sizeof.pl.patch; \
 	      export CC="$(CC) -noswitcherror"; \
 	      export CXX="$(CXX) -noswitcherror"; \
 	      export F77="$(F77) -noswitcherror"; \
 	      export FC="$(FC) -noswitcherror"; \
+              patch  $(SOURCE_DIR)/ompi/mca/fs/lustre/fs_lustre.c patch-files/fs_lustre.c.patch; \
+              patch  $(SOURCE_DIR)/ompi/mca/fs/lustre/fs_lustre.h patch-files/fs_lustre.h.patch; \
           fi; \
 	  cd $(SOURCE_DIR); \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
-	  make -j 16 \
+	  make -j 16  \
 	)
 
 install::
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
 	$(PKGROOT_BIND_MOUNT)
-	$(MODULE_LOAD_CC); \
-	cd $(SOURCE_DIR); \
-	make -j 16 install
-	/bin/cp -r $(KNEM_CACHE)/* $(ROOT)/$(PKGROOT)
+	( \
+	  $(MODULE_LOAD_CC); \
+	  cd $(SOURCE_DIR); \
+	  make install \
+	)
 	$(PKGROOT_BIND_UMOUNT)
 	$(INSTALL_LICENSE_FILES)
 
