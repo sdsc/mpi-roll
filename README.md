@@ -61,7 +61,7 @@ modulefiles to use for building the software, e.g.,
 The build processes recognizes the values `gnu`, `intel` and `pgi` for the
 ROLLCOMPILER value, defaulting to gnu.
 
-By default, the roll builds openmpi, openmpi2, and mvapich2 rpms.  You can
+By default, the roll builds openmpi, and mvapich2 rpms.  You can
 limit the build to a subset of these using the ROLLMPI make variable, e.g.,
 
 ```shell
@@ -115,7 +115,7 @@ In addition to the software itself, the roll installs package environment
 module files in (for example with an ib network):
 
 ```shell
-/opt/modulefiles/mpi/{mvapich2_ib,openmpi_ib,openmpi2_ib}
+/opt/modulefiles/mpi/{mvapich2_ib,openmpi_ib}
 ```
 
 
