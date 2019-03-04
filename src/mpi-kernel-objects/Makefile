@@ -88,7 +88,6 @@ $(MVAPICH2_PKGROOT_INC): $(MVAPICH2_PKGROOT_SRC)
 	/bin/grep 'MVAPICH2_ROOT.*=' $(MVAPICH2_PKGROOT_SRC) >> $@
 
 build: $(SRC_DIRS) $(MVAPICH2_PKGROOT_INC)
-	echo $(MVAPICH2_PKGROOT) >o
 	if test "$(ROLLNETWORK)" = "ib"; then \
 	  cd $(SOURCE_DIR)/limic2-*; \
           export CC=/bin/gcc; \
