@@ -88,13 +88,18 @@ $(MVAPICH2_PKGROOT_INC): $(MVAPICH2_PKGROOT_SRC)
 	/bin/grep 'MVAPICH2_ROOT.*=' $(MVAPICH2_PKGROOT_SRC) >> $@
 
 build: $(SRC_DIRS) $(MVAPICH2_PKGROOT_INC)
+	echo $(MVAPICH2_PKGROOT) >o
 	if test "$(ROLLNETWORK)" = "ib"; then \
-          export PATH=/bin:$${PATH}; \
 	  cd $(SOURCE_DIR)/limic2-*; \
+          export CC=/bin/gcc; \
+          export CXX=/bin/g++; \
+          export PATH=/bin:$${PATH}; \
 	  ./configure --prefix=$(MVAPICH2_PKGROOT) --enable-module; \
 	  make -j 16; \
 	fi
 	( \
+          export CC=/bin/gcc; \
+          export CXX=/bin/g++; \
           export PATH=/bin:$${PATH}; \
 	  cd $(KNEM_DIR); \
 	  ./configure --prefix=$(KO_PKGROOT); \
@@ -105,7 +110,9 @@ install::
 	mkdir -p -m 755 $(ROOT)/$(KO_PKGROOT) $(ROOT)/$(RC_PKGROOT)
 	mkdir -p -m 755 $(ROOT)/$(KO_PKGROOT)/lib
 	if test "$(ROLLNETWORK)" = "ib"; then \
-          export PATH=/bin/gcc:$${PATH}; \
+          export CC=/bin/gcc; \
+          export CXX=/bin/g++; \
+          export PATH=/bin:$${PATH}; \
           cd $(SOURCE_DIR)/limic2-*; \
           cp `find . -name \*.ko` $(ROOT)/$(KO_PKGROOT)/; \
           rm -fr $(LIMIC_CACHE); \
@@ -117,6 +124,8 @@ install::
           rm -rf $(MVAPICH2_ROOT); \
         fi
 	( \
+          export CC=/bin/gcc; \
+          export CXX=/bin/g++; \
           export PATH=/bin:$${PATH}; \
 	  cd $(KNEM_DIR); \
 	  mkdir -p -m 755 $(KNEM_CACHE); \
