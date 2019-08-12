@@ -1,10 +1,10 @@
---- openmpi-3.1.1/ompi/mca/fs/lustre/fs_lustre.h	2018-06-29 09:08:13.000000000 -0700
-+++ patch-files/fs_lustre.h	2018-08-21 12:21:09.498270579 -0700
-@@ -19,6 +19,7 @@
-  *
+--- openmpi-3.1.4/ompi/mca/fs/lustre/fs_lustre.h	2019-04-15 12:49:43.000000000 -0700
++++ patch-files/fs_lustre.h	2019-08-12 22:25:06.703478882 -0700
+@@ -20,6 +20,7 @@
   * $HEADER$
   */
-+typedef unsigned long int u_int64_t;
  
++typedef unsigned long int u_int64_t;
  #ifndef MCA_FS_LUSTRE_H
  #define MCA_FS_LUSTRE_H
+ 

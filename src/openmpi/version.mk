@@ -8,7 +8,7 @@ ifndef ROLLNETWORK
 endif
 
 NAME           = sdsc-openmpi_$(COMPILERNAME)_$(ROLLNETWORK)
-VERSION        = 3.1.1
+VERSION        = 3.1.4
 RELEASE        = 0
 PKGROOT        = /opt/openmpi/$(COMPILERNAME)/$(ROLLNETWORK)
 
