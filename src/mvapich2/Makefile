@@ -70,10 +70,8 @@ LIMIC_CACHE = $(REDHAT.ROOT)/cache/build-limic
 CONFIG_OPTS = --enable-shared --enable-sharedlibs=gcc --with-hwloc
 
 CPPFLAGS=
-ifeq ("$(COMPILERNAME)", "intel")
-  COMPILE_FLAGS = -fPIC -O3
-else ifeq ("$(COMPILERNAME)", "pgi")
-  COMPILE_FLAGS = -fPIC -O3 -noswitcherror
+ifeq ("$(COMPILERNAME)", "pgi")
+  COMPILE_FLAGS = -fPIC -O0 -noswitcherror
   CONFIG_OPTS += --disable-rpath --disable-static --disable-rdma-cm --without-hydra-ckpointlib --enable-f77 --enable-fc --enable-hybrid
 endif
 
