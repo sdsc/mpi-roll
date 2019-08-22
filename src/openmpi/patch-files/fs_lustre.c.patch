@@ -1,5 +1,5 @@
---- openmpi-3.1.1/ompi/mca/fs/lustre/fs_lustre.c	2018-06-29 09:08:13.000000000 -0700
-+++ patch-files/fs_lustre.c	2018-08-21 12:21:09.497270583 -0700
+--- openmpi-3.1.4/ompi/mca/fs/lustre/fs_lustre.c	2019-04-15 12:49:43.000000000 -0700
++++ patch-files/fs_lustre.c	2019-08-12 22:22:20.592966239 -0700
 @@ -88,7 +88,7 @@
      tmp = strchr (fh->f_filename, ':');
      if (!tmp) {

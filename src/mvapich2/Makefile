@@ -113,8 +113,6 @@ ifneq ("$(ROLLOPTS)", "$(subst lustre,,$(ROLLOPTS))")
   CONFIG_OPTS += --with-file-system=lustre
 endif
 
-MODULE_LOAD_AUTOCONF = $(call MODULE_LOAD_COMPILER, gnutools, autoconf)
-
 LIMIC_CACHE = $(REDHAT.ROOT)/cache/build-limic
 
 $(NAME).spec: DESCRIPTION LICENSE
@@ -131,9 +129,9 @@ LICENSE: $(SRC_DIRS)
 	echo BSD > $@
 
 build: $(SRC_DIRS)
+	patch $(SOURCE_DIR)/src/pm/hydra/configure patch-files/configure.hydra.patch
 	( \
 	  $(MODULE_LOAD_CC); \
-	  $(MODULE_LOAD_AUTOCONF); \
 	  $(NETWORKSETUP); \
 	  export CC=$(CC); \
 	  export CXX=$(CXX); \
@@ -152,11 +150,9 @@ build: $(SRC_DIRS)
 	  if test "$(COMPILERNAME)" = "gnu"; then \
 	    export MPICHLIB_CFLAGS='-std=gnu90'; \
 	  fi; \
-	  cd $(SOURCE_DIR)/contrib/hwloc; \
-          bash autogen.sh; \
-          cd ../..; \
+          cd $(SOURCE_DIR); \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
-	  make -j 16 \
+	  make -j 16; \
 	)
 
 install::
@@ -164,7 +160,6 @@ install::
 	$(PKGROOT_BIND_MOUNT)
 	( \
 	   $(MODULE_LOAD_CC); \
- 	   $(MODULE_LOAD_AUTOCONF); \
 	   cd $(SOURCE_DIR); \
 	   make -j 16 $(MAKE_OPTS) install; \
 	   if test "$(ROLLNETWORK)" = "ib"; then \

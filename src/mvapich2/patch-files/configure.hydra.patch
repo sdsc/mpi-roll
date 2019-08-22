@@ -1,0 +1,18 @@
+--- mvapich2-2.3/src/pm/hydra/configure	2018-07-25 06:34:35.000000000 -0700
++++ patch-files/configure	2019-08-13 13:45:25.265393911 -0700
+@@ -23920,11 +23920,11 @@
+   return 0;
+ }
+ _ACEOF
+-if ac_fn_c_try_link "$LINENO"; then :
+-  ac_cv_lib_XNVCtrl_XNVCTRLQueryTargetAttribute=yes
+-else
++#if ac_fn_c_try_link "$LINENO"; then :
++#  ac_cv_lib_XNVCtrl_XNVCTRLQueryTargetAttribute=yes
++#else
+   ac_cv_lib_XNVCtrl_XNVCTRLQueryTargetAttribute=no
+-fi
++#fi
+ rm -f core conftest.err conftest.$ac_objext \
+     conftest$ac_exeext conftest.$ac_ext
+ LIBS=$ac_check_lib_save_LIBS

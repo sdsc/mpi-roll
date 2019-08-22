@@ -91,7 +91,8 @@ CONFIG_OPTS = \
   --with-wrapper-cxxflags='$(WRAPPER_FLAGS)' \
   --with-wrapper-fcflags='$(WRAPPER_FLAGS)' \
   --enable-mpi-ext=affinity \
-  --enable-show-load-errors-by-default=no
+  --enable-show-load-errors-by-default=no \
+  --enable-orterun-prefix-by-default
 
 ifneq ("$(ROLLNETWORK)", "ib")
   CONFIG_OPTS += --without-openib
@@ -160,6 +161,8 @@ build: $(SRC_DIRS)
 	      export FC="$(FC) -noswitcherror"; \
               patch  $(SOURCE_DIR)/ompi/mca/fs/lustre/fs_lustre.c patch-files/fs_lustre.c.patch; \
               patch  $(SOURCE_DIR)/ompi/mca/fs/lustre/fs_lustre.h patch-files/fs_lustre.h.patch; \
+          elif test $(COMPILERNAME) = "intel"; then \
+              export LDFLAGS="-Wc,-static-intel"; \
           fi; \
 	  cd $(SOURCE_DIR); \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
