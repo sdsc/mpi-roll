@@ -145,9 +145,6 @@ build: $(SRC_DIRS)
              /bin/cp $(LIMIC_CACHE)/lib/liblimic2.la.in $(LIMIC_CACHE)/lib/liblimic2.la; \
              perl -pi -e "s!COMPILERNAME!$(COMPILERNAME)!" $(LIMIC_CACHE)/lib/liblimic2.la; \
           fi; \
-	  if test "$(COMPILERNAME)" = "gnu"; then \
-	    export MPICHLIB_CFLAGS='-std=gnu90'; \
-	  fi; \
           cd $(SOURCE_DIR); \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
 	  make -j 16; \
