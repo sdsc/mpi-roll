@@ -70,10 +70,8 @@ LIMIC_CACHE = $(REDHAT.ROOT)/cache/build-limic
 CONFIG_OPTS = --enable-shared --enable-sharedlibs=gcc --with-hwloc
 
 CPPFLAGS=
-ifeq ("$(COMPILERNAME)", "intel")
-  COMPILE_FLAGS = -fPIC -O3
-else ifeq ("$(COMPILERNAME)", "pgi")
-  COMPILE_FLAGS = -fPIC -O3 -noswitcherror
+ifeq ("$(COMPILERNAME)", "pgi")
+  COMPILE_FLAGS = -fPIC -O0 -noswitcherror
   CONFIG_OPTS += --disable-rpath --disable-static --disable-rdma-cm --without-hydra-ckpointlib --enable-f77 --enable-fc --enable-hybrid
 endif
 
@@ -147,9 +145,6 @@ build: $(SRC_DIRS)
              /bin/cp $(LIMIC_CACHE)/lib/liblimic2.la.in $(LIMIC_CACHE)/lib/liblimic2.la; \
              perl -pi -e "s!COMPILERNAME!$(COMPILERNAME)!" $(LIMIC_CACHE)/lib/liblimic2.la; \
           fi; \
-	  if test "$(COMPILERNAME)" = "gnu"; then \
-	    export MPICHLIB_CFLAGS='-std=gnu90'; \
-	  fi; \
           cd $(SOURCE_DIR); \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
 	  make -j 16; \
