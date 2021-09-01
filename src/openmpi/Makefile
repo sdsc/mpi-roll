@@ -163,6 +163,9 @@ build: $(SRC_DIRS)
               patch  $(SOURCE_DIR)/ompi/mca/fs/lustre/fs_lustre.h patch-files/fs_lustre.h.patch; \
           elif test $(COMPILERNAME) = "intel"; then \
               export LDFLAGS="-Wc,-static-intel"; \
+              patch  $(SOURCE_DIR)/ompi/mca/fs/lustre/fs_lustre.c patch-files/fs_lustre.c_2.patch; \
+          else \
+              patch  $(SOURCE_DIR)/ompi/mca/fs/lustre/fs_lustre.c patch-files/fs_lustre.c_2.patch; \
           fi; \
 	  cd $(SOURCE_DIR); \
 	  ./configure --prefix=$(PKGROOT) $(CONFIG_OPTS); \
