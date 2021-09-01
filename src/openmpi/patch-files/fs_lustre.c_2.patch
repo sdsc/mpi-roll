@@ -1,5 +1,5 @@
 --- openmpi-3.1.4/ompi/mca/fs/lustre/fs_lustre.c	2019-04-15 12:49:43.000000000 -0700
-+++ patch-files/fs_lustre.c	2021-08-31 18:34:46.474847238 -0700
++++ patch-files/fs_lustre.c	2021-08-31 17:59:14.412830014 -0700
 @@ -23,6 +23,9 @@
   * modules just to query their version and parameters
   */
@@ -20,12 +20,3 @@
  #ifdef HAVE_SYS_STAT_H
  #include <sys/stat.h>
  #endif
-@@ -88,7 +88,7 @@
-     tmp = strchr (fh->f_filename, ':');
-     if (!tmp) {
-         if (OMPIO_ROOT == fh->f_rank) {
--            fh->f_fstype = mca_fs_base_get_fstype ( fh->f_filename );
-+            fh->f_fstype = mca_fs_base_get_fstype ( (char *) fh->f_filename );
-         }
- 	fh->f_comm->c_coll->coll_bcast (&(fh->f_fstype),
- 				       1,
